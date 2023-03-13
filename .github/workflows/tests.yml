@@ -27,11 +27,9 @@ jobs:
       run: ./gradlew createDebugUnitTestCoverageReport
       
     - name: Run instrumented tests with Gradle
-      uses: reactivecircus/android-emulator-runner@v2.26.0
+      uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        target: google_apis
-        arch: x86_64
         script: ./gradlew createDebugAndroidTestCoverageReport
 
     - name: Upload coverage reports to Codecov
