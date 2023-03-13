@@ -20,7 +20,7 @@ class HomeScreenInstrumentedTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun basicTest() {
+    fun checkAnimation() {
         // Start the app
         composeTestRule.setContent {
             HomeScreen()
