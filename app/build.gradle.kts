@@ -59,6 +59,16 @@ android {
     }
 }
 
+tasks.register<Copy>("installGitHooks") {
+    val source = File(rootProject.rootDir, "scripts/pre-commit")
+    val destination = File(rootProject.rootDir, ".git/hooks")
+
+    from(source)
+    into(destination)
+}
+
+tasks.getByName("build").dependsOn("installGitHooks")
+
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
 
