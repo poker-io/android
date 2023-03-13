@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
       run: ./gradlew createDebugUnitTestCoverageReport
       
     - name: Run instrumented tests with Gradle
-      uses: reactivecircus/android-emulator-runner@v2
+      uses: vgaidarji/android-github-actions-emulator@v1.0.1
       with:
         api-level: 29
         target: google_apis
