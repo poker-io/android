@@ -1,11 +1,12 @@
 package com.pokerio.app
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-
-import org.junit.Test
-
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import org.junit.Rule
+import org.junit.Test
 
 /**
  * Instrumented test, which will execute on an Android device.
