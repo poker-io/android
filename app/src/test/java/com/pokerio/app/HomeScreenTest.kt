@@ -9,9 +9,10 @@ import org.junit.Assert.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class HomeScreenTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun testGetAnimatedString() {
+        assertEquals("Jetpack Compose", getAnimatedString())
     }
+
 }
