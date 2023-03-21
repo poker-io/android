@@ -7,11 +7,13 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
+        super.onMessageReceived(message)
         Log.d(TAG, "Received Message from: ${message.from}")
         Log.d(TAG, "Data: ${message.data}")
     }
 
     override fun onNewToken(token: String) {
+        super.onNewToken(token)
         Log.d(TAG, "New Token: $token")
     }
 
