@@ -2,6 +2,9 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
+
+    // Firebase
+    id("com.google.gms.google-services")
 }
 
 fun versionCode(): Int {
@@ -92,4 +95,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.6.1")
     implementation("androidx.navigation:navigation-compose:2.5.3")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:31.2.3"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
 }
