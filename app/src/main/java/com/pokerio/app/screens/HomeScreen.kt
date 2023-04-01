@@ -5,14 +5,11 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -36,12 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.R
 
 @Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,21 +51,22 @@ fun HomeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         StartGameCard()
-        BottomRow()
+        BottomRow(navigateToSettings = navigateToSettings)
     }
 }
 
 @Preview
 @Composable
 private fun BottomRow(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = { navigateToSettings() }) {
             Icon(
                 Icons.Rounded.Settings,
                 contentDescription = stringResource(id = R.string.contentDescription_settings_icon)
@@ -139,4 +141,8 @@ private fun createGame(context: Context) {
     Toast
         .makeText(context, "TODO: Creating game", Toast.LENGTH_LONG)
         .show()
+}
+
+private class UnitProvider : PreviewParameterProvider<() -> Unit> {
+    override val values = listOf({}).asSequence()
 }
