@@ -34,14 +34,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.R
+import com.pokerio.app.utils.UnitUnitProvider
 
 @Preview
 @Composable
 fun HomeScreen(
-    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit
+    @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -59,7 +59,7 @@ fun HomeScreen(
 @Composable
 private fun BottomRow(
     modifier: Modifier = Modifier,
-    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit
+    @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -141,8 +141,4 @@ private fun createGame(context: Context) {
     Toast
         .makeText(context, "TODO: Creating game", Toast.LENGTH_LONG)
         .show()
-}
-
-private class UnitProvider : PreviewParameterProvider<() -> Unit> {
-    override val values = listOf({}).asSequence()
 }

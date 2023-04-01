@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.SettingsScreen
+import com.pokerio.app.utils.discard
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,23 +34,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun MainActivityComposable() {
+    private fun MainActivityComposable() {
         val navController = rememberNavController()
 
         val navigateToSettings = {
             navController.navigate("settings")
         }
+        val navigateBack = {
+            navController.navigateUp().discard()
+        }
 
         Surface(modifier = Modifier.fillMaxSize()) {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") { HomeScreen(navigateToSettings = navigateToSettings) }
-                composable("settings") { SettingsScreen() }
+                composable("settings") { SettingsScreen(navigateBack = navigateBack) }
             }
         }
     }
 
     @Composable
-    fun AppTheme(
+    private fun AppTheme(
         useDarkTheme: Boolean = isSystemInDarkTheme(),
         content: @Composable () -> Unit
     ) {

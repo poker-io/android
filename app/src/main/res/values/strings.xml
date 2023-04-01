@@ -7,7 +7,16 @@
     <string name="error_game_code_empty">Game code cannot be empty!</string>
     <string name="error_game_code_incorrect">Game code is incorrect!</string>
 
+    <!-- Settings screen -->
+    <string name="settings">Settings</string>
+    <string name="starting_funds">Starting funds</string>
+    <string name="small_blind">Small blind</string>
+
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>
     <string name="contentDescription_settings_icon">Settings icon</string>
+    <string name="contentDescription_navigate_back">Navigate back</string>
+
+    <!-- Internal -->
+    <string name="shared_preferences_file">com.pokerio.app.SHARED_PREFERENCES</string>
 </resources>
