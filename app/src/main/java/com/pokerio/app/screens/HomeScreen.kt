@@ -45,9 +45,11 @@ import com.pokerio.app.R
 @Composable
 fun HomeScreen() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         StartGameCard()
         BottomRow()
@@ -85,9 +87,10 @@ private fun StartGameCard(
     Card(
         modifier = modifier.wrapContentSize(Alignment.Center)
     ) {
-        Column(modifier = Modifier
-            .padding(10.dp)
-            .width(IntrinsicSize.Max)
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .width(IntrinsicSize.Max)
         ) {
             Row(
                 modifier = Modifier.height(IntrinsicSize.Max),
@@ -97,7 +100,7 @@ private fun StartGameCard(
                     value = gameCode,
                     onValueChange = { gameCode = it },
                     label = { Text(stringResource(R.string.label_game_code)) },
-                    modifier = Modifier.padding(PaddingValues(end = 10.dp)),
+                    modifier = Modifier.padding(PaddingValues(end = 10.dp))
                 )
                 OutlinedButton(
                     onClick = { joinGame(context, gameCode) },
@@ -111,7 +114,7 @@ private fun StartGameCard(
                     Icon(
                         Icons.Rounded.PlayArrow,
                         contentDescription =
-                            stringResource(id = R.string.contentDescription_join_game_button)
+                        stringResource(id = R.string.contentDescription_join_game_button)
                     )
                 }
             }
@@ -120,7 +123,7 @@ private fun StartGameCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(PaddingValues(top = 10.dp)),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(stringResource(R.string.new_game))
             }
