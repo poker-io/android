@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -25,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -86,12 +83,11 @@ private fun StartGameCard(
     var gameCode by remember { mutableStateOf("") }
 
     Card(
-        modifier = modifier.wrapContentSize(Alignment.Center)
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
                 .padding(10.dp)
-                .width(IntrinsicSize.Max)
         ) {
             OutlinedTextField(
                 value = gameCode,
