@@ -59,7 +59,7 @@ fun HomeScreen(
 @Composable
 private fun BottomRow(
     modifier: Modifier = Modifier,
-    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit,
+    @PreviewParameter(UnitProvider::class) navigateToSettings: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
