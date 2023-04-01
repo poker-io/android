@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,31 +93,26 @@ private fun StartGameCard(
                 .padding(10.dp)
                 .width(IntrinsicSize.Max)
         ) {
-            Row(
-                modifier = Modifier.height(IntrinsicSize.Max),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = gameCode,
-                    onValueChange = { gameCode = it },
-                    label = { Text(stringResource(R.string.label_game_code)) },
-                    modifier = Modifier.padding(PaddingValues(end = 10.dp))
+            OutlinedTextField(
+                value = gameCode,
+                onValueChange = { gameCode = it },
+                label = { Text(stringResource(R.string.label_game_code)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedIconButton(
+                onClick = { joinGame(context, gameCode) },
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+                border = BorderStroke(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                OutlinedButton(
-                    onClick = { joinGame(context, gameCode) },
-                    modifier = Modifier.fillMaxHeight(),
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Icon(
-                        Icons.Rounded.PlayArrow,
-                        contentDescription =
-                        stringResource(id = R.string.contentDescription_join_game_button)
-                    )
-                }
+            ) {
+                Icon(
+                    Icons.Rounded.PlayArrow,
+                    contentDescription =
+                    stringResource(id = R.string.contentDescription_join_game_button)
+                )
             }
             Button(
                 onClick = { createGame(context) },
