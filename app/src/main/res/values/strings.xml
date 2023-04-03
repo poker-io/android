@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Pokerio</string>
 
+    <!-- Initial setup screen -->
+    <string name="select_nickname">Please select a nickname</string>
+
     <!-- Home screen -->
     <string name="label_game_code">Game code</string>
     <string name="new_game">New game</string>

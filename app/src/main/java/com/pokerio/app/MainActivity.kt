@@ -1,5 +1,6 @@
 package com.pokerio.app
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -15,10 +16,12 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pokerio.app.screens.HomeScreen
+import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.discard
 
@@ -43,11 +46,32 @@ class MainActivity : AppCompatActivity() {
         val navigateBack = {
             navController.navigateUp().discard()
         }
+        val exitInitialSetup = {
+            navController.navigateUp()
+            navController.navigate("home")
+        }
+
+        // Check if user had already set a nickname
+        val sharedPreferences = LocalContext.current.getSharedPreferences(
+            stringResource(id = R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+        val nicknameSet = sharedPreferences.getString(
+            stringResource(id = R.string.sharedPreferences_nickname),
+            ""
+        )!!.isNotBlank()
+        val startDestination =
+            if (nicknameSet) {
+                "home"
+            } else {
+                "initialSetup"
+            }
 
         Surface(modifier = Modifier.fillMaxSize()) {
-            NavHost(navController = navController, startDestination = "home") {
+            NavHost(navController = navController, startDestination = startDestination) {
                 composable("home") { HomeScreen(navigateToSettings = navigateToSettings) }
                 composable("settings") { SettingsScreen(navigateBack = navigateBack) }
+                composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
             }
         }
     }
