@@ -56,10 +56,12 @@ class MainActivity : AppCompatActivity() {
             stringResource(id = R.string.shared_preferences_file),
             Context.MODE_PRIVATE
         )
-        val nicknameSet = sharedPreferences.getString(
-            stringResource(id = R.string.sharedPreferences_nickname),
-            ""
-        )!!.isNotBlank()
+        val nicknameSet = (
+            sharedPreferences.getString(
+                stringResource(id = R.string.sharedPreferences_nickname),
+                ""
+            ) ?: ""
+            ).isNotBlank()
         val startDestination =
             if (nicknameSet) {
                 "home"

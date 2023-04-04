@@ -69,14 +69,58 @@ object GameState {
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: FileNotFoundException) {
-                e.printStackTrace()
+                PokerioLogger.error(e.toString())
                 ContextCompat.getMainExecutor(context).execute(onError)
             }
         }
     }
 
-    fun joinGame(gameID: String): Boolean {
-        return false
+    fun joinGame(gameID: String, context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
+        // Get all values
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+
+        val nickname = sharedPreferences.getString(
+            context.getString(R.string.sharedPreferences_nickname),
+            "Player"
+        ) ?: "Player"
+
+        // Make request
+        netowrkCoroutine.launch {
+            try {
+                val playerID = FirebaseMessaging.getInstance().token.await()
+
+                // Prepare url
+                val urlString = "/joinGame?nickname=$nickname&playerToken=$playerID&gameId=$gameID"
+                val url = URL(BASE_URL + urlString)
+
+                val responseJson = url.readText()
+                val responseObject =
+                    Json.decodeFromString(JoinGameResponseSerializer, responseJson)
+
+                this@GameState.gameID = gameID
+                startingFunds = responseObject.startingFunds
+                smallBlind = responseObject.smallBlind
+
+                // We are included in the player list, so no need to add as separately
+                responseObject.players.forEach {
+                    players.add(
+                        Player(
+                            it.nickname,
+                            it.playerHash,
+                            it.playerHash == responseObject.gameMaster
+                        )
+                    )
+                }
+
+                ContextCompat.getMainExecutor(context).execute(onSuccess)
+            } catch (e: FileNotFoundException) {
+                PokerioLogger.error(e.toString())
+                ContextCompat.getMainExecutor(context).execute(onError)
+            }
+        }
     }
 }
 
@@ -89,3 +133,19 @@ data class CreateGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
+
+data class JoinGameResponse(
+    val startingFunds: Int,
+    val smallBlind: Int,
+    val gameMaster: String,
+    val players: Array<JoinGameResponsePlayer>
+)
+
+data class JoinGameResponsePlayer(
+    val nickname: String,
+    val playerHash: String
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = JoinGameResponse::class)
+object JoinGameResponseSerializer
