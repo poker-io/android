@@ -39,10 +39,10 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.UnitUnitProvider
 
-@Preview
 @Composable
 fun HomeScreen(
-    @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
+    navigateToSettings: () -> Unit,
+    navigateToLobby: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -51,7 +51,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        StartGameCard()
+        StartGameCard(navigateToLobby = navigateToLobby)
         BottomRow(navigateToSettings = navigateToSettings)
     }
 }
@@ -80,10 +80,15 @@ private fun BottomRow(
 @Preview
 @Composable
 private fun StartGameCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    @PreviewParameter(UnitUnitProvider::class) navigateToLobby: () -> Unit
 ) {
     val context = LocalContext.current
     var gameCode by remember { mutableStateOf("") }
+
+    val onSuccess = {
+        navigateToLobby()
+    }
 
     Card(
         modifier = modifier.fillMaxWidth()
@@ -99,7 +104,7 @@ private fun StartGameCard(
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedIconButton(
-                onClick = { joinGame(context, gameCode) },
+                onClick = { joinGame(context, gameCode, onSuccess) },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth(),
                 border = BorderStroke(
@@ -114,7 +119,7 @@ private fun StartGameCard(
                 )
             }
             Button(
-                onClick = { createGame(context) },
+                onClick = { createGame(context, onSuccess) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(PaddingValues(top = 10.dp)),
@@ -126,26 +131,24 @@ private fun StartGameCard(
     }
 }
 
-private fun joinGame(context: Context, gameCode: String) {
+private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) {
     if (gameCode.isBlank()) {
         Toast
             .makeText(context, context.getText(R.string.error_game_code_empty), Toast.LENGTH_LONG)
             .show()
-    } else {
+        return
+    }
+
+    val onError = {
         Toast
-            .makeText(context, "TODO: Joining game", Toast.LENGTH_LONG)
+            .makeText(context, "Failed to join game", Toast.LENGTH_LONG)
             .show()
     }
+
+    GameState.joinGame(gameCode, context, onSuccess, onError)
 }
 
-private fun createGame(context: Context) {
-    val onSuccess = {
-        Toast
-            .makeText(context, "Successfully created game with ID = ${GameState.gameID}", Toast.LENGTH_LONG)
-            .show()
-        // TODO: navigate somewhere
-    }
-
+private fun createGame(context: Context, onSuccess: () -> Unit) {
     val onError = {
         Toast
             .makeText(context, "Failed to create game", Toast.LENGTH_LONG)

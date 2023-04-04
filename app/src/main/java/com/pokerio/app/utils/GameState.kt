@@ -9,9 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
-import java.io.FileNotFoundException
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.net.URL
 
 // This is an object - a static object if you will that will exist in the global context. There
@@ -24,7 +27,7 @@ object GameState {
     var smallBlind: Int = -1
 
     // Constants
-    const val BASE_URL = "http://10.20.7.83:42069"
+    const val BASE_URL = "http://192.168.86.30:42069"
     val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
@@ -67,8 +70,11 @@ object GameState {
                 startingFunds = responseObject.startingFunds
                 smallBlind = responseObject.smallBlind
 
+                // We have to add the creator to the list of players
+                players.add(Player(nickname, creatorID, true))
+
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: FileNotFoundException) {
+            } catch (e: Exception) {
                 PokerioLogger.error(e.toString())
                 ContextCompat.getMainExecutor(context).execute(onError)
             }
@@ -97,26 +103,33 @@ object GameState {
                 val url = URL(BASE_URL + urlString)
 
                 val responseJson = url.readText()
-                val responseObject =
-                    Json.decodeFromString(JoinGameResponseSerializer, responseJson)
+                println(responseJson)
+                val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
                 this@GameState.gameID = gameID
-                startingFunds = responseObject.startingFunds
-                smallBlind = responseObject.smallBlind
+                startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
+                smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
+
+                val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
 
                 // We are included in the player list, so no need to add as separately
-                responseObject.players.forEach {
+                responseObject["players"]!!.jsonArray.forEach {
+                    val nickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
+                    val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
+
                     players.add(
-                        Player(
-                            it.nickname,
-                            it.playerHash,
-                            it.playerHash == responseObject.gameMaster
-                        )
+                        Player(nickname, playerHash, playerHash == gameMasterHash)
+//                        Player(
+//                            playerObject.nickname,
+//                            playerObject.playerHash,
+//                            playerObject.playerHash == responseObject.gameMaster
+//                        )
                     )
                 }
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: FileNotFoundException) {
+            } catch (e: Exception) {
+                e.printStackTrace()
                 PokerioLogger.error(e.toString())
                 ContextCompat.getMainExecutor(context).execute(onError)
             }
@@ -124,6 +137,7 @@ object GameState {
     }
 }
 
+@Serializable
 data class CreateGameResponse(
     val gameKey: String,
     val startingFunds: Int,
@@ -134,18 +148,24 @@ data class CreateGameResponse(
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
 
+@Serializable
 data class JoinGameResponse(
     val startingFunds: Int,
     val smallBlind: Int,
-    val gameMaster: String,
-    val players: Array<JoinGameResponsePlayer>
+    val gameMasterHash: String,
+    val players: ArrayList<JoinGameResponsePlayer> = ArrayList(8)
 )
 
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = JoinGameResponse::class)
+object JoinGameResponseSerializer
+
+@Serializable
 data class JoinGameResponsePlayer(
     val nickname: String,
     val playerHash: String
 )
 
 @OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = JoinGameResponse::class)
-object JoinGameResponseSerializer
+@Serializer(forClass = JoinGameResponsePlayer::class)
+object JoinGameResponsePlayerSerializer
