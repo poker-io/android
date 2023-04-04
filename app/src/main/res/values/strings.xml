@@ -25,6 +25,7 @@
     <string name="shared_preferences_file">com.pokerio.app.SHARED_PREFERENCES</string>
 
     <!-- Shared preferences strings -->
+    <string name="sharedPreferences_firebase_token">firebase_token</string>
     <string name="sharedPreferences_nickname">nickname</string>
     <string name="sharedPreferences_starting_funds">starting_funds</string>
     <string name="sharedPreferences_small_blind">small_blind</string>

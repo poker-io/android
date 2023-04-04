@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
-    kotlin("android")
+    kotlin("android") version "1.8.10"
+    kotlin("plugin.serialization") version "1.8.10"
     id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
 
     // Firebase
@@ -77,6 +78,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

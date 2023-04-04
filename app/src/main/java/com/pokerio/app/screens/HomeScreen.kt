@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.R
+import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.UnitUnitProvider
 
 @Preview
@@ -138,7 +139,18 @@ private fun joinGame(context: Context, gameCode: String) {
 }
 
 private fun createGame(context: Context) {
-    Toast
-        .makeText(context, "TODO: Creating game", Toast.LENGTH_LONG)
-        .show()
+    val onSuccess = {
+        Toast
+            .makeText(context, "Successfully created game with ID = ${GameState.gameID}", Toast.LENGTH_LONG)
+            .show()
+        // TODO: navigate somewhere
+    }
+
+    val onError = {
+        Toast
+            .makeText(context, "Failed to create game", Toast.LENGTH_LONG)
+            .show()
+    }
+
+    GameState.createGame(context, onSuccess, onError)
 }
