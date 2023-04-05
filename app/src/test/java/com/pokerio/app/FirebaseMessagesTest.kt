@@ -22,5 +22,8 @@ class FirebaseMessagesTest {
         assert(!player.isAdmin)
         assert(player.nickname == playerName)
         assert(player.playerID == playerHash)
+
+        // Clean up after ourselves
+        GameState.players.clear()
     }
 }
