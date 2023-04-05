@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -61,11 +62,13 @@ fun InitialSetupScreen(
         OutlinedTextField(
             value = nickname,
             onValueChange = { nickname = it },
-            label = { Text(stringResource(id = R.string.nickname)) }
+            label = { Text(stringResource(id = R.string.nickname)) },
+            modifier = Modifier.testTag("nickname_input")
         )
         IconButton(
             onClick = { onContinue() },
-            enabled = nickname.isNotBlank()
+            enabled = nickname.isNotBlank(),
+            modifier = Modifier.testTag("continue_button")
         ) {
             Icon(
                 Icons.Rounded.ArrowForward,
