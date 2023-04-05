@@ -182,6 +182,7 @@ data class CreateGameResponse(
     val smallBlind: Int
 )
 
+@Generated
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
