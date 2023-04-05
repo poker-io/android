@@ -8,7 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.pokerio.app.utils.GameState
 
@@ -27,7 +29,7 @@ fun LobbyScreen() {
     }
 
     // This is a debugging UI
-    Column {
+    Column(modifier = Modifier.testTag("lobby_column")) {
         Text(text = "Game code: ${GameState.gameID}")
         Text(text = "Players ($numberOfPlayers):")
         GameState.players.forEach {
