@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,7 +95,10 @@ fun SettingsScreen(
         TopAppBar(
             title = { Text(stringResource(id = R.string.settings)) },
             navigationIcon = {
-                IconButton(onClick = { navigateBack() }) {
+                IconButton(
+                    onClick = { navigateBack() },
+                    modifier = Modifier.testTag("settings_back")
+                ) {
                     Icon(
                         Icons.Rounded.ArrowBack,
                         contentDescription = stringResource(
@@ -106,7 +110,9 @@ fun SettingsScreen(
         )
         Column(modifier = Modifier.padding(10.dp)) {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("settings_nickname"),
                 value = nickname,
                 onValueChange = { onNicknameUpdate(it) },
                 label = { Text(stringResource(id = R.string.nickname)) }
@@ -143,7 +149,7 @@ fun SettingsScreen(
 
 @Preview
 @Composable
-private fun Selector(
+fun Selector(
     minValue: Float = 0f,
     maxValue: Float = 100f,
     initialValue: Float = 50f,
@@ -152,7 +158,7 @@ private fun Selector(
     var currentValue by remember { mutableStateOf(initialValue) }
 
     fun updateValue(newValue: Float) {
-        currentValue = min(max(newValue, 0f), maxValue)
+        currentValue = min(max(newValue, minValue), maxValue)
         onValueSelected(currentValue.toInt())
     }
 
@@ -169,14 +175,18 @@ private fun Selector(
                 OutlinedButton(onClick = { updateValue(currentValue - 100) }) {
                     Text(text = "-100")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue - 10) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue - 10) },
+                    modifier = Modifier.testTag("slider-10")
+                ) {
                     Text(text = "-10")
                 }
             }
             Text(
                 text = currentValue.toInt().toString(),
                 fontSize = 36.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.testTag("slider_text")
             )
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                 OutlinedButton(onClick = { updateValue(currentValue + 1000) }) {
@@ -185,14 +195,18 @@ private fun Selector(
                 OutlinedButton(onClick = { updateValue(currentValue + 100) }) {
                     Text(text = "+100")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue + 10) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue + 10) },
+                    modifier = Modifier.testTag("slider+10")
+                ) {
                     Text(text = "+10")
                 }
             }
         }
         Slider(
             value = (currentValue - minValue) / (maxValue - minValue),
-            onValueChange = { updateValue(minValue + it * (maxValue - minValue)) }
+            onValueChange = { updateValue(minValue + it * (maxValue - minValue)) },
+            modifier = Modifier.testTag("selector_slider")
         )
     }
 }

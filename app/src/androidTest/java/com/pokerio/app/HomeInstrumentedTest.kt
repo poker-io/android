@@ -9,7 +9,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class HomeScreenInstrumentedTest {
+class HomeInstrumentedTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
