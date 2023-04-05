@@ -37,80 +37,80 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+}
 
-    @Composable
-    private fun MainActivityComposable() {
-        val navController = rememberNavController()
+@Composable
+fun MainActivityComposable() {
+    val navController = rememberNavController()
 
-        val navigateToSettings = {
-            navController.navigate("settings")
-        }
-        val navigateBack = {
-            navController.navigateUp().discard()
-        }
-        val exitInitialSetup = {
-            navController.navigateUp()
-            navController.navigate("home")
-        }
-        val navigateToLobby = {
-            navController.navigate("lobby")
-        }
-
-        // Check if user had already set a nickname
-        val sharedPreferences = LocalContext.current.getSharedPreferences(
-            stringResource(id = R.string.shared_preferences_file),
-            Context.MODE_PRIVATE
-        )
-        val nicknameSet = (
-            sharedPreferences.getString(
-                stringResource(id = R.string.sharedPreferences_nickname),
-                ""
-            ) ?: ""
-            ).isNotBlank()
-        val startDestination =
-            if (nicknameSet) {
-                "home"
-            } else {
-                "initialSetup"
-            }
-
-        Surface(modifier = Modifier.fillMaxSize()) {
-            NavHost(navController = navController, startDestination = startDestination) {
-                composable("home") {
-                    HomeScreen(
-                        navigateToSettings = navigateToSettings,
-                        navigateToLobby = navigateToLobby
-                    )
-                }
-                composable("settings") { SettingsScreen(navigateBack = navigateBack) }
-                composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
-                composable("lobby") { LobbyScreen() }
-            }
-        }
+    val navigateToSettings = {
+        navController.navigate("settings")
+    }
+    val navigateBack = {
+        navController.navigateUp().discard()
+    }
+    val exitInitialSetup = {
+        navController.navigateUp()
+        navController.navigate("home")
+    }
+    val navigateToLobby = {
+        navController.navigate("lobby")
     }
 
-    @Composable
-    private fun AppTheme(
-        useDarkTheme: Boolean = isSystemInDarkTheme(),
-        content: @Composable () -> Unit
-    ) {
-        val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (useDarkTheme) {
-                dynamicDarkColorScheme(LocalContext.current)
-            } else {
-                dynamicLightColorScheme(LocalContext.current)
-            }
+    // Check if user had already set a nickname
+    val sharedPreferences = LocalContext.current.getSharedPreferences(
+        stringResource(id = R.string.shared_preferences_file),
+        Context.MODE_PRIVATE
+    )
+    val nicknameSet = (
+        sharedPreferences.getString(
+            stringResource(id = R.string.sharedPreferences_nickname),
+            ""
+        ) ?: ""
+        ).isNotBlank()
+    val startDestination =
+        if (nicknameSet) {
+            "home"
         } else {
-            if (useDarkTheme) {
-                darkColorScheme()
-            } else {
-                lightColorScheme()
-            }
+            "initialSetup"
         }
 
-        MaterialTheme(
-            colorScheme = colors,
-            content = content
-        )
+    Surface(modifier = Modifier.fillMaxSize()) {
+        NavHost(navController = navController, startDestination = startDestination) {
+            composable("home") {
+                HomeScreen(
+                    navigateToSettings = navigateToSettings,
+                    navigateToLobby = navigateToLobby
+                )
+            }
+            composable("settings") { SettingsScreen(navigateBack = navigateBack) }
+            composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
+            composable("lobby") { LobbyScreen() }
+        }
     }
+}
+
+@Composable
+private fun AppTheme(
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (useDarkTheme) {
+            dynamicDarkColorScheme(LocalContext.current)
+        } else {
+            dynamicLightColorScheme(LocalContext.current)
+        }
+    } else {
+        if (useDarkTheme) {
+            darkColorScheme()
+        } else {
+            lightColorScheme()
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = colors,
+        content = content
+    )
 }
