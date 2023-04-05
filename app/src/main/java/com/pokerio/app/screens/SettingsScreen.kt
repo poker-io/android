@@ -57,8 +57,10 @@ fun SettingsScreen(
     )
 
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
-    val nicknameInitialValue = getInitialNickname(context)
+    var nickname by remember { mutableStateOf(getInitialNickname(context)) }
     val onNicknameUpdate = { newValue: String ->
+        nickname = newValue
+
         with(sharedPreferences.edit()) {
             putString(nicknameSharedKey, newValue)
             apply()
@@ -67,8 +69,7 @@ fun SettingsScreen(
 
     // TODO: What if someone lowers starting funds and now the small blind doesn't make sense?
     val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
-    val startingFundsInitialValue = getInitialStartingFunds(context)
-    var startingFunds by remember { mutableStateOf(startingFundsInitialValue) }
+    var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
     val onStartingFundsUpdate = { newValue: Int ->
         startingFunds = newValue
 
@@ -79,8 +80,10 @@ fun SettingsScreen(
     }
 
     val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
-    val smallBlindInitialValue = getInitialSmallBlind(context)
+    var smallBlind by remember { mutableStateOf(getInitialSmallBlind(context)) }
     val onSmallBlindUpdate = { newValue: Int ->
+        smallBlind = newValue
+
         with(sharedPreferences.edit()) {
             putInt(smallBlindSharedKey, newValue)
             apply()
@@ -104,7 +107,7 @@ fun SettingsScreen(
         Column(modifier = Modifier.padding(10.dp)) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = nicknameInitialValue,
+                value = nickname,
                 onValueChange = { onNicknameUpdate(it) },
                 label = { Text(stringResource(id = R.string.nickname)) }
             )
@@ -119,7 +122,7 @@ fun SettingsScreen(
                 onValueSelected = { onStartingFundsUpdate(it) },
                 minValue = 100f,
                 maxValue = 10000f,
-                initialValue = startingFundsInitialValue.toFloat()
+                initialValue = startingFunds.toFloat()
             )
             Spacer(modifier = spacerModifier)
             Text(
@@ -132,7 +135,7 @@ fun SettingsScreen(
                 onValueSelected = { onSmallBlindUpdate(it) },
                 minValue = 10f,
                 maxValue = startingFunds * 0.4f,
-                initialValue = smallBlindInitialValue.toFloat()
+                initialValue = smallBlind.toFloat()
             )
         }
     }
