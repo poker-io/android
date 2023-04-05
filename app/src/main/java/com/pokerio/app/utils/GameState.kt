@@ -23,11 +23,16 @@ object GameState {
     // Class fields
     var gameID = ""
     var players = mutableListOf<Player>()
+        private set
     var startingFunds: Int = -1
     var smallBlind: Int = -1
 
+    // Callbacks
+    private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private var nextId = 0
+
     // Constants
-    const val BASE_URL = "http://192.168.86.30:42069"
+    const val BASE_URL = "http://10.20.6.52:42069"
     val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
@@ -71,7 +76,7 @@ object GameState {
                 smallBlind = responseObject.smallBlind
 
                 // We have to add the creator to the list of players
-                players.add(Player(nickname, creatorID, true))
+                addPlayer(Player(nickname, creatorID, true))
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
@@ -107,6 +112,7 @@ object GameState {
                 val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
                 this@GameState.gameID = gameID
+                // TODO: This has to be parsed better
                 startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
                 smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
 
@@ -117,14 +123,7 @@ object GameState {
                     val nickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
                     val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
 
-                    players.add(
-                        Player(nickname, playerHash, playerHash == gameMasterHash)
-//                        Player(
-//                            playerObject.nickname,
-//                            playerObject.playerHash,
-//                            playerObject.playerHash == responseObject.gameMaster
-//                        )
-                    )
+                    addPlayer(Player(nickname, playerHash, playerHash == gameMasterHash))
                 }
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
@@ -134,6 +133,20 @@ object GameState {
                 ContextCompat.getMainExecutor(context).execute(onError)
             }
         }
+    }
+
+    fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
+        playerJoinedCallbacks.put(nextId, callback)
+        return nextId++
+    }
+
+    fun removeOnPlayerJoinedCallback(id: Int) {
+        playerJoinedCallbacks.remove(id)
+    }
+
+    fun addPlayer(player: Player) {
+        players.add(player)
+        playerJoinedCallbacks.forEach { it.value(player) }
     }
 }
 
@@ -147,25 +160,3 @@ data class CreateGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
-
-@Serializable
-data class JoinGameResponse(
-    val startingFunds: Int,
-    val smallBlind: Int,
-    val gameMasterHash: String,
-    val players: ArrayList<JoinGameResponsePlayer> = ArrayList(8)
-)
-
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = JoinGameResponse::class)
-object JoinGameResponseSerializer
-
-@Serializable
-data class JoinGameResponsePlayer(
-    val nickname: String,
-    val playerHash: String
-)
-
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = JoinGameResponsePlayer::class)
-object JoinGameResponsePlayerSerializer
