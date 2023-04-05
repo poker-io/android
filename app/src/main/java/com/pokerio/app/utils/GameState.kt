@@ -39,7 +39,12 @@ object GameState {
 
     // This method makes a request to create a game and sets the field of the GameState object on
     // success and returns true. Returns false if something goes wrong.
-    fun createGame(context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
+    fun createGame(
+        context: Context,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
         // Get all values
         val sharedPreferences = context.getSharedPreferences(
             context.getString(R.string.shared_preferences_file),
@@ -49,7 +54,7 @@ object GameState {
         val nickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
             "Player"
-        )!!
+        ) ?: "Player"
         // TODO: Load settings
 //        val startingFunds = sharedPreferences.getInt(
 //            context.getString(R.string.sharedPreferences_starting_funds), -1
@@ -62,10 +67,9 @@ object GameState {
         netowrkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
-
                 // Prepare url
                 val urlString = "/createGame?creatorToken=$creatorID&nickname=$nickname"
-                val url = URL(BASE_URL + urlString)
+                val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
                 val responseObject =
@@ -86,7 +90,13 @@ object GameState {
         }
     }
 
-    fun joinGame(gameID: String, context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
+    fun joinGame(
+        gameID: String,
+        context: Context,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
         // Get all values
         val sharedPreferences = context.getSharedPreferences(
             context.getString(R.string.shared_preferences_file),
@@ -105,7 +115,7 @@ object GameState {
 
                 // Prepare url
                 val urlString = "/joinGame?nickname=$nickname&playerToken=$playerID&gameId=$gameID"
-                val url = URL(BASE_URL + urlString)
+                val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
                 println(responseJson)

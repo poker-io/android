@@ -82,6 +82,9 @@ dependencies {
 
     // Testing
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.3.1")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
     androidTestImplementation(composeBom)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
