@@ -7,4 +7,6 @@ class SettingsInstrumentedTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    // TODO
 }

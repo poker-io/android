@@ -29,6 +29,7 @@ object GameState {
 
     // Callbacks
     private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private var playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
 
     // Constants
@@ -144,9 +145,25 @@ object GameState {
         playerJoinedCallbacks.remove(id)
     }
 
+    fun addOnPlayerRemovedCallback(callback: (Player) -> Unit): Int {
+        playerRemovedCallbacks.put(nextId, callback)
+        return nextId++
+    }
+
+    fun removeOnPlayerRemovedCallback(id: Int) {
+        playerRemovedCallbacks.remove(id)
+    }
+
     fun addPlayer(player: Player) {
         players.add(player)
         playerJoinedCallbacks.forEach { it.value(player) }
+    }
+
+    fun removePlayer(playerHash: String) {
+        val player = players.find { it.playerID == playerHash } ?: return
+
+        players.removeIf { it.playerID == playerHash }
+        playerRemovedCallbacks.forEach { it.value(player) }
     }
 }
 
