@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -167,7 +166,6 @@ object GameState {
     }
 }
 
-@Serializable
 data class CreateGameResponse(
     val gameKey: String,
     val startingFunds: Int,
