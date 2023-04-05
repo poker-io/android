@@ -23,7 +23,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-        private fun playerJoined(data: MutableMap<String, String>) {
+        fun playerJoined(data: MutableMap<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
 
             GameState.addPlayer(
