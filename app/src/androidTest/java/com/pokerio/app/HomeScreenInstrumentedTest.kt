@@ -3,16 +3,11 @@ package com.pokerio.app
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import com.pokerio.app.screens.HomeScreen
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 
 class HomeScreenInstrumentedTest {
 
@@ -20,16 +15,23 @@ class HomeScreenInstrumentedTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun checkAnimation() {
+    fun checkSettingsNavigation() {
         // Start the app
-        composeTestRule.setContent {
-            HomeScreen()
+        var settingsNavigationSuccess = false
+        val navigateToSettings = {
+            settingsNavigationSuccess = true
         }
 
-        composeTestRule.onNodeWithTag("image_caption", useUnmergedTree = true)
-            .assertDoesNotExist()
-        composeTestRule.onRoot().performClick()
-        composeTestRule.onNodeWithTag("image_caption", useUnmergedTree = true)
-            .assertIsDisplayed()
+        composeTestRule.setContent {
+            HomeScreen(
+                navigateToSettings = navigateToSettings,
+                navigateToLobby = {}
+            )
+        }
+        val settingsButton = composeTestRule.onNodeWithTag("settings_button")
+
+        settingsButton.assertIsDisplayed()
+        settingsButton.performClick()
+        assertTrue("navigateToSettings wasn't called!", settingsNavigationSuccess)
     }
 }

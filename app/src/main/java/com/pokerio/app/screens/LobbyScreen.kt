@@ -17,13 +17,16 @@ import com.pokerio.app.utils.GameState
 fun LobbyScreen() {
     var numberOfPlayers by remember { mutableStateOf(0) }
 
+    // Sign-up for updates when a new player appears
     val callbackId = GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
     DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
+            // Unregister callback when we leave the view
             GameState.removeOnPlayerJoinedCallback(callbackId)
         }
     }
 
+    // This is a debugging UI
     Column {
         Text(text = "Game code: ${GameState.gameID}")
         Text(text = "Players ($numberOfPlayers):")

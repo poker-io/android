@@ -35,8 +35,3 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 }
-
-// @Serializable
-// data class FCMPlayerJoined(
-//
-// )

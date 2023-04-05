@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -67,7 +68,10 @@ private fun BottomRow(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { navigateToSettings() }) {
+        IconButton(
+            onClick = { navigateToSettings() },
+            modifier = Modifier.testTag("settings_button")
+        ) {
             Icon(
                 Icons.Rounded.Settings,
                 contentDescription = stringResource(id = R.string.contentDescription_settings_icon)
@@ -91,7 +95,9 @@ private fun StartGameCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("StartGameCard")
     ) {
         Column(
             modifier = Modifier
