@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
@@ -93,12 +94,18 @@ class MainActivity : AppCompatActivity() {
         useDarkTheme: Boolean = isSystemInDarkTheme(),
         content: @Composable () -> Unit
     ) {
-        val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        var colors = when {
-            dynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
-            dynamicColor && !useDarkTheme -> dynamicLightColorScheme(LocalContext.current)
-            useDarkTheme -> darkColorScheme()
-            else -> lightColorScheme()
+        val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (useDarkTheme) {
+                dynamicDarkColorScheme(LocalContext.current)
+            } else {
+                dynamicLightColorScheme(LocalContext.current)
+            }
+        } else {
+            if (useDarkTheme) {
+                darkColorScheme()
+            } else {
+                lightColorScheme()
+            }
         }
 
         MaterialTheme(
