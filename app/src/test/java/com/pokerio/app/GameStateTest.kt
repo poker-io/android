@@ -30,7 +30,7 @@ class GameStateTest {
         val playerAddedCallbackId = GameState.addOnPlayerJoinedCallback(onPlayerAdded)
 
         GameState.addPlayer(testPlayer)
-        assertTrue("onPlayerAdded callback not called or called to many times", playerAddedCalledCounter == 1)
+        assertTrue("onPlayerAdded callback not called or called too many times", playerAddedCalledCounter == 1)
         GameState.removePlayer(testPlayer.playerID)
         assertTrue("onPlayerAdded callback should not have been called", playerAddedCalledCounter == 1)
 
@@ -54,7 +54,7 @@ class GameStateTest {
         GameState.addPlayer(testPlayer)
         assertTrue("onPlayerRemoved callback should not have been called", playerRemovedCalledCounter == 0)
         GameState.removePlayer(testPlayer.playerID)
-        assertTrue("onPlayerRemoved callback not called or called to many times", playerRemovedCalledCounter == 1)
+        assertTrue("onPlayerRemoved callback not called or called too many times", playerRemovedCalledCounter == 1)
 
         GameState.removeOnPlayerRemovedCallback(playerRemovedCallbackId)
         GameState.addPlayer(testPlayer)
