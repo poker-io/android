@@ -56,12 +56,6 @@ object GameState {
             "Player"
         ) ?: "Player"
         // TODO: Load settings
-//        val startingFunds = sharedPreferences.getInt(
-//            context.getString(R.string.sharedPreferences_starting_funds), -1
-//        )
-//        val smallBlind = sharedPreferences.getInt(
-//            context.getString(R.string.sharedPreferences_small_blind), -1
-//        )
 
         // Make request
         netowrkCoroutine.launch {
