@@ -34,11 +34,13 @@ fun LobbyScreen() {
     }
 
     // This is a debugging UI
-    Column(modifier = Modifier.testTag("lobby_column")) {
-        Text(text = "Game code: ${GameState.gameID}")
-        Text(text = "Players ($numberOfPlayers):")
-        GameState.players.forEach {
-            Text(text = it.nickname)
+    Column() {
+        Column(modifier = Modifier.testTag("lobby_column")) {
+            Text(text = "Game code: ${GameState.gameID}")
+            Text(text = "Players ($numberOfPlayers):")
+            GameState.players.forEach {
+                Text(text = it.nickname)
+            }
         }
         Button(onClick = { updateGameSettings(context) }) {
             Text(text = "Update game settings")
