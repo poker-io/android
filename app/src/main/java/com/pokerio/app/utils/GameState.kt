@@ -32,7 +32,7 @@ object GameState {
     private var nextId = 0
 
     // Constants
-    const val BASE_URL = "http://158.101.160.143:42069"
+    const val BASE_URL = "http://10.0.2.2:42069"
     val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
@@ -74,6 +74,7 @@ object GameState {
                 smallBlind = responseObject.smallBlind
 
                 // We have to add the creator to the list of players
+                players.clear()
                 addPlayer(Player(nickname, creatorID, true))
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)

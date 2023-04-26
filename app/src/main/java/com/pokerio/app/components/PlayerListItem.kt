@@ -7,6 +7,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -23,22 +24,25 @@ fun PlayerListItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
+            .padding(
+                vertical = 6.dp
+            )
     ) {
         Column(
             modifier = Modifier.padding(
-                horizontal = 12.dp,
-                vertical = 5.dp
+                horizontal = 20.dp,
+                vertical = 12.dp
             )
         ) {
             Text(
                 text = player.nickname,
-                fontSize = 20.sp
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
             )
             Text(
                 text = "ID: ${player.playerID.substring(0..6)}",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Thin
+                fontSize = 16.sp,
+                color = Color.Gray
             )
         }
     }

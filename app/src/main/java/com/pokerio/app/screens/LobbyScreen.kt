@@ -2,7 +2,10 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,16 +19,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.pokerio.app.components.PlayerListItem
 import com.pokerio.app.utils.GameState
 
 @Preview
 @Composable
 fun LobbyScreen() {
-    var numberOfPlayers by remember { mutableStateOf(0) }
+    var numberOfPlayers by remember { mutableStateOf(GameState.players.size) }
     val context = LocalContext.current
 
     // Sign-up for updates when a new player appears
-    val callbackId = GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
+    val callbackId =
+        GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
     DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
             // Unregister callback when we leave the view
@@ -33,13 +39,20 @@ fun LobbyScreen() {
         }
     }
 
+    val scrollState = ScrollState(0)
+
     // This is a debugging UI
-    Column() {
-        Column(modifier = Modifier.testTag("lobby_column")) {
-            Text(text = "Game code: ${GameState.gameID}")
-            Text(text = "Players ($numberOfPlayers):")
+    Column {
+        Text(text = "Game code: ${GameState.gameID}")
+        Text(text = "Players: $numberOfPlayers/8")
+        Column(
+            modifier = Modifier
+                .testTag("lobby_column")
+                .verticalScroll(scrollState, true)
+                .padding(horizontal = 12.dp)
+        ) {
             GameState.players.forEach {
-                Text(text = it.nickname)
+                PlayerListItem(player = it)
             }
         }
         Button(onClick = { updateGameSettings(context) }) {
