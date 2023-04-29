@@ -25,6 +25,7 @@ object GameState {
         private set
     var startingFunds: Int = -1
     var smallBlind: Int = -1
+    var isPlayerAdmin: Boolean = false
 
     // Callbacks
     private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
@@ -77,6 +78,7 @@ object GameState {
                 players.clear()
                 addPlayer(Player(nickname, creatorID, true))
 
+                isPlayerAdmin = true
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
                 PokerioLogger.error(e.toString())

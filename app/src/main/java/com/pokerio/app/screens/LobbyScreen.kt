@@ -42,10 +42,14 @@ import com.pokerio.app.utils.GameState
 fun LobbyScreen() {
     var numberOfPlayers by remember { mutableStateOf(GameState.players.size) }
     val context = LocalContext.current
+    var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
 
     // Sign-up for updates when a new player appears
     val callbackId =
-        GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
+        GameState.addOnPlayerJoinedCallback {
+            numberOfPlayers = GameState.players.size
+            isAdmin = GameState.isPlayerAdmin
+        }
     DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
             // Unregister callback when we leave the view
@@ -101,18 +105,46 @@ fun LobbyScreen() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Funds",
+                        fontWeight = FontWeight.Light
+                    )
+                    Text(text = GameState.startingFunds.toString())
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Small blind",
+                        fontWeight = FontWeight.Light
+                    )
+                    Text(text = GameState.smallBlind.toString())
+                }
+            }
             OutlinedButton(
                 onClick = { updateGameSettings(context) },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Update settings")
+                Text(text = "Leave game")
             }
-            Button(
-                onClick = { startGame(context) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Start game")
+            if (isAdmin) {
+                OutlinedButton(
+                    onClick = { updateGameSettings(context) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(text = "Update settings")
+                }
+                Button(
+                    onClick = { startGame(context) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Start game")
+                }
             }
         }
     }
