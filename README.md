@@ -8,8 +8,8 @@
 
 ## Building
 
-The easiest way to build the app is through Android Studio (requires Electric
-Eel or newer). Gradle will install all the necessary dependencies.
+The easiest way to build the app is through Android Studio (requires Flamingi
+or newer). Gradle will install all the necessary dependencies.
 
 Alternatively you can run the build from a command line with:
 
