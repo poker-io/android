@@ -30,9 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pokerio.app.R
 import com.pokerio.app.components.PlayerListItem
 import com.pokerio.app.utils.GameState
 
@@ -54,6 +56,8 @@ fun LobbyScreen() {
         onDispose {
             // Unregister callback when we leave the view
             GameState.removeOnPlayerJoinedCallback(callbackId)
+            // Notify the server we're leaving the game
+            leaveGame(context)
         }
     }
 
@@ -73,28 +77,28 @@ fun LobbyScreen() {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Game code",
+                        text = stringResource(id = R.string.label_game_code),
                         fontWeight = FontWeight.Light
                     )
                     Text(text = GameState.gameID)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Players",
+                        text = stringResource(id = R.string.players),
                         fontWeight = FontWeight.Light
                     )
                     Text(text = "$numberOfPlayers/8")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Funds",
+                        text = stringResource(id = R.string.funds),
                         fontWeight = FontWeight.Light
                     )
                     Text(text = GameState.startingFunds.toString())
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Small blind",
+                        text = stringResource(id = R.string.small_blind),
                         fontWeight = FontWeight.Light
                     )
                     Text(text = GameState.smallBlind.toString())
@@ -128,7 +132,7 @@ fun LobbyScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Leave game")
+                Text(text = stringResource(id = R.string.leave_game))
             }
             if (isAdmin) {
                 OutlinedButton(
@@ -136,13 +140,13 @@ fun LobbyScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    Text(text = "Update settings")
+                    Text(text = stringResource(id = R.string.update_settings))
                 }
                 Button(
                     onClick = { startGame(context) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Start game")
+                    Text(text = stringResource(id = R.string.start_game))
                 }
             }
         }
