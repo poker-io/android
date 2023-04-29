@@ -6,16 +6,13 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
@@ -75,18 +72,16 @@ fun MainActivityComposable() {
             "initialSetup"
         }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = startDestination) {
-            composable("home") {
-                HomeScreen(
-                    navigateToSettings = navigateToSettings,
-                    navigateToLobby = navigateToLobby
-                )
-            }
-            composable("settings") { SettingsScreen(navigateBack = navigateBack) }
-            composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
-            composable("lobby") { LobbyScreen() }
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("home") {
+            HomeScreen(
+                navigateToSettings = navigateToSettings,
+                navigateToLobby = navigateToLobby
+            )
         }
+        composable("settings") { SettingsScreen(navigateBack = navigateBack) }
+        composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
+        composable("lobby") { LobbyScreen() }
     }
 }
 
