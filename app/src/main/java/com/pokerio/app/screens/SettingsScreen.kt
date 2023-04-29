@@ -1,6 +1,7 @@
 package com.pokerio.app.screens
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -20,6 +21,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pokerio.app.R
+import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
 import com.pokerio.app.utils.UnitUnitProvider
 import java.lang.Float.max
@@ -56,6 +60,23 @@ fun SettingsScreen(
         stringResource(id = R.string.shared_preferences_file),
         Context.MODE_PRIVATE
     )
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        onDispose {
+            // Unregister callback when we leave the view
+            GameState.exitSettings(
+                context = context,
+                onError =
+                {
+                    Toast.makeText(
+                        context,
+                        "Failed to update settings",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+        }
+    }
 
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
     var nickname by remember { mutableStateOf(getInitialNickname(context)) }
@@ -109,14 +130,16 @@ fun SettingsScreen(
             }
         )
         Column(modifier = Modifier.padding(10.dp)) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("settings_nickname"),
-                value = nickname,
-                onValueChange = { onNicknameUpdate(it) },
-                label = { Text(stringResource(id = R.string.nickname)) }
-            )
+            if (!GameState.isInGame()) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("settings_nickname"),
+                    value = nickname,
+                    onValueChange = { onNicknameUpdate(it) },
+                    label = { Text(stringResource(id = R.string.nickname)) }
+                )
+            }
             Spacer(modifier = spacerModifier)
             Text(
                 text = stringResource(id = R.string.starting_funds),

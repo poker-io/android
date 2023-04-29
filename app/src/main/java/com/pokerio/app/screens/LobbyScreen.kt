@@ -16,11 +16,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.UnitUnitProvider
 
 @Preview
 @Composable
-fun LobbyScreen() {
+fun LobbyScreen(
+    @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
+) {
     var numberOfPlayers by remember { mutableStateOf(0) }
     val context = LocalContext.current
 
@@ -42,7 +46,7 @@ fun LobbyScreen() {
                 Text(text = it.nickname)
             }
         }
-        Button(onClick = { updateGameSettings(context) }) {
+        Button(onClick = { navigateToSettings() }) {
             Text(text = "Update game settings")
         }
         Button(onClick = { startGame(context) }) {

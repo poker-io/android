@@ -85,7 +85,7 @@ fun MainActivityComposable() {
             }
             composable("settings") { SettingsScreen(navigateBack = navigateBack) }
             composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
-            composable("lobby") { LobbyScreen() }
+            composable("lobby") { LobbyScreen(navigateToSettings = navigateToSettings) }
         }
     }
 }

@@ -32,7 +32,7 @@ object GameState {
     private var nextId = 0
 
     // Constants
-    const val BASE_URL = "http://158.101.160.143:42069"
+    const val BASE_URL = "http://172.20.239.191:42069"
     val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
@@ -139,6 +139,44 @@ object GameState {
         }
     }
 
+    fun exitSettings(
+        context: Context,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
+        if (isInGame()) {
+            val sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.shared_preferences_file),
+                Context.MODE_PRIVATE
+            )
+
+            val smallBlind = sharedPreferences.getInt(
+                context.getString(R.string.sharedPreferences_small_blind),
+                1000
+            )
+
+            val startingFunds = sharedPreferences.getInt(
+                context.getString(R.string.sharedPreferences_starting_funds),
+                100
+            )
+
+            netowrkCoroutine.launch {
+                try {
+                    val playerID = FirebaseMessaging.getInstance().token.await()
+
+                    // Prepare url
+                    val urlString = "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
+                    val url = URL(baseUrl + urlString)
+                    url.readText()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    PokerioLogger.error(e.toString())
+                    ContextCompat.getMainExecutor(context).execute(onError)
+                }
+            }
+        }
+    }
+
     fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
         playerJoinedCallbacks.put(nextId, callback)
         return nextId++
@@ -167,6 +205,10 @@ object GameState {
 
         players.removeIf { it.playerID == playerHash }
         playerRemovedCallbacks.forEach { it.value(player) }
+    }
+
+    fun isInGame(): Boolean {
+        return gameID != ""
     }
 }
 
