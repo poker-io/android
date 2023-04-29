@@ -115,7 +115,6 @@ object GameState {
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
-                println(responseJson)
                 val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
                 this@GameState.gameID = gameID
