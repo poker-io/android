@@ -13,6 +13,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
         when (message.data["type"]) {
             "playerJoined" -> playerJoined(message.data)
+            "settingsUpdated" -> settingsUpdated(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -31,6 +32,14 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
                     data["nickname"] ?: "Player",
                     data["playerHash"] ?: ""
                 )
+            )
+        }
+        fun settingsUpdated(data: MutableMap<String, String>) {
+            PokerioLogger.debug("Received updatedSettings FCM message")
+
+            GameState.changeGameSettings(
+                data["startingFunds"]?.toInt() ?: GameState.startingFunds,
+                data["smallBlind"]?.toInt() ?: GameState.smallBlind
             )
         }
     }
