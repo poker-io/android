@@ -8,7 +8,7 @@
 
 ## Building
 
-The easiest way to build the app is through Android Studio (requires Flamingi
+The easiest way to build the app is through Android Studio (requires Flamingo
 or newer). Gradle will install all the necessary dependencies.
 
 Alternatively you can run the build from a command line with:
