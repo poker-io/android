@@ -124,7 +124,7 @@ fun LobbyScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedButton(
-                onClick = { updateGameSettings(context) },
+                onClick = { leaveGame(context) },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
@@ -147,6 +147,10 @@ fun LobbyScreen() {
             }
         }
     }
+}
+
+private fun leaveGame(context: Context) {
+    Toast.makeText(context, "TODO: Leave game", Toast.LENGTH_LONG).show()
 }
 
 private fun updateGameSettings(context: Context) {
