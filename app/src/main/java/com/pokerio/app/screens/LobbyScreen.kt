@@ -2,6 +2,9 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -23,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.pokerio.app.components.PlayerListItem
 import com.pokerio.app.utils.GameState
 
+@OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
 fun LobbyScreen() {
@@ -52,7 +56,12 @@ fun LobbyScreen() {
                 .padding(horizontal = 12.dp)
         ) {
             GameState.players.forEach {
-                PlayerListItem(player = it)
+                AnimatedVisibility(
+                    visible = true,
+                    enter = scaleIn()
+                ) {
+                    PlayerListItem(player = it)
+                }
             }
         }
         Button(onClick = { updateGameSettings(context) }) {
