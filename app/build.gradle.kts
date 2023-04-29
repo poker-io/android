@@ -75,7 +75,7 @@ tasks.getByName("build").dependsOn("installGitHooks")
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
@@ -97,7 +97,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation("androidx.activity:activity-compose:1.7.1")
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
     // Firebase
