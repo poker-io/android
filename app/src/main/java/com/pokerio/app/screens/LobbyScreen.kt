@@ -66,49 +66,25 @@ fun LobbyScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Game code",
-                    fontWeight = FontWeight.Light
-                )
-                Text(text = GameState.gameID)
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Players",
-                    fontWeight = FontWeight.Light
-                )
-                Text(text = "$numberOfPlayers/8")
-            }
-        }
-        Column(
-            modifier = Modifier
-                .verticalScroll(scrollState, true)
-                .fillMaxHeight()
-        ) {
-            (1..8).forEach {
-                AnimatedVisibility(
-                    visible = it <= numberOfPlayers,
-                    enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
-                    exit = scaleOut()
-                ) {
-                    if (it <= numberOfPlayers) {
-                        PlayerListItem(player = GameState.players[it - 1])
-                    }
-                }
-            }
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Game code",
+                        fontWeight = FontWeight.Light
+                    )
+                    Text(text = GameState.gameID)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Players",
+                        fontWeight = FontWeight.Light
+                    )
+                    Text(text = "$numberOfPlayers/8")
+                }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "Funds",
@@ -124,6 +100,29 @@ fun LobbyScreen() {
                     Text(text = GameState.smallBlind.toString())
                 }
             }
+        }
+        Column(
+            modifier = Modifier
+                .verticalScroll(scrollState, true)
+                .padding(vertical = 12.dp)
+                .fillMaxHeight()
+        ) {
+            (1..8).forEach {
+                AnimatedVisibility(
+                    visible = it <= numberOfPlayers,
+                    enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                    exit = scaleOut(),
+                    modifier = Modifier.padding(vertical = 6.dp)
+                ) {
+                    if (it <= numberOfPlayers) {
+                        PlayerListItem(player = GameState.players[it - 1])
+                    }
+                }
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             OutlinedButton(
                 onClick = { updateGameSettings(context) },
                 modifier = Modifier

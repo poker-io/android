@@ -22,6 +22,8 @@
     <string name="contentDescription_join_game_button">Join game button</string>
     <string name="contentDescription_settings_icon">Settings icon</string>
     <string name="contentDescription_navigate_back">Navigate back</string>
+    <string name="contentDescription_admin">Player is an admin</string>
+    <string name="contentDescription_kickUser">Kick user from the game</string>
 
     <!-- Internal -->
     <string name="shared_preferences_file">com.pokerio.app.SHARED_PREFERENCES</string>
