@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.pokerio.app.utils.GameState
-import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
 
 @Preview
@@ -30,7 +29,6 @@ fun LobbyScreen(
     val context = LocalContext.current
 
     DisposableEffect(LocalLifecycleOwner.current) {
-
         // Sign-up for updates when a new player appears
         val callbackId = GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
         onDispose {

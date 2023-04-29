@@ -207,7 +207,7 @@ object GameState {
         playerRemovedCallbacks.forEach { it.value(player) }
     }
 
-    fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int){
+    fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
     }
