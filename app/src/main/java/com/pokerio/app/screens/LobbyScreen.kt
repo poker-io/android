@@ -4,12 +4,21 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -17,10 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.components.PlayerListItem
@@ -45,30 +55,65 @@ fun LobbyScreen() {
 
     val scrollState = ScrollState(0)
 
-    // This is a debugging UI
-    Column {
-        Text(text = "Game code: ${GameState.gameID}")
-        Text(text = "Players: $numberOfPlayers/8")
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Game code",
+                    fontWeight = FontWeight.Light
+                )
+                Text(text = GameState.gameID)
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Players",
+                    fontWeight = FontWeight.Light
+                )
+                Text(text = "$numberOfPlayers/8")
+            }
+        }
         Column(
             modifier = Modifier
-                .testTag("lobby_column")
                 .verticalScroll(scrollState, true)
-                .padding(horizontal = 12.dp)
+                .fillMaxHeight()
         ) {
-            GameState.players.forEach {
+            (1..8).forEach {
                 AnimatedVisibility(
-                    visible = true,
-                    enter = scaleIn()
+                    visible = it <= numberOfPlayers,
+                    enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                    exit = scaleOut()
                 ) {
-                    PlayerListItem(player = it)
+                    if (it <= numberOfPlayers) {
+                        PlayerListItem(player = GameState.players[it - 1])
+                    }
                 }
             }
         }
-        Button(onClick = { updateGameSettings(context) }) {
-            Text(text = "Update game settings")
-        }
-        Button(onClick = { startGame(context) }) {
-            Text(text = "Start game")
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            OutlinedButton(
+                onClick = { updateGameSettings(context) },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Update settings")
+            }
+            Button(
+                onClick = { startGame(context) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Start game")
+            }
         }
     }
 }
