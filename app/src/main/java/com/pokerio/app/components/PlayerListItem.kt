@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,23 +50,25 @@ fun PlayerListItem(
                 Text(
                     text = player.nickname,
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag("nickname")
                 )
                 Text(
                     text = "ID: ${player.playerID.substring(0..6)}",
                     fontSize = 16.sp,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    modifier = Modifier.testTag("player_id")
                 )
             }
             if (player.isAdmin) {
-                IconButton(onClick = {}, enabled = false) {
+                IconButton(onClick = {}, enabled = false, modifier = Modifier.testTag("admin_icon")) {
                     Icon(
                         Icons.Outlined.Star,
                         contentDescription = stringResource(id = R.string.contentDescription_admin)
                     )
                 }
             } else if (GameState.isPlayerAdmin) {
-                IconButton(onClick = { kickPlayer(context) }) {
+                IconButton(onClick = { kickPlayer(context) }, modifier = Modifier.testTag("kick_button")) {
                     Icon(
                         Icons.Outlined.Delete,
                         contentDescription = stringResource(id = R.string.contentDescription_kickUser)
