@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -110,6 +111,7 @@ fun LobbyScreen() {
                 .verticalScroll(scrollState, true)
                 .padding(vertical = 12.dp)
                 .fillMaxHeight()
+                .testTag("player_list")
         ) {
             (1..8).forEach {
                 AnimatedVisibility(
@@ -131,6 +133,7 @@ fun LobbyScreen() {
                 onClick = { leaveGame(context) },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .testTag("leave_game")
             ) {
                 Text(text = stringResource(id = R.string.leave_game))
             }
@@ -139,12 +142,15 @@ fun LobbyScreen() {
                     onClick = { updateGameSettings(context) },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .testTag("update_settings")
                 ) {
                     Text(text = stringResource(id = R.string.update_settings))
                 }
                 Button(
                     onClick = { startGame(context) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("start_game")
                 ) {
                     Text(text = stringResource(id = R.string.start_game))
                 }

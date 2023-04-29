@@ -10,6 +10,7 @@ import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.Rule
 import org.junit.Test
+import java.lang.Integer.min
 
 class PlayerListItemInstrumentedTest {
 
@@ -33,7 +34,7 @@ class PlayerListItemInstrumentedTest {
 
         val idText = composeTestRule.onNodeWithTag("player_id")
         idText.assertExists()
-        idText.assert(hasText("ID: ${id.substring(0..6)}"))
+        idText.assert(hasText("ID: ${id.substring(0, min(id.length, 7))}"))
 
         val adminIcon = composeTestRule.onNodeWithTag("admin_icon")
         adminIcon.assertIsDisplayed()
@@ -59,7 +60,7 @@ class PlayerListItemInstrumentedTest {
 
         val idText = composeTestRule.onNodeWithTag("player_id")
         idText.assertExists()
-        idText.assert(hasText("ID: ${id.substring(0..6)}"))
+        idText.assert(hasText("ID: ${id.substring(0, min(id.length, 7))}"))
 
         val adminIcon = composeTestRule.onNodeWithTag("admin_icon")
         adminIcon.assertIsDisplayed()
@@ -85,7 +86,7 @@ class PlayerListItemInstrumentedTest {
 
         val idText = composeTestRule.onNodeWithTag("player_id")
         idText.assertExists()
-        idText.assert(hasText("ID: ${id.substring(0..6)}"))
+        idText.assert(hasText("ID: ${id.substring(0, min(id.length, 7))}"))
 
         val adminIcon = composeTestRule.onNodeWithTag("admin_icon")
         adminIcon.assertDoesNotExist()
@@ -111,12 +112,32 @@ class PlayerListItemInstrumentedTest {
 
         val idText = composeTestRule.onNodeWithTag("player_id")
         idText.assertExists()
-        idText.assert(hasText("ID: ${id.substring(0..6)}"))
+        idText.assert(hasText("ID: ${id.substring(0, min(id.length, 7))}"))
 
         val adminIcon = composeTestRule.onNodeWithTag("admin_icon")
         adminIcon.assertDoesNotExist()
 
         val kickButton = composeTestRule.onNodeWithTag("kick_button")
         kickButton.assertDoesNotExist()
+    }
+
+    @Test
+    fun shortIDTest() {
+        GameState.isPlayerAdmin = false
+        val nickname = "TestPlayer"
+        val id = "123"
+        val player = Player(nickname, id, false)
+
+        composeTestRule.setContent {
+            PlayerListItem(player = player)
+        }
+
+        val nicknameText = composeTestRule.onNodeWithTag("nickname")
+        nicknameText.assertExists()
+        nicknameText.assert(hasText(nickname))
+
+        val idText = composeTestRule.onNodeWithTag("player_id")
+        idText.assertExists()
+        idText.assert(hasText("ID: ${id.substring(0, min(id.length, 7))}"))
     }
 }

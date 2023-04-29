@@ -30,6 +30,7 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PlayerProvider
+import java.lang.Integer.min
 
 @Preview
 @Composable
@@ -54,21 +55,28 @@ fun PlayerListItem(
                     modifier = Modifier.testTag("nickname")
                 )
                 Text(
-                    text = "ID: ${player.playerID.substring(0..6)}",
+                    text = "ID: ${player.playerID.substring(0, min(player.playerID.length, 7))}",
                     fontSize = 16.sp,
                     color = Color.Gray,
                     modifier = Modifier.testTag("player_id")
                 )
             }
             if (player.isAdmin) {
-                IconButton(onClick = {}, enabled = false, modifier = Modifier.testTag("admin_icon")) {
+                IconButton(
+                    onClick = {},
+                    enabled = false,
+                    modifier = Modifier.testTag("admin_icon")
+                ) {
                     Icon(
                         Icons.Outlined.Star,
                         contentDescription = stringResource(id = R.string.contentDescription_admin)
                     )
                 }
             } else if (GameState.isPlayerAdmin) {
-                IconButton(onClick = { kickPlayer(context) }, modifier = Modifier.testTag("kick_button")) {
+                IconButton(
+                    onClick = { kickPlayer(context) },
+                    modifier = Modifier.testTag("kick_button")
+                ) {
                     Icon(
                         Icons.Outlined.Delete,
                         contentDescription = stringResource(id = R.string.contentDescription_kickUser)
