@@ -125,7 +125,6 @@ object GameState {
 
                 val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
 
-                // We are included in the player list, so no need to add as separately
                 responseObject["players"]!!.jsonArray.forEach {
                     val nickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
                     val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
@@ -133,6 +132,7 @@ object GameState {
                     addPlayer(Player(nickname, playerHash, playerHash == gameMasterHash))
                 }
 
+                // This player is not included in the player list, so we need to add them separately
                 addPlayer(Player(nickname, playerID))
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
