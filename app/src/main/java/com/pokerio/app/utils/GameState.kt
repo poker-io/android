@@ -81,7 +81,7 @@ object GameState {
                 // Prepare url
                 val urlString =
                     "/createGame?creatorToken=$creatorID&nickname=$nickname" +
-                            "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
+                        "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
@@ -256,7 +256,6 @@ object GameState {
         }
     }
 
-
     fun startGameRequest(
         context: Context,
         onSuccess: () -> Unit,
@@ -273,7 +272,7 @@ object GameState {
 
                 url.readText()
 
-                //onGameStart()
+                // onGameStart()
             } catch (e: Exception) {
                 e.printStackTrace()
                 PokerioLogger.error(e.toString())
@@ -391,7 +390,6 @@ object GameState {
     fun isInGame(): Boolean {
         return gameID.isNotBlank()
     }
-
 }
 
 data class CreateGameResponse(

@@ -1,13 +1,10 @@
 package com.pokerio.app
 
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.pokerio.app.utils.Card
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PokerioLogger
-import kotlinx.coroutines.tasks.await
 
 class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 

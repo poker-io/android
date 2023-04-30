@@ -79,11 +79,11 @@ fun MainActivityComposable() {
         Context.MODE_PRIVATE
     )
     val nicknameSet = (
-            sharedPreferences.getString(
-                stringResource(id = R.string.sharedPreferences_nickname),
-                ""
-            ) ?: ""
-            ).isNotBlank()
+        sharedPreferences.getString(
+            stringResource(id = R.string.sharedPreferences_nickname),
+            ""
+        ) ?: ""
+        ).isNotBlank()
     val startDestination =
         if (nicknameSet) {
             "home"

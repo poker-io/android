@@ -69,7 +69,7 @@ class ServerRequestTest {
             assertThat("CreateGame should not error", false)
         }
 
-        GameState.createGame(context, onSuccess, onError, url)
+        GameState.createGameRequest(context, onSuccess, onError, url)
     }
 
     @Test
@@ -84,7 +84,7 @@ class ServerRequestTest {
             assert(true)
         }
 
-        GameState.createGame(context, onSuccess, onError, url)
+        GameState.createGameRequest(context, onSuccess, onError, url)
     }
 
     @Test
@@ -134,7 +134,7 @@ class ServerRequestTest {
             assertThat("JoinGame should not error", false)
         }
 
-        GameState.joinGame(gameKey, context, onSuccess, onError, url)
+        GameState.joinGameRequest(gameKey, context, onSuccess, onError, url)
     }
 
     @Test
@@ -149,7 +149,7 @@ class ServerRequestTest {
             assert(true)
         }
 
-        GameState.joinGame("123456", context, onSuccess, onError, url)
+        GameState.joinGameRequest("123456", context, onSuccess, onError, url)
     }
 
     @Test
@@ -164,7 +164,7 @@ class ServerRequestTest {
             assertThat("KickPlayer should not error", false)
         }
 
-        GameState.kickPlayer("testId", context, onSuccess, onError)
+        GameState.kickPlayerRequest("testId", context, onSuccess, onError)
     }
 
     @Test
@@ -179,7 +179,7 @@ class ServerRequestTest {
             assert(true)
         }
 
-        GameState.kickPlayer("testId", context, onSuccess, onError)
+        GameState.kickPlayerRequest("testId", context, onSuccess, onError)
     }
 
     @Test
@@ -197,7 +197,7 @@ class ServerRequestTest {
             assertThat("JoinGame should not error", false)
         }
 
-        GameState.leaveGame(context, onSuccess, onError, url)
+        GameState.leaveGameRequest(context, onSuccess, onError, url)
     }
 
     @After
