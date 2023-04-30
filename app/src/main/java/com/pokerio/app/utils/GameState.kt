@@ -30,6 +30,7 @@ object GameState {
     // Callbacks
     private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private var SettingsChangedCallback = HashMap<Int, () -> Unit>()
     private var nextId = 0
 
     // Constants
@@ -144,6 +145,7 @@ object GameState {
     fun exitSettings(
         context: Context,
         onError: () -> Unit,
+        onSuccess: () -> Unit,
         baseUrl: String = BASE_URL
     ) {
         if (isInGame()) {
@@ -170,6 +172,7 @@ object GameState {
                     val urlString = "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
                     val url = URL(baseUrl + urlString)
                     url.readText()
+                    ContextCompat.getMainExecutor(context).execute(onSuccess)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     PokerioLogger.error(e.toString())
@@ -197,6 +200,15 @@ object GameState {
         playerRemovedCallbacks.remove(id)
     }
 
+    fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
+        SettingsChangedCallback.put(nextId, callback)
+        return nextId++
+    }
+
+    fun removeOnSettingsChangedCallback(id: Int) {
+        SettingsChangedCallback.remove(id)
+    }
+
     fun addPlayer(player: Player) {
         players.add(player)
         playerJoinedCallbacks.forEach { it.value(player) }
@@ -212,9 +224,10 @@ object GameState {
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
+        SettingsChangedCallback.forEach {it.value()}
     }
     fun isInGame(): Boolean {
-        return gameID != ""
+        return gameID.isNotBlank()
     }
 }
 

@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.invalidateGroupsWithKey
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,8 +45,12 @@ import com.pokerio.app.utils.UnitUnitProvider
 @OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
-fun LobbyScreen() {
+fun LobbyScreen(
+    @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
+) {
     var numberOfPlayers by remember { mutableStateOf(GameState.players.size) }
+    var funds by remember { mutableStateOf(GameState.startingFunds) }
+    var smallBlind by remember { mutableStateOf(GameState.smallBlind)}
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
 
@@ -55,11 +60,16 @@ fun LobbyScreen() {
             numberOfPlayers = GameState.players.size
             isAdmin = GameState.isPlayerAdmin
         }
+    val callbackSettingsId =
+            GameState.addOnSettingsChangedCallback {
+                funds = GameState.startingFunds
+                smallBlind = GameState.smallBlind
+            }
+
     DisposableEffect(LocalLifecycleOwner.current) {
-        // Sign-up for updates when a new player appears
-        val callbackId = GameState.addOnPlayerJoinedCallback { numberOfPlayers = GameState.players.size }
         onDispose {
             // Unregister callback when we leave the view
+            GameState.removeOnSettingsChangedCallback(callbackSettingsId)
             GameState.removeOnPlayerJoinedCallback(callbackId)
         }
     }
@@ -97,14 +107,14 @@ fun LobbyScreen() {
                         text = stringResource(id = R.string.funds),
                         fontWeight = FontWeight.Light
                     )
-                    Text(text = GameState.startingFunds.toString())
+                    Text(text = "$funds")
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(id = R.string.small_blind),
                         fontWeight = FontWeight.Light
                     )
-                    Text(text = GameState.smallBlind.toString())
+                    Text(text = "$smallBlind")
                 }
             }
         }
@@ -141,7 +151,7 @@ fun LobbyScreen() {
             }
             if (isAdmin) {
                 OutlinedButton(
-                    onClick = { updateGameSettings(context) },
+                    onClick = { navigateToSettings() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("update_settings")
@@ -163,10 +173,6 @@ fun LobbyScreen() {
 
 private fun leaveGame(context: Context) {
     Toast.makeText(context, "TODO: Leave game", Toast.LENGTH_LONG).show()
-}
-
-private fun updateGameSettings(context: Context) {
-    Toast.makeText(context, "TODO: Update settings", Toast.LENGTH_LONG).show()
 }
 
 private fun startGame(context: Context) {

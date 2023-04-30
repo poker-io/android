@@ -73,6 +73,14 @@ fun SettingsScreen(
                         "Failed to update settings",
                         Toast.LENGTH_LONG
                     ).show()
+                },
+                onSuccess =
+                {
+                    Toast.makeText(
+                        context,
+                        "Successfully updated settings",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             )
         }
