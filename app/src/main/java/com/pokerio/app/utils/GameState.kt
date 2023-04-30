@@ -272,7 +272,7 @@ object GameState {
 
                 url.readText()
 
-                // onGameStart()
+                ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
                 e.printStackTrace()
                 PokerioLogger.error(e.toString())

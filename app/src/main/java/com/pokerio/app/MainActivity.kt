@@ -25,7 +25,6 @@ import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
-import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.discard
 
 class MainActivity : AppCompatActivity() {
