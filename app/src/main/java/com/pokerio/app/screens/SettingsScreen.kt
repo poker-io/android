@@ -79,7 +79,7 @@ fun SettingsScreen(
                 ).show()
             }
 
-            GameState.exitSettings(
+            GameState.exitSettingsRequest(
                 context = context,
                 onError = onError,
                 onSuccess = onSuccess

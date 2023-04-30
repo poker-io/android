@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pokerio.app.screens.Game
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
@@ -63,6 +64,12 @@ fun MainActivityComposable() {
             navController.popBackStack("home", inclusive = false)
         }
     }
+    GameState.onGameStart = {
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack()
+            navController.navigate("game")
+        }
+    }
 
     // Check if user had already set a nickname
     val sharedPreferences = LocalContext.current.getSharedPreferences(
@@ -89,9 +96,11 @@ fun MainActivityComposable() {
                 navigateToLobby = navigateToLobby
             )
         }
+
         composable("settings") { SettingsScreen(navigateBack = navigateBack) }
         composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
         composable("lobby") { LobbyScreen(navigateToSettings = navigateToSettings) }
+        composable("game") { Game() }
     }
 }
 

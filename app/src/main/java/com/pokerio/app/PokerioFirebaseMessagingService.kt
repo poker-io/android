@@ -16,6 +16,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             "settingsUpdated" -> settingsUpdated(message.data)
             "playerKicked" -> playerKicked(message.data)
             "playerLeft" -> playerLeft(message.data)
+            "startGame" -> startGame(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -56,6 +57,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             PokerioLogger.debug("Received playerLeft FCM message")
 
             GameState.removePlayer(data["playerHash"]!!, data["gameMaster"]!!)
+        }
+
+        fun startGame(data: Map<String, String>) {
+            PokerioLogger.debug("Received startGame FCM message")
+            GameState.startGame(data)
         }
     }
 }
