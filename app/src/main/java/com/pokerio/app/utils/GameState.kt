@@ -367,9 +367,7 @@ object GameState {
     fun startGame(data: Map<String, String>) {
         card1 = Card(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
         card2 = Card(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
-        val gameInfoJsonString = data["startedGameInfo"]!!
-        val gameInfoJson = Json.parseToJsonElement(gameInfoJsonString).jsonObject
-        players.forEach { it.funds = GameState.startingFunds }
+        players.forEach { it.funds = startingFunds }
 
         onGameStart()
     }
