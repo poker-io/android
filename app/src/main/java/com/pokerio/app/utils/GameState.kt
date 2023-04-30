@@ -15,21 +15,22 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.URL
+import java.security.MessageDigest
 
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
 object GameState {
     // Class fields
     var gameID = ""
-    var players = mutableListOf<Player>()
-        private set
+    val players = mutableListOf<Player>()
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var isPlayerAdmin: Boolean = false
 
     // Callbacks
-    private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
-    private var playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
+    var onGameReset = {}
+    private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
 
     // Constants
@@ -167,6 +168,23 @@ object GameState {
         }
     }
 
+    fun resetGameState() {
+        // Class fields
+        gameID = ""
+        players.clear()
+        startingFunds = -1
+        smallBlind = -1
+        isPlayerAdmin = false
+
+        // Callbacks
+        playerJoinedCallbacks.clear()
+        playerRemovedCallbacks.clear()
+        // Not resetting nextId, because someone might be holding on to an old one and we don't
+        // want then to remove new callbacks by mistake
+
+        onGameReset()
+    }
+
     fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
         playerJoinedCallbacks.put(nextId, callback)
         return nextId++
@@ -177,7 +195,7 @@ object GameState {
     }
 
     fun addOnPlayerRemovedCallback(callback: (Player) -> Unit): Int {
-        playerRemovedCallbacks.put(nextId, callback)
+        playerRemovedCallbacks[nextId] = callback
         return nextId++
     }
 
@@ -191,10 +209,20 @@ object GameState {
     }
 
     fun removePlayer(playerHash: String) {
-        val player = players.find { it.playerID == playerHash } ?: return
+        val digest = MessageDigest.getInstance("SHA-256")
 
-        players.removeIf { it.playerID == playerHash }
-        playerRemovedCallbacks.forEach { it.value(player) }
+        // Check if this player is being removed
+        val thisPlayerRemoved = players.find {
+            digest.digest(it.playerID.toByteArray()).contentEquals(playerHash.toByteArray())
+        } != null
+        if (thisPlayerRemoved) {
+            resetGameState()
+        } else {
+            val player = players.find { it.playerID == playerHash } ?: return
+
+            players.removeIf { it.playerID == playerHash }
+            playerRemovedCallbacks.forEach { it.value(player) }
+        }
     }
 }
 

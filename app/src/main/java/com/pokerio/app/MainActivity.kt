@@ -22,6 +22,7 @@ import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
+import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.discard
 
 class MainActivity : AppCompatActivity() {
@@ -52,6 +53,11 @@ fun MainActivityComposable() {
     }
     val navigateToLobby = {
         navController.navigate("lobby")
+    }
+
+    GameState.resetGameState()
+    GameState.onGameReset = {
+        navController.popBackStack("home", inclusive = false)
     }
 
     // Check if user had already set a nickname
