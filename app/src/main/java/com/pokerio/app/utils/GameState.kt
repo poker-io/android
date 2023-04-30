@@ -34,7 +34,7 @@ object GameState {
 
     // Constants
     const val BASE_URL = "http://158.101.160.143:42069"
-    val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
+    val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
 
@@ -59,7 +59,7 @@ object GameState {
         // TODO: Load settings
 
         // Make request
-        netowrkCoroutine.launch {
+        networkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
                 // Prepare url
@@ -106,7 +106,7 @@ object GameState {
         ) ?: "Player"
 
         // Make request
-        netowrkCoroutine.launch {
+        networkCoroutine.launch {
             try {
                 val playerID = FirebaseMessaging.getInstance().token.await()
 
@@ -148,7 +148,7 @@ object GameState {
         onSuccess: () -> Unit,
         baseUrl: String = BASE_URL
     ) {
-        netowrkCoroutine.launch {
+        networkCoroutine.launch {
             try {
                 val myID = FirebaseMessaging.getInstance().token.await()
 
