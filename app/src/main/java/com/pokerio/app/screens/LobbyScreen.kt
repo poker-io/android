@@ -111,14 +111,14 @@ fun LobbyScreen(
                         text = stringResource(id = R.string.funds),
                         fontWeight = FontWeight.Light
                     )
-                    Text(text = "$funds")
+                    Text(text = "$funds", modifier = Modifier.testTag("funds"))
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(id = R.string.small_blind),
                         fontWeight = FontWeight.Light
                     )
-                    Text(text = "$smallBlind")
+                    Text(text = "$smallBlind", modifier = Modifier.testTag("small_blind"))
                 }
             }
         }
