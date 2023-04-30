@@ -76,7 +76,7 @@ object GameState {
                 // Prepare url
                 val urlString =
                     "/createGame?creatorToken=$creatorID&nickname=$nickname" +
-                            "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
+                        "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
