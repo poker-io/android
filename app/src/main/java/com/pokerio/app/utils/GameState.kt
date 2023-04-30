@@ -25,6 +25,7 @@ object GameState {
         private set
     var startingFunds: Int = -1
     var smallBlind: Int = -1
+    var isPlayerAdmin: Boolean = false
 
     // Callbacks
     private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
@@ -74,8 +75,10 @@ object GameState {
                 smallBlind = responseObject.smallBlind
 
                 // We have to add the creator to the list of players
+                players.clear()
                 addPlayer(Player(nickname, creatorID, true))
 
+                isPlayerAdmin = true
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
                 PokerioLogger.error(e.toString())
@@ -112,7 +115,6 @@ object GameState {
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
-                println(responseJson)
                 val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
                 this@GameState.gameID = gameID
