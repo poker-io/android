@@ -31,6 +31,7 @@ object GameState {
     var onGameReset = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private var settingsChangedCallback = HashMap<Int, () -> Unit>()
     private var nextId = 0
 
     // Constants
@@ -57,14 +58,25 @@ object GameState {
             context.getString(R.string.sharedPreferences_nickname),
             "Player"
         ) ?: "Player"
-        // TODO: Load settings
+
+        val preferredSmallBlind = sharedPreferences.getInt(
+            context.getString(R.string.sharedPreferences_small_blind),
+            1000
+        )
+
+        val preferredStartingFunds = sharedPreferences.getInt(
+            context.getString(R.string.sharedPreferences_starting_funds),
+            100
+        )
 
         // Make request
         networkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
                 // Prepare url
-                val urlString = "/createGame?creatorToken=$creatorID&nickname=$nickname"
+                val urlString =
+                    "/createGame?creatorToken=$creatorID&nickname=$nickname" +
+                        "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
@@ -144,6 +156,47 @@ object GameState {
         }
     }
 
+    fun exitSettings(
+        context: Context,
+        onError: () -> Unit,
+        onSuccess: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
+        if (isInGame()) {
+            val sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.shared_preferences_file),
+                Context.MODE_PRIVATE
+            )
+
+            val smallBlind = sharedPreferences.getInt(
+                context.getString(R.string.sharedPreferences_small_blind),
+                1000
+            )
+
+            val startingFunds = sharedPreferences.getInt(
+                context.getString(R.string.sharedPreferences_starting_funds),
+                100
+            )
+
+            networkCoroutine.launch {
+                try {
+                    val playerID = FirebaseMessaging.getInstance().token.await()
+
+                    // Prepare url
+                    val urlString =
+                        "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
+                    val url = URL(baseUrl + urlString)
+                    url.readText()
+                    ContextCompat.getMainExecutor(context).execute(onSuccess)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    PokerioLogger.error(e.toString())
+                    ContextCompat.getMainExecutor(context).execute(onError)
+                }
+            }
+        }
+    }
+
     fun kickPlayer(
         playerID: String,
         context: Context,
@@ -205,6 +258,15 @@ object GameState {
         playerRemovedCallbacks.remove(id)
     }
 
+    fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
+        settingsChangedCallback.put(nextId, callback)
+        return nextId++
+    }
+
+    fun removeOnSettingsChangedCallback(id: Int) {
+        settingsChangedCallback.remove(id)
+    }
+
     fun addPlayer(player: Player) {
         players.add(player)
         playerJoinedCallbacks.forEach { it.value(player) }
@@ -230,6 +292,15 @@ object GameState {
             .getInstance("SHA-256")
             .digest(string.toByteArray())
             .fold("") { str, it -> str + "%02x".format(it) }
+    }
+
+    fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
+        startingFunds = newStartingFunds
+        smallBlind = newSmallBlind
+        settingsChangedCallback.forEach { it.value() }
+    }
+    fun isInGame(): Boolean {
+        return gameID.isNotBlank()
     }
 }
 

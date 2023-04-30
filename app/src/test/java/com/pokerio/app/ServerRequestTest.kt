@@ -45,8 +45,8 @@ class ServerRequestTest {
     @Test
     fun createGameRequestTest() {
         val gameKey = "123456"
-        val startingFunds = 1000
-        val smallBlind = 100
+        val startingFunds = 2137
+        val smallBlind = 1000
 
         server.enqueue(
             MockResponse().setBody(

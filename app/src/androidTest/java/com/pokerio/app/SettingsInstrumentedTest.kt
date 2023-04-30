@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import com.pokerio.app.screens.Selector
 import com.pokerio.app.screens.SettingsScreen
+import com.pokerio.app.utils.GameState
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -54,6 +55,17 @@ class SettingsInstrumentedTest {
             ""
         )
         assert(newNickname == replaceNickname)
+    }
+
+    @Test
+    fun testNicknameSetterInGame() {
+        GameState.gameID = "699"
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val textField = androidTestRule.onNodeWithTag("settings_nickname")
+        textField.assertDoesNotExist()
     }
 
     @Test
