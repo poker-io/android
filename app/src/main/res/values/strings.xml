@@ -18,10 +18,19 @@
     <string name="starting_funds">Starting funds</string>
     <string name="small_blind">Small blind</string>
 
+    <!-- Lobby screen -->
+    <string name="players">Players</string>
+    <string name="funds">Funds</string>
+    <string name="leave_game">Leave game</string>
+    <string name="update_settings">Update settings</string>
+    <string name="start_game">Start game</string>
+
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>
     <string name="contentDescription_settings_icon">Settings icon</string>
     <string name="contentDescription_navigate_back">Navigate back</string>
+    <string name="contentDescription_admin">Player is an admin</string>
+    <string name="contentDescription_kickUser">Kick user from the game</string>
 
     <!-- Internal -->
     <string name="shared_preferences_file">com.pokerio.app.SHARED_PREFERENCES</string>
