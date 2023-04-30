@@ -15,6 +15,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainActivityComposable() {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     val navigateToSettings = {
         navController.navigate("settings")
@@ -57,7 +59,9 @@ fun MainActivityComposable() {
 
     GameState.resetGameState()
     GameState.onGameReset = {
-        navController.popBackStack("home", inclusive = false)
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack("home", inclusive = false)
+        }
     }
 
     // Check if user had already set a nickname

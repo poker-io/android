@@ -133,6 +133,8 @@ object GameState {
                     addPlayer(Player(nickname, playerHash, playerHash == gameMasterHash))
                 }
 
+                addPlayer(Player(nickname, playerID))
+
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -209,11 +211,9 @@ object GameState {
     }
 
     fun removePlayer(playerHash: String) {
-        val digest = MessageDigest.getInstance("SHA-256")
-
         // Check if this player is being removed
         val thisPlayerRemoved = players.find {
-            digest.digest(it.playerID.toByteArray()).contentEquals(playerHash.toByteArray())
+            sha256(it.playerID) == playerHash
         } != null
         if (thisPlayerRemoved) {
             resetGameState()
@@ -223,6 +223,13 @@ object GameState {
             players.removeIf { it.playerID == playerHash }
             playerRemovedCallbacks.forEach { it.value(player) }
         }
+    }
+
+    private fun sha256(string: String): String {
+        return MessageDigest
+            .getInstance("SHA-256")
+            .digest(string.toByteArray())
+            .fold("") { str, it -> str + "%02x".format(it) }
     }
 }
 
