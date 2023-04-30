@@ -187,8 +187,8 @@ object GameState {
                 url.readText()
 
                 ContextCompat.getMainExecutor(context).execute {
-                    onSuccess()
                     resetGameState()
+                    onSuccess()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
