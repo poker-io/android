@@ -64,24 +64,25 @@ fun SettingsScreen(
     DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
             // Unregister callback when we leave the view
+            val onError = {
+                Toast.makeText(
+                    context,
+                    "Failed to update settings",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            val onSuccess = {
+                Toast.makeText(
+                    context,
+                    "Successfully updated settings",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
             GameState.exitSettings(
                 context = context,
-                onError =
-                {
-                    Toast.makeText(
-                        context,
-                        "Failed to update settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                },
-                onSuccess =
-                {
-                    Toast.makeText(
-                        context,
-                        "Successfully updated settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                onError = onError,
+                onSuccess = onSuccess
             )
         }
     }

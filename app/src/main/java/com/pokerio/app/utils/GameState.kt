@@ -31,7 +31,7 @@ object GameState {
     var onGameReset = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
-    private var SettingsChangedCallback = HashMap<Int, () -> Unit>()
+    private var settingsChangedCallback = HashMap<Int, () -> Unit>()
     private var nextId = 0
 
     // Constants
@@ -58,14 +58,25 @@ object GameState {
             context.getString(R.string.sharedPreferences_nickname),
             "Player"
         ) ?: "Player"
-        // TODO: Load settings
+
+        val preferredSmallBlind = sharedPreferences.getInt(
+            context.getString(R.string.sharedPreferences_small_blind),
+            1000
+        )
+
+        val preferredStartingFunds = sharedPreferences.getInt(
+            context.getString(R.string.sharedPreferences_starting_funds),
+            100
+        )
 
         // Make request
         networkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
                 // Prepare url
-                val urlString = "/createGame?creatorToken=$creatorID&nickname=$nickname"
+                val urlString =
+                    "/createGame?creatorToken=$creatorID&nickname=$nickname" +
+                            "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
@@ -185,6 +196,7 @@ object GameState {
             }
         }
     }
+
     fun kickPlayer(
         playerID: String,
         context: Context,
@@ -247,12 +259,12 @@ object GameState {
     }
 
     fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
-        SettingsChangedCallback.put(nextId, callback)
+        settingsChangedCallback.put(nextId, callback)
         return nextId++
     }
 
     fun removeOnSettingsChangedCallback(id: Int) {
-        SettingsChangedCallback.remove(id)
+        settingsChangedCallback.remove(id)
     }
 
     fun addPlayer(player: Player) {
@@ -285,7 +297,7 @@ object GameState {
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
-        SettingsChangedCallback.forEach { it.value() }
+        settingsChangedCallback.forEach { it.value() }
     }
     fun isInGame(): Boolean {
         return gameID.isNotBlank()

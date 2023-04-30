@@ -39,8 +39,8 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             PokerioLogger.debug("Received updatedSettings FCM message")
 
             GameState.changeGameSettings(
-                data["startingFunds"]?.toInt() ?: GameState.startingFunds,
-                data["smallBlind"]?.toInt() ?: GameState.smallBlind
+                data["startingFunds"]!!.toInt(),
+                data["smallBlind"]!!.toInt()
             )
         }
 
