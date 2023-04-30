@@ -66,7 +66,6 @@ fun MainActivityComposable() {
         }
     }
     GameState.onGameStart = {
-        PokerioLogger.debug("Called onGameStart")
         ContextCompat.getMainExecutor(context).execute {
             navController.popBackStack()
             navController.navigate("game")
