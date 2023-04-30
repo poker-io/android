@@ -57,8 +57,6 @@ fun LobbyScreen() {
         onDispose {
             // Unregister callback when we leave the view
             GameState.removeOnPlayerJoinedCallback(callbackId)
-            // Notify the server we're leaving the game
-            leaveGame(context)
         }
     }
 
