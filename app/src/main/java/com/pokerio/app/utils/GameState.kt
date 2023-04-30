@@ -213,32 +213,6 @@ object GameState {
                 val url = URL(baseUrl + urlString)
 
                 url.readText()
-                
-                ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
-            }
-        }
-    }
-
-    fun kickPlayer(
-        playerID: String,
-        context: Context,
-        onSuccess: () -> Unit,
-        onError: () -> Unit,
-        baseUrl: String = BASE_URL
-    ) {
-        networkCoroutine.launch {
-            try {
-                val myID = FirebaseMessaging.getInstance().token.await()
-
-                // Prepare url
-                val urlString = "/kickPlayer?creatorToken=$myID&playerToken=$playerID"
-                val url = URL(baseUrl + urlString)
-
-                url.readText()
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
@@ -248,7 +222,7 @@ object GameState {
             }
         }
     }
-    
+
     fun resetGameState() {
         // Class fields
         gameID = ""
