@@ -164,7 +164,15 @@ fun LobbyScreen() {
 }
 
 private fun leaveGame(context: Context) {
-    Toast.makeText(context, "TODO: Leave game", Toast.LENGTH_LONG).show()
+    val onSuccess = {
+        Toast.makeText(context, "Left game", Toast.LENGTH_LONG).show()
+    }
+
+    val onError = {
+        Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
+    }
+
+    GameState.leaveGame(context, onSuccess, onError)
 }
 
 private fun updateGameSettings(context: Context) {
