@@ -2,6 +2,7 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
@@ -52,6 +53,7 @@ fun LobbyScreen(
     var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
+    val scrollState = ScrollState(0)
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears
@@ -77,8 +79,10 @@ fun LobbyScreen(
             GameState.removeOnPlayerRemovedCallback(removedCallbackId)
         }
     }
-
-    val scrollState = ScrollState(0)
+    BackHandler {
+        // Leave the game if we're navigating back
+        leaveGame(context)
+    }
 
     Column(
         modifier = Modifier
@@ -176,7 +180,15 @@ fun LobbyScreen(
 }
 
 private fun leaveGame(context: Context) {
-    Toast.makeText(context, "TODO: Leave game", Toast.LENGTH_LONG).show()
+    val onSuccess = {
+        Toast.makeText(context, "Left game", Toast.LENGTH_LONG).show()
+    }
+
+    val onError = {
+        Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
+    }
+
+    GameState.leaveGame(context, onSuccess, onError)
 }
 
 private fun startGame(context: Context) {

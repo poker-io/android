@@ -223,6 +223,34 @@ object GameState {
         }
     }
 
+    fun leaveGame(
+        context: Context,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
+        networkCoroutine.launch {
+            try {
+                val myID = FirebaseMessaging.getInstance().token.await()
+
+                // Prepare url
+                val urlString = "/leaveGame?playerToken=$myID"
+                val url = URL(baseUrl + urlString)
+
+                url.readText()
+
+                ContextCompat.getMainExecutor(context).execute {
+                    resetGameState()
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                PokerioLogger.error(e.toString())
+                ContextCompat.getMainExecutor(context).execute(onError)
+            }
+        }
+    }
+
     fun resetGameState() {
         // Class fields
         gameID = ""
@@ -272,18 +300,37 @@ object GameState {
         playerJoinedCallbacks.forEach { it.value(player) }
     }
 
-    fun removePlayer(playerHash: String) {
+    fun removePlayer(playerHash: String, newAdmin: String? = null) {
         // Check if this player is being removed
-        val thisPlayerRemoved = players.find {
+        val isThisPlayerRemoved = players.find {
             sha256(it.playerID) == playerHash
         } != null
-        if (thisPlayerRemoved) {
+        if (isThisPlayerRemoved) {
             resetGameState()
         } else {
-            val player = players.find { it.playerID == playerHash } ?: return
+            val removedPlayer = players.find { it.playerID == playerHash } ?: return
+
+            if (removedPlayer.isAdmin && newAdmin == null) {
+                throw Exception("Admin removed without new admin given")
+            } else if (removedPlayer.isAdmin) {
+                val isThisPlayerNewAdmin = players.find {
+                    sha256(it.playerID) == newAdmin
+                } != null
+
+                if (isThisPlayerNewAdmin) {
+                    isPlayerAdmin = true
+                    val thisPlayer = players.find {
+                        sha256(it.playerID) == newAdmin
+                    }
+                    thisPlayer!!.isAdmin = true
+                } else {
+                    val newAdminPlayer = players.find { it.playerID == newAdmin }
+                    newAdminPlayer!!.isAdmin = true
+                }
+            }
 
             players.removeIf { it.playerID == playerHash }
-            playerRemovedCallbacks.forEach { it.value(player) }
+            playerRemovedCallbacks.forEach { it.value(removedPlayer) }
         }
     }
 

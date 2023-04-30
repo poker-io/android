@@ -182,6 +182,24 @@ class ServerRequestTest {
         GameState.kickPlayer("testId", context, onSuccess, onError)
     }
 
+    @Test
+    fun leaveGameRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        val onSuccess = {
+            assert(GameState.gameID == "")
+            assert(GameState.players.isEmpty())
+        }
+
+        val onError = {
+            assertThat("JoinGame should not error", false)
+        }
+
+        GameState.leaveGame(context, onSuccess, onError, url)
+    }
+
     @After
     fun tearDown() {
         server.shutdown()
