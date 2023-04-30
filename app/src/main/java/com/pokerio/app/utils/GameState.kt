@@ -33,8 +33,8 @@ object GameState {
     private var nextId = 0
 
     // Constants
-    const val BASE_URL = "http://158.101.160.143:42069"
-    val networkCoroutine = CoroutineScope(Dispatchers.IO)
+    private const val BASE_URL = "http://158.101.160.143:42069"
+    private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
 
