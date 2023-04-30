@@ -104,10 +104,6 @@ class ServerRequestTest {
                     {
                         "nickname": "test1",
                         "playerHash": "1",
-                    },
-                    {
-                        "nickname": "test2",
-                        "playerHash": "2",
                     }
                 ]
             }
