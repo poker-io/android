@@ -15,6 +15,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +23,7 @@ import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
+import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.discard
 
 class MainActivity : AppCompatActivity() {
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainActivityComposable() {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     val navigateToSettings = {
         navController.navigate("settings")
@@ -52,6 +55,13 @@ fun MainActivityComposable() {
     }
     val navigateToLobby = {
         navController.navigate("lobby")
+    }
+
+    GameState.resetGameState()
+    GameState.onGameReset = {
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack("home", inclusive = false)
+        }
     }
 
     // Check if user had already set a nickname

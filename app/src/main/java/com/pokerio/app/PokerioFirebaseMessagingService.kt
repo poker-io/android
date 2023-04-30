@@ -14,6 +14,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         when (message.data["type"]) {
             "playerJoined" -> playerJoined(message.data)
             "settingsUpdated" -> settingsUpdated(message.data)
+            "playerKicked" -> playerKicked(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -24,13 +25,13 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-        fun playerJoined(data: MutableMap<String, String>) {
+        fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
 
             GameState.addPlayer(
                 Player(
-                    data["nickname"] ?: "Player",
-                    data["playerHash"] ?: ""
+                    data["nickname"]!!,
+                    data["playerHash"]!!
                 )
             )
         }
@@ -41,6 +42,12 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
                 data["startingFunds"]?.toInt() ?: GameState.startingFunds,
                 data["smallBlind"]?.toInt() ?: GameState.smallBlind
             )
+        }
+
+        fun playerKicked(data: Map<String, String>) {
+            PokerioLogger.debug("Received playerKicked FCM message")
+
+            GameState.removePlayer(data["playerHash"]!!)
         }
     }
 }

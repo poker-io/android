@@ -54,23 +54,30 @@ fun LobbyScreen(
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
 
-    // Sign-up for updates when a new player appears
-    val callbackId =
-        GameState.addOnPlayerJoinedCallback {
-            numberOfPlayers = GameState.players.size
-            isAdmin = GameState.isPlayerAdmin
-        }
-    val callbackSettingsId =
+
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        // Sign-up for updates when a new player appears
+        val joinedCallbackId =
+            GameState.addOnPlayerJoinedCallback {
+                numberOfPlayers = GameState.players.size
+                isAdmin = GameState.isPlayerAdmin
+            }
+        val removedCallbackId =
+            GameState.addOnPlayerRemovedCallback {
+                numberOfPlayers = GameState.players.size
+                isAdmin = GameState.isPlayerAdmin
+            }
+        val callbackSettingsId =
             GameState.addOnSettingsChangedCallback {
                 funds = GameState.startingFunds
                 smallBlind = GameState.smallBlind
             }
-
-    DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
             // Unregister callback when we leave the view
             GameState.removeOnSettingsChangedCallback(callbackSettingsId)
-            GameState.removeOnPlayerJoinedCallback(callbackId)
+            GameState.removeOnPlayerJoinedCallback(joinedCallbackId)
+            GameState.removeOnPlayerRemovedCallback(removedCallbackId)
         }
     }
 
