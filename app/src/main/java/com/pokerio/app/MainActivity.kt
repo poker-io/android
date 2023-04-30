@@ -36,13 +36,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // Leave the game if the app was closed
-        GameState.leaveGame(this, {}, {})
-    }
 }
 
 @Composable
