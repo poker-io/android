@@ -285,7 +285,7 @@ object GameState {
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
-        SettingsChangedCallback.forEach {it.value()}
+        SettingsChangedCallback.forEach { it.value() }
     }
     fun isInGame(): Boolean {
         return gameID.isNotBlank()

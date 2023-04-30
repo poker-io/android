@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.invalidateGroupsWithKey
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,11 +49,9 @@ fun LobbyScreen(
 ) {
     var numberOfPlayers by remember { mutableStateOf(GameState.players.size) }
     var funds by remember { mutableStateOf(GameState.startingFunds) }
-    var smallBlind by remember { mutableStateOf(GameState.smallBlind)}
+    var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
-
-
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears
