@@ -145,8 +145,8 @@ object GameState {
     fun kickPlayer(
         playerID: String,
         context: Context,
-        onError: () -> Unit,
         onSuccess: () -> Unit,
+        onError: () -> Unit,
         baseUrl: String = BASE_URL
     ) {
         networkCoroutine.launch {
@@ -154,7 +154,7 @@ object GameState {
                 val myID = FirebaseMessaging.getInstance().token.await()
 
                 // Prepare url
-                val urlString = "/joinGame?creatorToken=$myID&playerToken=$playerID"
+                val urlString = "/kickPlayer?creatorToken=$myID&playerToken=$playerID"
                 val url = URL(baseUrl + urlString)
 
                 url.readText()
