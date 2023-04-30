@@ -104,10 +104,6 @@ class ServerRequestTest {
                     {
                         "nickname": "test1",
                         "playerHash": "1",
-                    },
-                    {
-                        "nickname": "test2",
-                        "playerHash": "2",
                     }
                 ]
             }
@@ -154,6 +150,36 @@ class ServerRequestTest {
         }
 
         GameState.joinGame("123456", context, onSuccess, onError, url)
+    }
+
+    @Test
+    fun kickPlayerCorrectResponseTest() {
+        server.enqueue(MockResponse().setBody(""))
+
+        val onSuccess = {
+            assert(true)
+        }
+
+        val onError = {
+            assertThat("KickPlayer should not error", false)
+        }
+
+        GameState.kickPlayer("testId", context, onSuccess, onError)
+    }
+
+    @Test
+    fun kickPlayerWrongResponseTest() {
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertThat("KickPlayer should error", false)
+        }
+
+        val onError = {
+            assert(true)
+        }
+
+        GameState.kickPlayer("testId", context, onSuccess, onError)
     }
 
     @After

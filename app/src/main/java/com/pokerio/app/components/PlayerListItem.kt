@@ -74,7 +74,7 @@ fun PlayerListItem(
                 }
             } else if (GameState.isPlayerAdmin) {
                 IconButton(
-                    onClick = { kickPlayer(context) },
+                    onClick = { kickPlayer(context, player.playerID) },
                     modifier = Modifier.testTag("kick_button")
                 ) {
                     Icon(
@@ -87,6 +87,14 @@ fun PlayerListItem(
     }
 }
 
-fun kickPlayer(context: Context) {
-    Toast.makeText(context, "TODO: Kick player", Toast.LENGTH_LONG).show()
+fun kickPlayer(context: Context, playerID: String) {
+    val onSuccess = {
+        Toast.makeText(context, "Kicked player", Toast.LENGTH_LONG).show()
+    }
+
+    val onError = {
+        Toast.makeText(context, "Failed to kick player", Toast.LENGTH_LONG).show()
+    }
+
+    GameState.kickPlayer(playerID, context, onSuccess, onError)
 }

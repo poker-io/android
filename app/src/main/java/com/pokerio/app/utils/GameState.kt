@@ -15,26 +15,27 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.URL
+import java.security.MessageDigest
 
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
 object GameState {
     // Class fields
     var gameID = ""
-    var players = mutableListOf<Player>()
-        private set
+    val players = mutableListOf<Player>()
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var isPlayerAdmin: Boolean = false
 
     // Callbacks
-    private var playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
-    private var playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
+    var onGameReset = {}
+    private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
+    private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
 
     // Constants
-    const val BASE_URL = "http://158.101.160.143:42069"
-    val netowrkCoroutine = CoroutineScope(Dispatchers.IO)
+    private const val BASE_URL = "http://158.101.160.143:42069"
+    private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
 
@@ -59,7 +60,7 @@ object GameState {
         // TODO: Load settings
 
         // Make request
-        netowrkCoroutine.launch {
+        networkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
                 // Prepare url
@@ -106,7 +107,7 @@ object GameState {
         ) ?: "Player"
 
         // Make request
-        netowrkCoroutine.launch {
+        networkCoroutine.launch {
             try {
                 val playerID = FirebaseMessaging.getInstance().token.await()
 
@@ -124,13 +125,15 @@ object GameState {
 
                 val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
 
-                // We are included in the player list, so no need to add as separately
                 responseObject["players"]!!.jsonArray.forEach {
                     val nickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
                     val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
 
                     addPlayer(Player(nickname, playerHash, playerHash == gameMasterHash))
                 }
+
+                // This player is not included in the player list, so we need to add them separately
+                addPlayer(Player(nickname, playerID))
 
                 ContextCompat.getMainExecutor(context).execute(onSuccess)
             } catch (e: Exception) {
@@ -139,6 +142,49 @@ object GameState {
                 ContextCompat.getMainExecutor(context).execute(onError)
             }
         }
+    }
+
+    fun kickPlayer(
+        playerID: String,
+        context: Context,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
+        networkCoroutine.launch {
+            try {
+                val myID = FirebaseMessaging.getInstance().token.await()
+
+                // Prepare url
+                val urlString = "/kickPlayer?creatorToken=$myID&playerToken=$playerID"
+                val url = URL(baseUrl + urlString)
+
+                url.readText()
+
+                ContextCompat.getMainExecutor(context).execute(onSuccess)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                PokerioLogger.error(e.toString())
+                ContextCompat.getMainExecutor(context).execute(onError)
+            }
+        }
+    }
+
+    fun resetGameState() {
+        // Class fields
+        gameID = ""
+        players.clear()
+        startingFunds = -1
+        smallBlind = -1
+        isPlayerAdmin = false
+
+        // Callbacks
+        playerJoinedCallbacks.clear()
+        playerRemovedCallbacks.clear()
+        // Not resetting nextId, because someone might be holding on to an old one and we don't
+        // want then to remove new callbacks by mistake
+
+        onGameReset()
     }
 
     fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
@@ -151,7 +197,7 @@ object GameState {
     }
 
     fun addOnPlayerRemovedCallback(callback: (Player) -> Unit): Int {
-        playerRemovedCallbacks.put(nextId, callback)
+        playerRemovedCallbacks[nextId] = callback
         return nextId++
     }
 
@@ -165,10 +211,25 @@ object GameState {
     }
 
     fun removePlayer(playerHash: String) {
-        val player = players.find { it.playerID == playerHash } ?: return
+        // Check if this player is being removed
+        val thisPlayerRemoved = players.find {
+            sha256(it.playerID) == playerHash
+        } != null
+        if (thisPlayerRemoved) {
+            resetGameState()
+        } else {
+            val player = players.find { it.playerID == playerHash } ?: return
 
-        players.removeIf { it.playerID == playerHash }
-        playerRemovedCallbacks.forEach { it.value(player) }
+            players.removeIf { it.playerID == playerHash }
+            playerRemovedCallbacks.forEach { it.value(player) }
+        }
+    }
+
+    private fun sha256(string: String): String {
+        return MessageDigest
+            .getInstance("SHA-256")
+            .digest(string.toByteArray())
+            .fold("") { str, it -> str + "%02x".format(it) }
     }
 }
 

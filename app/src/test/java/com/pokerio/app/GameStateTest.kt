@@ -61,4 +61,27 @@ class GameStateTest {
         GameState.removePlayer(testPlayer.playerID)
         assertTrue("onPlayerRemoved callback not removed", playerRemovedCalledCounter == 1)
     }
+
+    @Test
+    fun resetGameStateTest() {
+        var resetCalled = false
+        val onResetState = {
+            resetCalled = true
+        }
+
+        GameState.gameID = "test"
+        GameState.players.add(Player("testPlayer", "hash"))
+        GameState.startingFunds = 123123
+        GameState.smallBlind = 123123
+        GameState.isPlayerAdmin = true
+        GameState.onGameReset = onResetState
+
+        GameState.resetGameState()
+        assertTrue("gameID not reset", GameState.gameID.isEmpty())
+        assertTrue("players list not reset", GameState.players.isEmpty())
+        assertTrue("startingFunds not reset", GameState.startingFunds == -1)
+        assertTrue("smallBlind not reset", GameState.smallBlind == -1)
+        assertTrue("isPlayerAdmin not reset", GameState.isPlayerAdmin == false)
+        assertTrue("onGameReset not called", resetCalled)
+    }
 }
