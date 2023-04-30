@@ -96,5 +96,5 @@ fun kickPlayer(context: Context, playerID: String) {
         Toast.makeText(context, "Failed to kick player", Toast.LENGTH_LONG).show()
     }
 
-    GameState.kickPlayer(playerID, context, onSuccess, onError)
+    GameState.kickPlayerRequest(playerID, context, onSuccess, onError)
 }

@@ -1,10 +1,13 @@
 package com.pokerio.app
 
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.pokerio.app.utils.Card
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PokerioLogger
+import kotlinx.coroutines.tasks.await
 
 class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -16,6 +19,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             "settingsUpdated" -> settingsUpdated(message.data)
             "playerKicked" -> playerKicked(message.data)
             "playerLeft" -> playerLeft(message.data)
+            "startGame" -> startGame(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -56,6 +60,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             PokerioLogger.debug("Received playerLeft FCM message")
 
             GameState.removePlayer(data["playerHash"]!!, data["gameMaster"]!!)
+        }
+
+        fun startGame(data: Map<String, String>) {
+            PokerioLogger.debug("Received startGame FCM message")
+            GameState.startGame(data)
         }
     }
 }

@@ -188,9 +188,17 @@ private fun leaveGame(context: Context) {
         Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
     }
 
-    GameState.leaveGame(context, onSuccess, onError)
+    GameState.leaveGameRequest(context, onSuccess, onError)
 }
 
 private fun startGame(context: Context) {
-    Toast.makeText(context, "TODO: Start game", Toast.LENGTH_LONG).show()
+    val onSuccess = {
+        Toast.makeText(context, "Started Game", Toast.LENGTH_LONG).show()
+    }
+
+    val onError = {
+        Toast.makeText(context, "Failed to start game", Toast.LENGTH_LONG).show()
+    }
+
+    GameState.startGameRequest(context, onSuccess, onError)
 }

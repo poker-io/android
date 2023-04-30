@@ -26,23 +26,27 @@ object GameState {
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var isPlayerAdmin: Boolean = false
+    var myToken = ""
+    var card1: Card = Card("E", "E")
+    var card2: Card = Card("E", "E")
 
     // Callbacks
     var onGameReset = {}
+    var onGameStart = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var settingsChangedCallback = HashMap<Int, () -> Unit>()
     private var nextId = 0
 
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://10.0.2.2:42069"
     private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
 
     // This method makes a request to create a game and sets the field of the GameState object on
     // success and returns true. Returns false if something goes wrong.
-    fun createGame(
+    fun createGameRequest(
         context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -73,10 +77,11 @@ object GameState {
         networkCoroutine.launch {
             try {
                 val creatorID = FirebaseMessaging.getInstance().token.await()
+                myToken = creatorID
                 // Prepare url
                 val urlString =
                     "/createGame?creatorToken=$creatorID&nickname=$nickname" +
-                        "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
+                            "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
                 val url = URL(baseUrl + urlString)
 
                 val responseJson = url.readText()
@@ -100,7 +105,7 @@ object GameState {
         }
     }
 
-    fun joinGame(
+    fun joinGameRequest(
         gameID: String,
         context: Context,
         onSuccess: () -> Unit,
@@ -122,7 +127,7 @@ object GameState {
         networkCoroutine.launch {
             try {
                 val playerID = FirebaseMessaging.getInstance().token.await()
-
+                myToken = playerID
                 // Prepare url
                 val urlString = "/joinGame?nickname=$nickname&playerToken=$playerID&gameId=$gameID"
                 val url = URL(baseUrl + urlString)
@@ -156,7 +161,7 @@ object GameState {
         }
     }
 
-    fun exitSettings(
+    fun exitSettingsRequest(
         context: Context,
         onError: () -> Unit,
         onSuccess: () -> Unit,
@@ -197,7 +202,7 @@ object GameState {
         }
     }
 
-    fun kickPlayer(
+    fun kickPlayerRequest(
         playerID: String,
         context: Context,
         onSuccess: () -> Unit,
@@ -223,7 +228,7 @@ object GameState {
         }
     }
 
-    fun leaveGame(
+    fun leaveGameRequest(
         context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -251,6 +256,32 @@ object GameState {
         }
     }
 
+
+    fun startGameRequest(
+        context: Context,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL
+    ) {
+        networkCoroutine.launch {
+            try {
+                val myID = FirebaseMessaging.getInstance().token.await()
+
+                // Prepare url
+                val urlString = "/startGame?creatorToken=$myID"
+                val url = URL(baseUrl + urlString)
+
+                url.readText()
+
+                //onGameStart()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                PokerioLogger.error(e.toString())
+                ContextCompat.getMainExecutor(context).execute(onError)
+            }
+        }
+    }
+
     fun resetGameState() {
         // Class fields
         gameID = ""
@@ -258,7 +289,7 @@ object GameState {
         startingFunds = -1
         smallBlind = -1
         isPlayerAdmin = false
-
+        myToken = ""
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -334,7 +365,17 @@ object GameState {
         }
     }
 
-    private fun sha256(string: String): String {
+    fun startGame(data: Map<String, String>) {
+        card1 = Card(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
+        card2 = Card(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
+        val gameInfoJsonString = data["startedGameInfo"]!!
+        val gameInfoJson = Json.parseToJsonElement(gameInfoJsonString).jsonObject
+        players.forEach { it.funds = GameState.startingFunds }
+
+        onGameStart()
+    }
+
+    fun sha256(string: String): String {
         return MessageDigest
             .getInstance("SHA-256")
             .digest(string.toByteArray())
@@ -346,9 +387,11 @@ object GameState {
         smallBlind = newSmallBlind
         settingsChangedCallback.forEach { it.value() }
     }
+
     fun isInGame(): Boolean {
         return gameID.isNotBlank()
     }
+
 }
 
 data class CreateGameResponse(

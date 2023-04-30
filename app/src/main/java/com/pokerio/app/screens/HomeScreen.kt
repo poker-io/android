@@ -151,7 +151,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
             .show()
     }
 
-    GameState.joinGame(gameCode, context, onSuccess, onError)
+    GameState.joinGameRequest(gameCode, context, onSuccess, onError)
 }
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
@@ -161,5 +161,5 @@ private fun createGame(context: Context, onSuccess: () -> Unit) {
             .show()
     }
 
-    GameState.createGame(context, onSuccess, onError)
+    GameState.createGameRequest(context, onSuccess, onError)
 }
