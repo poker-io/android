@@ -1,5 +1,6 @@
 package com.pokerio.app
 
+import com.pokerio.app.utils.Card
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.Assert.assertTrue
@@ -75,6 +76,8 @@ class GameStateTest {
         GameState.smallBlind = 123123
         GameState.isPlayerAdmin = true
         GameState.onGameReset = onResetState
+        GameState.card1 = Card("E", "E")
+        GameState.card2 = Card("E", "E")
 
         GameState.resetGameState()
         assertTrue("gameID not reset", GameState.gameID.isEmpty())
@@ -83,5 +86,7 @@ class GameStateTest {
         assertTrue("smallBlind not reset", GameState.smallBlind == -1)
         assertTrue("isPlayerAdmin not reset", GameState.isPlayerAdmin == false)
         assertTrue("onGameReset not called", resetCalled)
+        assertTrue("card1 not reset", GameState.card1 == null)
+        assertTrue("card2 not reset", GameState.card2 == null)
     }
 }
