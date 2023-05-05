@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.UnitUnitProvider
@@ -145,13 +146,21 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
         return
     }
 
-    val onError = {
-        Toast
-            .makeText(context, context.getString(R.string.error_failed_to_join_game), Toast.LENGTH_LONG)
-            .show()
+    val onSuccessWrapper = {
+        ContextCompat.getMainExecutor(context).execute(onSuccess)
     }
 
-    GameState.joinGameRequest(gameCode, context, onSuccess, onError)
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast
+                .makeText(context, context.getString(R.string.error_failed_to_join_game), Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.joinGameRequest(gameCode, context, onSuccessWrapper, onError)
+    }
 }
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
@@ -161,5 +170,7 @@ private fun createGame(context: Context, onSuccess: () -> Unit) {
             .show()
     }
 
-    GameState.createGameRequest(context, onSuccess, onError)
+    GameState.launchTask {
+        GameState.createGameRequest(context, onSuccess, onError)
+    }
 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
@@ -65,25 +66,31 @@ fun SettingsScreen(
         onDispose {
             // Unregister callback when we leave the view
             val onError = {
-                Toast.makeText(
-                    context,
-                    "Failed to update settings",
-                    Toast.LENGTH_LONG
-                ).show()
+                ContextCompat.getMainExecutor(context).execute {
+                    Toast.makeText(
+                        context,
+                        "Failed to update settings",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
             val onSuccess = {
-                Toast.makeText(
-                    context,
-                    "Successfully updated settings",
-                    Toast.LENGTH_LONG
-                ).show()
+                ContextCompat.getMainExecutor(context).execute {
+                    Toast.makeText(
+                        context,
+                        "Successfully updated settings",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
 
-            GameState.exitSettingsRequest(
-                context = context,
-                onError = onError,
-                onSuccess = onSuccess
-            )
+            GameState.launchTask {
+                GameState.exitSettingsRequest(
+                    context = context,
+                    onError = onError,
+                    onSuccess = onSuccess
+                )
+            }
         }
     }
 

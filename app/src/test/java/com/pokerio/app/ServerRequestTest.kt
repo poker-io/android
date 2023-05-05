@@ -67,7 +67,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.createGameRequestSuspend(context, onSuccess, onError, url, "idTest")
+            GameState.createGameRequest(context, onSuccess, onError, url, "idTest")
         }
 
         assert(GameState.gameID == gameKey)
@@ -89,7 +89,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.createGameRequestSuspend(context, onSuccess, onError, url, "idTest")
+            GameState.createGameRequest(context, onSuccess, onError, url, "idTest")
         }
 
         assert(onErrorCalled == 1)
@@ -126,7 +126,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.joinGameRequestSuspend(gameKey, context, onSuccess, onError, url, "idTest")
+            GameState.joinGameRequest(gameKey, context, onSuccess, onError, url, "idTest")
         }
 
         assert(GameState.gameID == gameKey)
@@ -162,7 +162,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.joinGameRequestSuspend("123456", context, onSuccess, onError, url, "idTest")
+            GameState.joinGameRequest("123456", context, onSuccess, onError, url, "idTest")
         }
 
         assert(onErrorCalled == 1)
@@ -182,7 +182,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, url, "idTest")
+            GameState.kickPlayerRequest("testId", onSuccess, onError, url, "idTest")
         }
 
         assert(onSuccessCalled == 1)
@@ -202,7 +202,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, url, "idTest")
+            GameState.kickPlayerRequest("testId", onSuccess, onError, url, "idTest")
         }
 
         assert(onErrorCalled == 1)
@@ -221,7 +221,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.leaveGameRequestSuspend(onSuccess, onError, url, "idTest")
+            GameState.leaveGameRequest(onSuccess, onError, url, "idTest")
         }
 
         assert(GameState.gameID == "")

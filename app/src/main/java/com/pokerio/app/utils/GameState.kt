@@ -41,20 +41,13 @@ object GameState {
     private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
-
-    // This method makes a request to create a game and sets the field of the GameState object on
-    // success and returns true. Returns false if something goes wrong.
-    fun createGameRequest(
-        context: Context,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
+    fun launchTask(task: suspend () -> Unit) {
         networkCoroutine.launch {
-            createGameRequestSuspend(context, onSuccess, onError)
+            task()
         }
     }
 
-    suspend fun createGameRequestSuspend(
+    suspend fun createGameRequest(
         context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -111,18 +104,7 @@ object GameState {
         }
     }
 
-    fun joinGameRequest(
-        gameID: String,
-        context: Context,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        networkCoroutine.launch {
-            joinGameRequestSuspend(gameID, context, onSuccess, onError)
-        }
-    }
-
-    suspend fun joinGameRequestSuspend(
+    suspend fun joinGameRequest(
         gameID: String,
         context: Context,
         onSuccess: () -> Unit,
@@ -176,11 +158,12 @@ object GameState {
         }
     }
 
-    fun exitSettingsRequest(
+    suspend fun exitSettingsRequest(
         context: Context,
         onError: () -> Unit,
         onSuccess: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
         if (isInGame()) {
             val sharedPreferences = context.getSharedPreferences(
@@ -198,36 +181,24 @@ object GameState {
                 100
             )
 
-            networkCoroutine.launch {
-                try {
-                    val playerID = FirebaseMessaging.getInstance().token.await()
+            try {
+                val playerID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-                    // Prepare url
-                    val urlString =
-                        "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
-                    val url = URL(baseUrl + urlString)
-                    url.readText()
-                    onSuccess()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    PokerioLogger.error(e.toString())
-                    onError()
-                }
+                // Prepare url
+                val urlString =
+                    "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
+                val url = URL(baseUrl + urlString)
+                url.readText()
+                onSuccess()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                PokerioLogger.error(e.toString())
+                onError()
             }
         }
     }
 
-    fun kickPlayerRequest(
-        playerID: String,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        networkCoroutine.launch {
-            kickPlayerRequestSuspend(playerID, onSuccess, onError)
-        }
-    }
-
-    suspend fun kickPlayerRequestSuspend(
+    suspend fun kickPlayerRequest(
         playerID: String,
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -251,16 +222,7 @@ object GameState {
         }
     }
 
-    fun leaveGameRequest(
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        networkCoroutine.launch {
-            leaveGameRequestSuspend(onSuccess, onError)
-        }
-    }
-
-    suspend fun leaveGameRequestSuspend(
+    suspend fun leaveGameRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
         baseUrl: String = BASE_URL,
@@ -284,16 +246,7 @@ object GameState {
         }
     }
 
-    fun startGameRequest(
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        networkCoroutine.launch {
-            startGameRequestSuspend(onSuccess, onError)
-        }
-    }
-
-    suspend fun startGameRequestSuspend(
+    suspend fun startGameRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
         baseUrl: String = BASE_URL,
