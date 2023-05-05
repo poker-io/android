@@ -40,7 +40,7 @@ class ServerRequestTest {
 
         // Start server on localhost
         server.start(port)
-        url = server.url("/").toString().trimEnd { it == '/'}
+        url = server.url("/").toString().trimEnd { it == '/' }
     }
 
     @Test
@@ -55,7 +55,8 @@ class ServerRequestTest {
                     "gameKey": $gameKey,
                     "startingFunds": $startingFunds,
                     "smallBlind": $smallBlind
-                }""".trimMargin()
+                }
+                """.trimMargin()
             )
         )
 
@@ -94,58 +95,58 @@ class ServerRequestTest {
         assert(onErrorCalled == 1)
     }
 
-//    @Test
-//    fun joinGameRequestTest() {
-//        val gameKey = "123456"
-//        val gameMasterHash = "123456789"
-//        val startingFunds = 1000
-//        val smallBlind = 100
-//
-//        server.enqueue(
-//            MockResponse().setBody(
-//                """{
-//                "gameMasterHash": "$gameMasterHash",
-//                "startingFunds": $startingFunds,
-//                "smallBlind": $smallBlind,
-//                "players": [
-//                    {
-//                        "nickname": "test1",
-//                        "playerHash": "1"
-//                    }
-//                ]
-//            }
-//                """.trimMargin()
-//            )
-//        )
-//
-//        val onSuccess = {}
-//
-//        val onError = {
-//            assertThat("JoinGame should not error", false)
-//        }
-//
-//        runBlocking {
-//            GameState.joinGameRequestSuspend(gameKey, context, onSuccess, onError, url, "idTest")
-//        }
-//
-//        assert(GameState.gameID == gameKey)
-//        assert(GameState.startingFunds == startingFunds)
-//        assert(GameState.smallBlind == smallBlind)
-//        // There are only two players
-//        println("joinGameRequestTest: ${GameState.players.size}")
-//        assert(GameState.players.size == 2)
-//        // Only one of the players is an admin
-//        assert(GameState.players[0].isAdmin.xor(GameState.players[1].isAdmin))
-//        // Check their names and ids
-//        assert(
-//            GameState.players[0].nickname == "test1" && GameState.players[0].playerID == "1" ||
-//                GameState.players[1].nickname == "test1" && GameState.players[1].playerID == "1"
-//        )
-//        assert(
-//            GameState.players[0].nickname == "test2" && GameState.players[0].playerID == "2" ||
-//                GameState.players[1].nickname == "test2" && GameState.players[1].playerID == "2"
-//        )
-//    }
+    @Test
+    fun joinGameRequestTest() {
+        val gameKey = "123456"
+        val gameMasterHash = "123456789"
+        val startingFunds = 1000
+        val smallBlind = 100
+
+        server.enqueue(
+            MockResponse().setBody(
+                """{
+                "gameMasterHash": "$gameMasterHash",
+                "startingFunds": $startingFunds,
+                "smallBlind": $smallBlind,
+                "players": [
+                    {
+                        "nickname": "test1",
+                        "playerHash": "$gameMasterHash"
+                    }
+                ]
+            }
+                """.trimMargin()
+            )
+        )
+
+        val onSuccess = {}
+
+        val onError = {
+            assertThat("JoinGame should not error", false)
+        }
+
+        runBlocking {
+            GameState.joinGameRequestSuspend(gameKey, context, onSuccess, onError, url, "idTest")
+        }
+
+        assert(GameState.gameID == gameKey)
+        assert(GameState.startingFunds == startingFunds)
+        assert(GameState.smallBlind == smallBlind)
+        // There are only two players
+        assert(GameState.players.size == 2)
+        // Only one of the players is an admin
+        assert(GameState.players[0].isAdmin.xor(GameState.players[1].isAdmin))
+        // Check their names and ids
+        assert(
+            GameState.players[0].nickname == "test1" &&
+                GameState.players[0].playerID == gameMasterHash ||
+                GameState.players[1].nickname == "test1" &&
+                GameState.players[1].playerID == gameMasterHash
+        )
+        assert(
+            GameState.players[0].playerID == "idTest" || GameState.players[1].playerID == "idTest"
+        )
+    }
 
     @Test
     fun joinGameWrongResponseTest() {
@@ -167,25 +168,25 @@ class ServerRequestTest {
         assert(onErrorCalled == 1)
     }
 
-//    @Test
-//    fun kickPlayerCorrectResponseTest() {
-//        server.enqueue(MockResponse().setBody(""))
-//
-//        var onSuccessCalled = 0
-//        val onSuccess = {
-//            onSuccessCalled += 1
-//        }
-//
-//        val onError = {
-//            assertThat("KickPlayer should not error", false)
-//        }
-//
-//        runBlocking {
-//            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, "idTest")
-//        }
-//
-//        assert(onSuccessCalled == 1)
-//    }
+    @Test
+    fun kickPlayerCorrectResponseTest() {
+        server.enqueue(MockResponse().setBody(""))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertThat("KickPlayer should not error", false)
+        }
+
+        runBlocking {
+            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
 
     @Test
     fun kickPlayerWrongResponseTest() {
@@ -230,5 +231,8 @@ class ServerRequestTest {
     @After
     fun tearDown() {
         server.shutdown()
+
+        // Clean up after each test
+        GameState.resetGameState()
     }
 }
