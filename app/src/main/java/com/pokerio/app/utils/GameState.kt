@@ -38,11 +38,10 @@ object GameState {
 
     // Constants
     private const val BASE_URL = "http://158.101.160.143:42069"
-    private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
-        networkCoroutine.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             task()
         }
     }
@@ -158,43 +157,27 @@ object GameState {
         }
     }
 
-    suspend fun exitSettingsRequest(
-        context: Context,
-        onError: () -> Unit,
+    suspend fun modifyGameRequest(
+        smallBlind: Int,
+        startingFunds: Int,
         onSuccess: () -> Unit,
+        onError: () -> Unit,
         baseUrl: String = BASE_URL,
         firebaseId: String? = null
     ) {
-        if (isInGame()) {
-            val sharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences_file),
-                Context.MODE_PRIVATE
-            )
+        try {
+            val playerID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-            val smallBlind = sharedPreferences.getInt(
-                context.getString(R.string.sharedPreferences_small_blind),
-                1000
-            )
-
-            val startingFunds = sharedPreferences.getInt(
-                context.getString(R.string.sharedPreferences_starting_funds),
-                100
-            )
-
-            try {
-                val playerID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
-
-                // Prepare url
-                val urlString =
-                    "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
-                val url = URL(baseUrl + urlString)
-                url.readText()
-                onSuccess()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                onError()
-            }
+            // Prepare url
+            val urlString =
+                "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
+            val url = URL(baseUrl + urlString)
+            url.readText()
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 

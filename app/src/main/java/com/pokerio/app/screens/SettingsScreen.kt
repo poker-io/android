@@ -62,38 +62,6 @@ fun SettingsScreen(
         Context.MODE_PRIVATE
     )
 
-    DisposableEffect(LocalLifecycleOwner.current) {
-        onDispose {
-            // Unregister callback when we leave the view
-            val onError = {
-                ContextCompat.getMainExecutor(context).execute {
-                    Toast.makeText(
-                        context,
-                        "Failed to update settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-            val onSuccess = {
-                ContextCompat.getMainExecutor(context).execute {
-                    Toast.makeText(
-                        context,
-                        "Successfully updated settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-
-            GameState.launchTask {
-                GameState.exitSettingsRequest(
-                    context = context,
-                    onError = onError,
-                    onSuccess = onSuccess
-                )
-            }
-        }
-    }
-
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
     var nickname by remember { mutableStateOf(getInitialNickname(context)) }
     val onNicknameUpdate = { newValue: String ->
@@ -125,6 +93,41 @@ fun SettingsScreen(
         with(sharedPreferences.edit()) {
             putInt(smallBlindSharedKey, newValue)
             apply()
+        }
+    }
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        onDispose {
+            // Unregister callback when we leave the view
+            val onError = {
+                ContextCompat.getMainExecutor(context).execute {
+                    Toast.makeText(
+                        context,
+                        "Failed to update settings",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            val onSuccess = {
+                ContextCompat.getMainExecutor(context).execute {
+                    Toast.makeText(
+                        context,
+                        "Successfully updated settings",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            GameState.launchTask {
+                if (GameState.isInGame()) {
+                    GameState.modifyGameRequest(
+                        smallBlind,
+                        startingFunds,
+                        onSuccess,
+                        onError
+                    )
+                }
+            }
         }
     }
 

@@ -31,9 +31,6 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PlayerProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
 @Preview
