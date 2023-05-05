@@ -182,7 +182,7 @@ class ServerRequestTest {
         }
 
         runBlocking {
-            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, "idTest")
+            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, url, "idTest")
         }
 
         assert(onSuccessCalled == 1)
