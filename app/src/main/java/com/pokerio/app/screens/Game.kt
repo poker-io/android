@@ -9,7 +9,7 @@ import com.pokerio.app.utils.GameState
 @Preview
 @Composable
 fun Game() {
-    Column() {
+    Column {
         Text(text = "Player cards:")
         Text(text = GameState.card1.toString())
         Text(text = GameState.card2.toString())

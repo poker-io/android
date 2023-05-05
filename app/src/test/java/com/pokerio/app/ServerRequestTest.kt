@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import com.pokerio.app.utils.GameState
+import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.hamcrest.MatcherAssert.assertThat
@@ -59,17 +60,19 @@ class ServerRequestTest {
             )
         )
 
-        val onSuccess = {
-            assert(GameState.gameID == gameKey)
-            assert(GameState.startingFunds == startingFunds)
-            assert(GameState.smallBlind == smallBlind)
-        }
+        val onSuccess = {}
 
         val onError = {
             assertThat("CreateGame should not error", false)
         }
 
-        GameState.createGameRequest(context, onSuccess, onError, url)
+        runBlocking {
+            GameState.createGameRequestSuspend(context, onSuccess, onError, url)
+        }
+
+        assert(GameState.gameID == gameKey)
+        assert(GameState.startingFunds == startingFunds)
+        assert(GameState.smallBlind == smallBlind)
     }
 
     @Test
@@ -80,11 +83,16 @@ class ServerRequestTest {
             assertThat("CreateGame should error", false)
         }
 
+        var onErrorCalled = 0
         val onError = {
-            assert(true)
+            onErrorCalled += 1
         }
 
-        GameState.createGameRequest(context, onSuccess, onError, url)
+        runBlocking {
+            GameState.createGameRequestSuspend(context, onSuccess, onError, url)
+        }
+
+        assert(onErrorCalled == 1)
     }
 
     @Test
@@ -111,30 +119,32 @@ class ServerRequestTest {
             )
         )
 
-        val onSuccess = {
-            assert(GameState.gameID == gameKey)
-            assert(GameState.startingFunds == startingFunds)
-            assert(GameState.smallBlind == smallBlind)
-            // There are only two players
-            assert(GameState.players.size == 2)
-            // Only one of the players is an admin
-            assert(GameState.players[0].isAdmin.xor(GameState.players[1].isAdmin))
-            // Check their names and ids
-            assert(
-                GameState.players[0].nickname == "test1" && GameState.players[0].playerID == "1" ||
-                    GameState.players[1].nickname == "test1" && GameState.players[1].playerID == "1"
-            )
-            assert(
-                GameState.players[0].nickname == "test2" && GameState.players[0].playerID == "2" ||
-                    GameState.players[1].nickname == "test2" && GameState.players[1].playerID == "2"
-            )
-        }
+        val onSuccess = {}
 
         val onError = {
             assertThat("JoinGame should not error", false)
         }
 
-        GameState.joinGameRequest(gameKey, context, onSuccess, onError, url)
+        runBlocking {
+            GameState.joinGameRequestSuspend(gameKey, context, onSuccess, onError, url)
+        }
+
+        assert(GameState.gameID == gameKey)
+        assert(GameState.startingFunds == startingFunds)
+        assert(GameState.smallBlind == smallBlind)
+        // There are only two players
+        assert(GameState.players.size == 2)
+        // Only one of the players is an admin
+        assert(GameState.players[0].isAdmin.xor(GameState.players[1].isAdmin))
+        // Check their names and ids
+        assert(
+            GameState.players[0].nickname == "test1" && GameState.players[0].playerID == "1" ||
+                    GameState.players[1].nickname == "test1" && GameState.players[1].playerID == "1"
+        )
+        assert(
+            GameState.players[0].nickname == "test2" && GameState.players[0].playerID == "2" ||
+                    GameState.players[1].nickname == "test2" && GameState.players[1].playerID == "2"
+        )
     }
 
     @Test
@@ -145,11 +155,16 @@ class ServerRequestTest {
             assertThat("JoinGame should error", false)
         }
 
+        var onErrorCalled = 0
         val onError = {
-            assert(true)
+            onErrorCalled += 1
         }
 
-        GameState.joinGameRequest("123456", context, onSuccess, onError, url)
+        runBlocking {
+            GameState.joinGameRequestSuspend("123456", context, onSuccess, onError, url)
+        }
+
+        assert(onErrorCalled == 1)
     }
 
     @Test
@@ -164,7 +179,7 @@ class ServerRequestTest {
             assertThat("KickPlayer should not error", false)
         }
 
-        GameState.kickPlayerRequest("testId", context, onSuccess, onError)
+        GameState.kickPlayerRequest("testId", onSuccess, onError)
     }
 
     @Test
@@ -175,11 +190,16 @@ class ServerRequestTest {
             assertThat("KickPlayer should error", false)
         }
 
+        var onErrorCalled = 0
         val onError = {
-            assert(true)
+            onErrorCalled += 1
         }
 
-        GameState.kickPlayerRequest("testId", context, onSuccess, onError)
+        runBlocking {
+            GameState.kickPlayerRequestSuspend("testId", onSuccess, onError, url)
+        }
+
+        assert(onErrorCalled == 1)
     }
 
     @Test
@@ -188,16 +208,18 @@ class ServerRequestTest {
 
         server.enqueue(MockResponse().setResponseCode(200))
 
-        val onSuccess = {
-            assert(GameState.gameID == "")
-            assert(GameState.players.isEmpty())
-        }
+        val onSuccess = {}
 
         val onError = {
             assertThat("JoinGame should not error", false)
         }
 
-        GameState.leaveGameRequest(context, onSuccess, onError, url)
+        runBlocking {
+            GameState.leaveGameRequestSuspend(onSuccess, onError, url)
+        }
+
+        assert(GameState.gameID == "")
+        assert(GameState.players.isEmpty())
     }
 
     @After
