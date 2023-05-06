@@ -15,6 +15,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -129,6 +130,12 @@ private fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val lightColorScheme = lightColorScheme(
+        primary = colorResource(R.color.green_700),
+        primaryContainer = colorResource(R.color.green_100),
+        surfaceVariant = colorResource(R.color.green_100)
+    )
+
     val context = LocalContext.current
     val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (useDarkTheme) {
@@ -140,7 +147,7 @@ private fun AppTheme(
         if (useDarkTheme) {
             darkColorScheme()
         } else {
-            lightColorScheme()
+            lightColorScheme
         }
     }
 
