@@ -15,7 +15,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -29,11 +28,13 @@ import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.ThemeUtils
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Dark theme is disabled for now
         val useDarkTheme = false
 
         setContent {
@@ -130,12 +131,6 @@ private fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val lightColorScheme = lightColorScheme(
-        primary = colorResource(R.color.green_700),
-        primaryContainer = colorResource(R.color.green_100),
-        surfaceVariant = colorResource(R.color.green_100)
-    )
-
     val context = LocalContext.current
     val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (useDarkTheme) {
@@ -147,7 +142,7 @@ private fun AppTheme(
         if (useDarkTheme) {
             darkColorScheme()
         } else {
-            lightColorScheme
+            ThemeUtils.lightColorScheme
         }
     }
 
