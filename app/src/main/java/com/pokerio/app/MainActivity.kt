@@ -13,49 +13,69 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pokerio.app.screens.Game
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
-import com.pokerio.app.utils.discard
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val useDarkTheme = false
 
         setContent {
-            AppTheme(useDarkTheme = false) {
-                MainActivityComposable()
+            AppTheme(useDarkTheme) {
+                MainActivityComposable(useDarkTheme)
             }
         }
     }
 }
 
 @Composable
-fun MainActivityComposable() {
+fun MainActivityComposable(
+    useDarkTheme: Boolean = isSystemInDarkTheme()
+) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        Color.Transparent,
+        darkIcons = !useDarkTheme
+    )
+
     val navController = rememberNavController()
     val context = LocalContext.current
 
     val navigateToSettings = {
-        navController.navigate("settings")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.navigate("settings")
+        }
     }
     val navigateBack = {
-        navController.popBackStack().discard()
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack()
+        }
     }
     val exitInitialSetup = {
-        navController.popBackStack()
-        navController.navigate("home")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack()
+            navController.navigate("home")
+        }
     }
     val navigateToLobby = {
-        navController.navigate("lobby")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.navigate("lobby")
+        }
     }
 
     GameState.resetGameState()
@@ -109,11 +129,12 @@ private fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
     val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (useDarkTheme) {
-            dynamicDarkColorScheme(LocalContext.current)
+            dynamicDarkColorScheme(context)
         } else {
-            dynamicLightColorScheme(LocalContext.current)
+            dynamicLightColorScheme(context)
         }
     } else {
         if (useDarkTheme) {

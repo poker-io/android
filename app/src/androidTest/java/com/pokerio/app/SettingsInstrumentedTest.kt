@@ -2,7 +2,6 @@ package com.pokerio.app
 
 import android.content.Context
 import androidx.activity.compose.setContent
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -12,7 +11,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
-import androidx.lifecycle.LifecycleOwner
 import com.pokerio.app.screens.Selector
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
