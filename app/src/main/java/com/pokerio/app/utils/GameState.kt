@@ -310,7 +310,8 @@ object GameState {
         if (isThisPlayerRemoved) {
             resetGameState()
         } else {
-            val removedPlayer = players.find { it.playerID == playerHash } ?: return
+            val removedPlayer = players.find { it.playerID == playerHash }
+                ?: throw Exception("Player to be removed not found")
 
             if (removedPlayer.isAdmin && newAdmin == null) {
                 throw Exception("Admin removed without new admin given")

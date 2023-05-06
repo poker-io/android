@@ -8,8 +8,8 @@ import com.pokerio.app.utils.Player
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -67,7 +67,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("CreateGame should not error", false)
+            assertTrue("CreateGame should not error", false)
         }
 
         runBlocking {
@@ -85,7 +85,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setBody(""))
 
         val onSuccess = {
-            assertThat("CreateGame should error", false)
+            assertTrue("CreateGame should error", false)
         }
 
         var onErrorCalled = 0
@@ -130,7 +130,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("JoinGame should not error", false)
+            assertTrue("JoinGame should not error", false)
         }
 
         runBlocking {
@@ -162,7 +162,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setBody(""))
 
         val onSuccess = {
-            assertThat("JoinGame should error", false)
+            assertTrue("JoinGame should error", false)
         }
 
         var onErrorCalled = 0
@@ -187,7 +187,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("KickPlayer should not error", false)
+            assertTrue("KickPlayer should not error", false)
         }
 
         runBlocking {
@@ -202,7 +202,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setResponseCode(400))
 
         val onSuccess = {
-            assertThat("KickPlayer should error", false)
+            assertTrue("KickPlayer should error", false)
         }
 
         var onErrorCalled = 0
@@ -229,7 +229,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("JoinGame should not error", false)
+            assertTrue("JoinGame should not error", false)
         }
 
         runBlocking {
@@ -250,7 +250,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setResponseCode(500))
 
         val onSuccess = {
-            assertThat("LeaveGame should error", false)
+            assertTrue("LeaveGame should error", false)
         }
 
         var onErrorCalled = 0
@@ -279,7 +279,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("ModifyGame should not error", false)
+            assertTrue("ModifyGame should not error", false)
         }
 
         runBlocking {
@@ -296,7 +296,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setResponseCode(400))
 
         val onSuccess = {
-            assertThat("ModifyGame should error", false)
+            assertTrue("ModifyGame should error", false)
         }
 
         var onErrorCalled = 0
@@ -323,7 +323,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertThat("StartGame should not error", false)
+            assertTrue("StartGame should not error", false)
         }
 
         runBlocking {
@@ -340,7 +340,7 @@ class ServerRequestTest {
         server.enqueue(MockResponse().setResponseCode(400))
 
         val onSuccess = {
-            assertThat("StartGame should error", false)
+            assertTrue("StartGame should error", false)
         }
 
         var onErrorCalled = 0

@@ -1,6 +1,7 @@
 package com.pokerio.app
 
 import com.pokerio.app.utils.GameState
+import org.junit.After
 import org.junit.Test
 
 class FirebaseMessagesTest {
@@ -25,5 +26,11 @@ class FirebaseMessagesTest {
 
         // Clean up after ourselves
         GameState.players.clear()
+    }
+
+    @After
+    fun tearDown() {
+        // Clean up after each test
+        GameState.resetGameState()
     }
 }
