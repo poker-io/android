@@ -40,7 +40,12 @@ fun InitialSetupScreen(
     )
 
     var nickname by remember { mutableStateOf("") }
+    var nicknameCorrect by remember { mutableStateOf(false) }
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
+    val onNicknameUpdate = { newValue: String ->
+        nickname = newValue
+        nicknameCorrect = nickname.isNotBlank() && nickname.length <= 20
+    }
 
     val onContinue = {
         with(sharedPreferences.edit()) {
@@ -61,13 +66,19 @@ fun InitialSetupScreen(
         Text(text = stringResource(id = R.string.select_nickname))
         OutlinedTextField(
             value = nickname,
-            onValueChange = { nickname = it },
+            onValueChange = { onNicknameUpdate(it) },
             label = { Text(stringResource(id = R.string.nickname)) },
-            modifier = Modifier.testTag("nickname_input")
+            modifier = Modifier.testTag("nickname_input"),
+            isError = !nicknameCorrect,
+            supportingText = {
+                if (!nicknameCorrect) {
+                    Text(stringResource(id = R.string.nickname_error))
+                }
+            }
         )
         IconButton(
             onClick = { onContinue() },
-            enabled = nickname.isNotBlank(),
+            enabled = nicknameCorrect,
             modifier = Modifier.testTag("continue_button")
         ) {
             Icon(

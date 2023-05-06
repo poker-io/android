@@ -48,10 +48,10 @@ fun MainActivityComposable() {
         navController.navigate("settings")
     }
     val navigateBack = {
-        navController.navigateUp().discard()
+        navController.popBackStack().discard()
     }
     val exitInitialSetup = {
-        navController.navigateUp()
+        navController.popBackStack()
         navController.navigate("home")
     }
     val navigateToLobby = {

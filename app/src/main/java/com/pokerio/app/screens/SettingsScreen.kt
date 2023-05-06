@@ -2,6 +2,7 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -56,6 +57,8 @@ fun SettingsScreen(
     val sectionTitleModifier = Modifier.padding(10.dp)
     val spacerModifier = Modifier.padding(10.dp)
 
+    val maxSmallBlindModifier = 0.4f
+
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(
         stringResource(id = R.string.shared_preferences_file),
@@ -64,71 +67,75 @@ fun SettingsScreen(
 
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
     var nickname by remember { mutableStateOf(getInitialNickname(context)) }
+    var nicknameCorrect by remember { mutableStateOf(true) }
     val onNicknameUpdate = { newValue: String ->
         nickname = newValue
-
-        with(sharedPreferences.edit()) {
-            putString(nicknameSharedKey, newValue)
-            apply()
-        }
-    }
-
-    // TODO: What if someone lowers starting funds and now the small blind doesn't make sense?
-    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
-    var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
-    val onStartingFundsUpdate = { newValue: Int ->
-        startingFunds = newValue
-
-        with(sharedPreferences.edit()) {
-            putInt(startingFundsSharedKey, newValue)
-            apply()
-        }
+        nicknameCorrect = nickname.isNotBlank() && nickname.length <= 20
     }
 
     val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
     var smallBlind by remember { mutableStateOf(getInitialSmallBlind(context)) }
     val onSmallBlindUpdate = { newValue: Int ->
         smallBlind = newValue
+    }
 
-        with(sharedPreferences.edit()) {
-            putInt(smallBlindSharedKey, newValue)
-            apply()
+    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
+    var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
+    val onStartingFundsUpdate = { newValue: Int ->
+        startingFunds = newValue
+        if (startingFunds * maxSmallBlindModifier < smallBlind) {
+            onSmallBlindUpdate((startingFunds * maxSmallBlindModifier).toInt())
         }
     }
 
-    DisposableEffect(LocalLifecycleOwner.current) {
-        onDispose {
-            // Unregister callback when we leave the view
-            val onError = {
-                ContextCompat.getMainExecutor(context).execute {
-                    Toast.makeText(
-                        context,
-                        "Failed to update settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+    val onNavigateBack = {
+        // Update shared preferences values on exit
+        with(sharedPreferences.edit()) {
+            if (nicknameCorrect) {
+                putString(nicknameSharedKey, nickname)
             }
-            val onSuccess = {
-                ContextCompat.getMainExecutor(context).execute {
-                    Toast.makeText(
-                        context,
-                        "Successfully updated settings",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+            putInt(startingFundsSharedKey, startingFunds)
+            putInt(smallBlindSharedKey, smallBlind)
+            apply()
+        }
 
-            GameState.launchTask {
-                if (GameState.isInGame()) {
-                    GameState.modifyGameRequest(
-                        smallBlind,
-                        startingFunds,
-                        onSuccess,
-                        onError
-                    )
-                }
+        // Unregister callback when we leave the view
+        val onError = {
+            ContextCompat.getMainExecutor(context).execute {
+                Toast.makeText(
+                    context,
+                    "Failed to update settings",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
+        val onSuccess = {
+            ContextCompat.getMainExecutor(context).execute {
+                Toast.makeText(
+                    context,
+                    "Successfully updated settings",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        // Notify server about changes if we were in game
+        GameState.launchTask {
+            if (GameState.isInGame()) {
+                GameState.modifyGameRequest(
+                    smallBlind,
+                    startingFunds,
+                    onSuccess,
+                    onError
+                )
+            }
+        }
+
+        navigateBack()
+    }
+
+    BackHandler {
+        onNavigateBack()
     }
 
     Column {
@@ -136,7 +143,7 @@ fun SettingsScreen(
             title = { Text(stringResource(id = R.string.settings)) },
             navigationIcon = {
                 IconButton(
-                    onClick = { navigateBack() },
+                    onClick = { onNavigateBack() },
                     modifier = Modifier.testTag("settings_back")
                 ) {
                     Icon(
@@ -156,7 +163,13 @@ fun SettingsScreen(
                         .testTag("settings_nickname"),
                     value = nickname,
                     onValueChange = { onNicknameUpdate(it) },
-                    label = { Text(stringResource(id = R.string.nickname)) }
+                    label = { Text(stringResource(id = R.string.nickname)) },
+                    isError = !nicknameCorrect,
+                    supportingText = {
+                        if (!nicknameCorrect) {
+                            Text(stringResource(id = R.string.nickname_error))
+                        }
+                    }
                 )
             }
             Spacer(modifier = spacerModifier)
@@ -182,7 +195,7 @@ fun SettingsScreen(
             Selector(
                 onValueSelected = { onSmallBlindUpdate(it) },
                 minValue = 10f,
-                maxValue = startingFunds * 0.4f,
+                maxValue = startingFunds * maxSmallBlindModifier,
                 initialValue = smallBlind.toFloat()
             )
         }
@@ -198,6 +211,7 @@ fun Selector(
     @PreviewParameter(IntUnitProvider::class) onValueSelected: (value: Int) -> Unit
 ) {
     var currentValue by remember { mutableStateOf(initialValue) }
+    currentValue = minOf(currentValue, maxValue)
 
     fun updateValue(newValue: Float) {
         currentValue = min(max(newValue, minValue), maxValue)

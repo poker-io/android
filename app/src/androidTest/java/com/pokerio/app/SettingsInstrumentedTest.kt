@@ -2,6 +2,7 @@ package com.pokerio.app
 
 import android.content.Context
 import androidx.activity.compose.setContent
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
+import androidx.lifecycle.LifecycleOwner
 import com.pokerio.app.screens.Selector
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
@@ -50,11 +52,88 @@ class SettingsInstrumentedTest {
         textField.performTextReplacement(replaceNickname)
         textField.assert(hasText(replaceNickname))
 
+        val backButton = androidTestRule.onNodeWithTag("settings_back")
+        backButton.performClick()
+
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
             ""
         )
         assert(newNickname == replaceNickname)
+    }
+
+    @Test
+    fun testNicknameSetterBlank() {
+        val testNickname = "os391j2kd9"
+        val replaceNickname = ""
+
+        val context = androidTestRule.activity
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+
+        with(sharedPreferences.edit()) {
+            putString(context.getString(R.string.sharedPreferences_nickname), testNickname)
+            apply()
+        }
+
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val textField = androidTestRule.onNodeWithTag("settings_nickname")
+        textField.assertExists()
+        textField.assertIsDisplayed()
+        textField.assert(hasText(testNickname))
+        textField.performTextReplacement(replaceNickname)
+        textField.assert(hasText(replaceNickname))
+
+        val backButton = androidTestRule.onNodeWithTag("settings_back")
+        backButton.performClick()
+
+        val newNickname = sharedPreferences.getString(
+            context.getString(R.string.sharedPreferences_nickname),
+            ""
+        )
+        assert(newNickname == testNickname)
+    }
+
+    @Test
+    fun testNicknameSetterToLong() {
+        val testNickname = "os391j2kd9"
+        val replaceNickname = "012345678901234567890"
+
+        val context = androidTestRule.activity
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+
+        with(sharedPreferences.edit()) {
+            putString(context.getString(R.string.sharedPreferences_nickname), testNickname)
+            apply()
+        }
+
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val textField = androidTestRule.onNodeWithTag("settings_nickname")
+        textField.assertExists()
+        textField.assertIsDisplayed()
+        textField.assert(hasText(testNickname))
+        textField.performTextReplacement(replaceNickname)
+        textField.assert(hasText(replaceNickname))
+
+        val backButton = androidTestRule.onNodeWithTag("settings_back")
+        backButton.performClick()
+
+        val newNickname = sharedPreferences.getString(
+            context.getString(R.string.sharedPreferences_nickname),
+            ""
+        )
+        assert(newNickname == testNickname)
     }
 
     @Test

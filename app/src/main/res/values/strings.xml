@@ -17,6 +17,7 @@
     <string name="nickname">Nickname</string>
     <string name="starting_funds">Starting funds</string>
     <string name="small_blind">Small blind</string>
+    <string name="nickname_error">Nickname should be between 1 and 20 characters long</string>
 
     <!-- Lobby screen -->
     <string name="players">Players</string>

@@ -19,6 +19,8 @@ class InitialSetupInstrumentedTest {
 
     @Test
     fun checkButtonDisabled() {
+        val tooLongNickname = "123456789012345678901"
+
         composeTestRule.setContent {
             InitialSetupScreen(exitInitialSetup = {})
         }
@@ -32,7 +34,14 @@ class InitialSetupInstrumentedTest {
         // Blank nickname should not be possible
         textField.performTextReplacement("   ")
         button.assertIsNotEnabled()
-        textField.performTextReplacement("test")
+        // Nickname longer than 20 characters should not be possible
+        textField.performTextReplacement(tooLongNickname)
+        button.assertIsNotEnabled()
+        // Correct nickname short
+        textField.performTextReplacement("t")
+        button.assertIsEnabled()
+        // Correct nickname long
+        textField.performTextReplacement("12345678901234567890")
         button.assertIsEnabled()
     }
 
