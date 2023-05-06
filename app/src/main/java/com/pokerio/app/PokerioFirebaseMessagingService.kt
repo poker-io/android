@@ -23,14 +23,10 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-
-        deviceToken = token
         PokerioLogger.debug("New Token: $token")
     }
 
     companion object {
-        var deviceToken = ""
-            private set
 
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")

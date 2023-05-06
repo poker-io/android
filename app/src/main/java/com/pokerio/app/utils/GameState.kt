@@ -271,7 +271,7 @@ object GameState {
     }
 
     fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
-        playerJoinedCallbacks.put(nextId, callback)
+        playerJoinedCallbacks[nextId] = callback
         return nextId++
     }
 
@@ -289,7 +289,7 @@ object GameState {
     }
 
     fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
-        settingsChangedCallback.put(nextId, callback)
+        settingsChangedCallback[nextId] = callback
         return nextId++
     }
 
