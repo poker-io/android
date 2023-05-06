@@ -50,13 +50,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
         fun playerKicked(data: Map<String, String>) {
             PokerioLogger.debug("Received playerKicked FCM message")
-
             GameState.removePlayer(data["playerHash"]!!)
         }
 
         fun playerLeft(data: Map<String, String>) {
             PokerioLogger.debug("Received playerLeft FCM message")
-
             GameState.removePlayer(data["playerHash"]!!, data["gameMaster"]!!)
         }
 

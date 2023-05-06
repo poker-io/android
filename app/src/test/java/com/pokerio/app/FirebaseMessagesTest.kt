@@ -1,7 +1,5 @@
 package com.pokerio.app
 
-import com.google.firebase.messaging.RemoteMessage
-import com.google.firebase.messaging.RemoteMessageCreator
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.After
