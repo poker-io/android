@@ -39,7 +39,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             )
         }
 
-        fun settingsUpdated(data: MutableMap<String, String>) {
+        fun settingsUpdated(data: Map<String, String>) {
             PokerioLogger.debug("Received updatedSettings FCM message")
 
             GameState.changeGameSettings(

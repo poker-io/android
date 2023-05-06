@@ -42,6 +42,9 @@ class ServerRequestTest {
         // Start server on localhost
         server.start(port)
         url = server.url("/").toString().trimEnd { it == '/' }
+
+        // Make sure we're using a clean game state
+        GameState.resetGameState()
     }
 
     @Test

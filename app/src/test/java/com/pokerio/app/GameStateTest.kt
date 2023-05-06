@@ -10,6 +10,12 @@ import java.security.MessageDigest
 
 class GameStateTest {
     @Test
+    fun setup() {
+        // Make sure we're using a clean game state
+        GameState.resetGameState()
+    }
+
+    @Test
     fun addRemovePlayerTest() {
         val testPlayer = Player("Hi, I'm a test player", "42069")
 
