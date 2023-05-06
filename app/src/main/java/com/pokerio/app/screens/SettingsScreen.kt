@@ -228,15 +228,23 @@ fun Selector(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(onClick = { updateValue(currentValue - 1000) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue - 1000) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "-1000")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue - 100) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue - 100) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "-100")
                 }
                 OutlinedButton(
                     onClick = { updateValue(currentValue - 10) },
-                    modifier = Modifier.testTag("slider-10")
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("slider-10")
                 ) {
                     Text(text = "-10")
                 }
@@ -248,15 +256,23 @@ fun Selector(
                 modifier = Modifier.testTag("slider_text")
             )
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(onClick = { updateValue(currentValue + 1000) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue + 1000) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "+1000")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue + 100) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue + 100) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "+100")
                 }
                 OutlinedButton(
                     onClick = { updateValue(currentValue + 10) },
-                    modifier = Modifier.testTag("slider+10")
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("slider+10")
                 ) {
                     Text(text = "+10")
                 }
