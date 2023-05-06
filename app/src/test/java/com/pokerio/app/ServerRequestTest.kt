@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.Player
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -60,7 +61,10 @@ class ServerRequestTest {
             )
         )
 
-        val onSuccess = {}
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
 
         val onError = {
             assertThat("CreateGame should not error", false)
@@ -73,6 +77,7 @@ class ServerRequestTest {
         assert(GameState.gameID == gameKey)
         assert(GameState.startingFunds == startingFunds)
         assert(GameState.smallBlind == smallBlind)
+        assert(onSuccessCalled == 1)
     }
 
     @Test
@@ -119,7 +124,10 @@ class ServerRequestTest {
             )
         )
 
-        val onSuccess = {}
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
 
         val onError = {
             assertThat("JoinGame should not error", false)
@@ -146,6 +154,7 @@ class ServerRequestTest {
         assert(
             GameState.players[0].playerID == "idTest" || GameState.players[1].playerID == "idTest"
         )
+        assert(onSuccessCalled == 1)
     }
 
     @Test
@@ -214,7 +223,10 @@ class ServerRequestTest {
 
         server.enqueue(MockResponse().setResponseCode(200))
 
-        val onSuccess = {}
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
 
         val onError = {
             assertThat("JoinGame should not error", false)
@@ -226,6 +238,121 @@ class ServerRequestTest {
 
         assert(GameState.gameID == "")
         assert(GameState.players.isEmpty())
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun leaveGameWrongResponseTest() {
+        val gameId = "123456"
+        GameState.gameID = gameId
+        GameState.addPlayer(Player("testPlayer", "testHash"))
+
+        server.enqueue(MockResponse().setResponseCode(500))
+
+        val onSuccess = {
+            assertThat("LeaveGame should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.leaveGameRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(GameState.gameID == gameId)
+        assert(GameState.players.size == 1)
+        assert(onErrorCalled == 1)
+    }
+
+    @Test
+    fun modifyGameRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertThat("ModifyGame should not error", false)
+        }
+
+        runBlocking {
+            GameState.modifyGameRequest(2137, 271837, onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun modifyGameWrongResponseTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertThat("ModifyGame should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.modifyGameRequest(100, 1000, onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
+    }
+
+    @Test
+    fun startGameRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertThat("StartGame should not error", false)
+        }
+
+        runBlocking {
+            GameState.startGameRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun startGameWrongResponseTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertThat("StartGame should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.startGameRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
     }
 
     @After
