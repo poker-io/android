@@ -100,7 +100,7 @@ private fun StartGameCard(
         Card(
             modifier = modifier
                 .fillMaxWidth()
-                .testTag("StartGameCard")
+                .testTag("start_game_card")
         ) {
             Column(modifier = Modifier.padding(10.dp)) {
                 OutlinedTextField(
@@ -130,7 +130,7 @@ private fun StartGameCard(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .testTag("StartGameCard")
+                .testTag("create_game_card")
         ) {
             Column(modifier = Modifier.padding(10.dp)) {
                 OutlinedButton(
