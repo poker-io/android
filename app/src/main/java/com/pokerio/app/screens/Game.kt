@@ -14,7 +14,7 @@ fun Game() {
         Text(text = GameState.card1.toString())
         Text(text = GameState.card2.toString())
         GameState.players.forEach {
-            Column() {
+            Column {
                 Text(text = it.nickname)
                 // Text(text = it.playerID)
                 Text(text = it.funds.toString())

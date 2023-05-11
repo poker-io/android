@@ -46,7 +46,7 @@ fun MainActivityComposable(
 ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        Color.Transparent,
+        color = Color.Transparent,
         darkIcons = !useDarkTheme
     )
 

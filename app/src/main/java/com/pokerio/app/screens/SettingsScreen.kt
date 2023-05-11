@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
+import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.UnitUnitProvider
 import java.lang.Float.max
 import java.lang.Float.min
@@ -70,7 +71,7 @@ fun SettingsScreen(
     var nicknameCorrect by remember { mutableStateOf(true) }
     val onNicknameUpdate = { newValue: String ->
         nickname = newValue
-        nicknameCorrect = nickname.isNotBlank() && nickname.length <= 20
+        nicknameCorrect = Player.validateNickname(nickname)
     }
 
     val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
@@ -120,8 +121,8 @@ fun SettingsScreen(
         }
 
         // Notify server about changes if we were in game
-        GameState.launchTask {
-            if (GameState.isInGame()) {
+        if (GameState.isInGame()) {
+            GameState.launchTask {
                 GameState.modifyGameRequest(
                     smallBlind,
                     startingFunds,

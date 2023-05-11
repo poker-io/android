@@ -232,7 +232,7 @@ class ServerRequestTest {
         }
 
         val onError = {
-            assertTrue("JoinGame should not error", false)
+            assertTrue("LeaveGame should not error", false)
         }
 
         runBlocking {

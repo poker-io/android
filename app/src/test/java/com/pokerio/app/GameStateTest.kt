@@ -4,6 +4,7 @@ import com.pokerio.app.utils.Card
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.security.MessageDigest
@@ -71,6 +72,7 @@ class GameStateTest {
         assertTrue("onPlayerRemoved callback not removed", playerRemovedCalledCounter == 1)
     }
 
+    @Test
     fun changeSettingsTest() {
         GameState.startingFunds = 1000
         GameState.startingFunds = 100
@@ -127,7 +129,7 @@ class GameStateTest {
         assertTrue("players list not reset", GameState.players.isEmpty())
         assertTrue("startingFunds not reset", GameState.startingFunds == -1)
         assertTrue("smallBlind not reset", GameState.smallBlind == -1)
-        assertTrue("isPlayerAdmin not reset", GameState.isPlayerAdmin == false)
+        assertFalse("isPlayerAdmin not reset", GameState.isPlayerAdmin)
         assertTrue("onGameReset not called", resetCalled)
         assertTrue("card1 not reset", GameState.card1 == null)
         assertTrue("card2 not reset", GameState.card2 == null)

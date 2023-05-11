@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.R
+import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.UnitUnitProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +45,7 @@ fun InitialSetupScreen(
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
     val onNicknameUpdate = { newValue: String ->
         nickname = newValue
-        nicknameCorrect = nickname.isNotBlank() && nickname.length <= 20
+        nicknameCorrect = Player.validateNickname(nickname)
     }
 
     val onContinue = {
