@@ -20,5 +20,4 @@ class PlayerTests {
         assert(!Player.validateNickname(""))
         assert(!Player.validateNickname("     "))
     }
-
 }
