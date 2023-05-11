@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -17,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.pokerio.app.screens.Game
+import com.pokerio.app.screens.GameScreen
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
@@ -117,7 +116,7 @@ fun MainActivityComposable(
         composable("settings") { SettingsScreen(navigateBack = navigateBack) }
         composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
         composable("lobby") { LobbyScreen(navigateToSettings = navigateToSettings) }
-        composable("game") { Game() }
+        composable("game") { GameScreen() }
     }
 }
 

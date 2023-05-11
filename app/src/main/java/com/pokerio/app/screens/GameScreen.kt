@@ -8,7 +8,7 @@ import com.pokerio.app.utils.GameState
 
 @Preview
 @Composable
-fun Game() {
+fun GameScreen() {
     Column {
         Text(text = "Player cards:")
         Text(text = GameState.card1.toString())
@@ -16,7 +16,6 @@ fun Game() {
         GameState.players.forEach {
             Column {
                 Text(text = it.nickname)
-                // Text(text = it.playerID)
                 Text(text = it.funds.toString())
             }
         }
