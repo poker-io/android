@@ -1,7 +1,6 @@
 package com.pokerio.app.utils
 
 import android.content.Context
-import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import com.pokerio.app.R
 import kotlinx.coroutines.CoroutineScope
@@ -26,9 +25,8 @@ object GameState {
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var isPlayerAdmin: Boolean = false
-    var myToken = ""
-    var card1: Card = Card("E", "E")
-    var card2: Card = Card("E", "E")
+    var card1: Card? = null
+    var card2: Card? = null
 
     // Callbacks
     var onGameReset = {}
@@ -40,17 +38,20 @@ object GameState {
 
     // Constants
     private const val BASE_URL = "http://158.101.160.143:42069"
-    private val networkCoroutine = CoroutineScope(Dispatchers.IO)
 
     // Methods
+    fun launchTask(task: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            task()
+        }
+    }
 
-    // This method makes a request to create a game and sets the field of the GameState object on
-    // success and returns true. Returns false if something goes wrong.
-    fun createGameRequest(
+    suspend fun createGameRequest(
         context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
         // Get all values
         val sharedPreferences = context.getSharedPreferences(
@@ -74,43 +75,41 @@ object GameState {
         )
 
         // Make request
-        networkCoroutine.launch {
-            try {
-                val creatorID = FirebaseMessaging.getInstance().token.await()
-                myToken = creatorID
-                // Prepare url
-                val urlString =
-                    "/createGame?creatorToken=$creatorID&nickname=$nickname" +
-                        "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
-                val url = URL(baseUrl + urlString)
+        try {
+            val creatorID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+            // Prepare url
+            val urlString =
+                "/createGame?creatorToken=$creatorID&nickname=$nickname" +
+                    "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
+            val url = URL(baseUrl + urlString)
 
-                val responseJson = url.readText()
-                val responseObject =
-                    Json.decodeFromString(CreateGameResponseSerializer, responseJson)
+            val responseJson = url.readText()
+            val responseObject =
+                Json.decodeFromString(CreateGameResponseSerializer, responseJson)
 
-                gameID = responseObject.gameKey
-                startingFunds = responseObject.startingFunds
-                smallBlind = responseObject.smallBlind
+            gameID = responseObject.gameKey.toString()
+            startingFunds = responseObject.startingFunds
+            smallBlind = responseObject.smallBlind
 
-                // We have to add the creator to the list of players
-                players.clear()
-                addPlayer(Player(nickname, creatorID, true))
+            // We have to add the creator to the list of players
+            players.clear()
+            addPlayer(Player(nickname, creatorID, true))
 
-                isPlayerAdmin = true
-                ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: Exception) {
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
-            }
+            isPlayerAdmin = true
+            onSuccess()
+        } catch (e: Exception) {
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
-    fun joinGameRequest(
+    suspend fun joinGameRequest(
         gameID: String,
         context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
         // Get all values
         val sharedPreferences = context.getSharedPreferences(
@@ -124,160 +123,132 @@ object GameState {
         ) ?: "Player"
 
         // Make request
-        networkCoroutine.launch {
-            try {
-                val playerID = FirebaseMessaging.getInstance().token.await()
-                myToken = playerID
-                // Prepare url
-                val urlString = "/joinGame?nickname=$nickname&playerToken=$playerID&gameId=$gameID"
-                val url = URL(baseUrl + urlString)
+        try {
+            val playerID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+            // Prepare url
+            val urlString = "/joinGame?nickname=$nickname&playerToken=$playerID&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
 
-                val responseJson = url.readText()
-                val responseObject = Json.parseToJsonElement(responseJson).jsonObject
+            val responseJson = url.readText()
+            val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
-                this@GameState.gameID = gameID
-                // TODO: This has to be parsed better
-                startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
-                smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
+            this@GameState.gameID = gameID
+            // TODO: This has to be parsed better
+            startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
+            smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
 
-                val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
+            val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
 
-                responseObject["players"]!!.jsonArray.forEach {
-                    val nickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
-                    val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
+            responseObject["players"]!!.jsonArray.forEach {
+                val playerNickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
+                val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
 
-                    addPlayer(Player(nickname, playerHash, playerHash == gameMasterHash))
-                }
-
-                // This player is not included in the player list, so we need to add them separately
-                addPlayer(Player(nickname, playerID))
-
-                ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
+                addPlayer(Player(playerNickname, playerHash, playerHash == gameMasterHash))
             }
+
+            // This player is not included in the player list, so we need to add them separately
+            addPlayer(Player(nickname, playerID))
+
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
-    fun exitSettingsRequest(
-        context: Context,
-        onError: () -> Unit,
+    suspend fun modifyGameRequest(
+        smallBlind: Int,
+        startingFunds: Int,
         onSuccess: () -> Unit,
-        baseUrl: String = BASE_URL
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
-        if (isInGame()) {
-            val sharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences_file),
-                Context.MODE_PRIVATE
-            )
+        try {
+            val playerID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-            val smallBlind = sharedPreferences.getInt(
-                context.getString(R.string.sharedPreferences_small_blind),
-                1000
-            )
-
-            val startingFunds = sharedPreferences.getInt(
-                context.getString(R.string.sharedPreferences_starting_funds),
-                100
-            )
-
-            networkCoroutine.launch {
-                try {
-                    val playerID = FirebaseMessaging.getInstance().token.await()
-
-                    // Prepare url
-                    val urlString =
-                        "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
-                    val url = URL(baseUrl + urlString)
-                    url.readText()
-                    ContextCompat.getMainExecutor(context).execute(onSuccess)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    PokerioLogger.error(e.toString())
-                    ContextCompat.getMainExecutor(context).execute(onError)
-                }
-            }
+            // Prepare url
+            val urlString =
+                "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
+            val url = URL(baseUrl + urlString)
+            url.readText()
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
-    fun kickPlayerRequest(
+    suspend fun kickPlayerRequest(
         playerID: String,
-        context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
-        networkCoroutine.launch {
-            try {
-                val myID = FirebaseMessaging.getInstance().token.await()
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-                // Prepare url
-                val urlString = "/kickPlayer?creatorToken=$myID&playerToken=$playerID"
-                val url = URL(baseUrl + urlString)
+            // Prepare url
+            val urlString = "/kickPlayer?creatorToken=$myID&playerToken=$playerID"
+            val url = URL(baseUrl + urlString)
 
-                url.readText()
+            url.readText()
 
-                ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
-            }
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
-    fun leaveGameRequest(
-        context: Context,
+    suspend fun leaveGameRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
-        networkCoroutine.launch {
-            try {
-                val myID = FirebaseMessaging.getInstance().token.await()
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-                // Prepare url
-                val urlString = "/leaveGame?playerToken=$myID"
-                val url = URL(baseUrl + urlString)
+            // Prepare url
+            val urlString = "/leaveGame?playerToken=$myID"
+            val url = URL(baseUrl + urlString)
 
-                url.readText()
+            url.readText()
 
-                ContextCompat.getMainExecutor(context).execute {
-                    resetGameState()
-                    onSuccess()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
-            }
+            resetGameState()
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
-    fun startGameRequest(
-        context: Context,
+    suspend fun startGameRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
-        baseUrl: String = BASE_URL
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
     ) {
-        networkCoroutine.launch {
-            try {
-                val myID = FirebaseMessaging.getInstance().token.await()
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
-                // Prepare url
-                val urlString = "/startGame?creatorToken=$myID"
-                val url = URL(baseUrl + urlString)
+            // Prepare url
+            val urlString = "/startGame?creatorToken=$myID"
+            val url = URL(baseUrl + urlString)
 
-                url.readText()
+            url.readText()
 
-                ContextCompat.getMainExecutor(context).execute(onSuccess)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                PokerioLogger.error(e.toString())
-                ContextCompat.getMainExecutor(context).execute(onError)
-            }
+            onSuccess()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            PokerioLogger.error(e.toString())
+            onError()
         }
     }
 
@@ -288,7 +259,8 @@ object GameState {
         startingFunds = -1
         smallBlind = -1
         isPlayerAdmin = false
-        myToken = ""
+        card1 = null
+        card2 = null
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -299,7 +271,7 @@ object GameState {
     }
 
     fun addOnPlayerJoinedCallback(callback: (Player) -> Unit): Int {
-        playerJoinedCallbacks.put(nextId, callback)
+        playerJoinedCallbacks[nextId] = callback
         return nextId++
     }
 
@@ -317,7 +289,7 @@ object GameState {
     }
 
     fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
-        settingsChangedCallback.put(nextId, callback)
+        settingsChangedCallback[nextId] = callback
         return nextId++
     }
 
@@ -338,7 +310,8 @@ object GameState {
         if (isThisPlayerRemoved) {
             resetGameState()
         } else {
-            val removedPlayer = players.find { it.playerID == playerHash } ?: return
+            val removedPlayer = players.find { it.playerID == playerHash }
+                ?: throw Exception("Player to be removed not found")
 
             if (removedPlayer.isAdmin && newAdmin == null) {
                 throw Exception("Admin removed without new admin given")
@@ -391,7 +364,7 @@ object GameState {
 }
 
 data class CreateGameResponse(
-    val gameKey: String,
+    val gameKey: Int,
     val startingFunds: Int,
     val smallBlind: Int
 )

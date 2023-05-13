@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
@@ -37,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.components.PlayerListItem
 import com.pokerio.app.utils.GameState
@@ -87,7 +90,9 @@ fun LobbyScreen(
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -181,24 +186,36 @@ fun LobbyScreen(
 
 private fun leaveGame(context: Context) {
     val onSuccess = {
-        Toast.makeText(context, "Left game", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Left game", Toast.LENGTH_LONG).show()
+        }
     }
 
     val onError = {
-        Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
+        }
     }
 
-    GameState.leaveGameRequest(context, onSuccess, onError)
+    GameState.launchTask {
+        GameState.leaveGameRequest(onSuccess, onError)
+    }
 }
 
 private fun startGame(context: Context) {
     val onSuccess = {
-        Toast.makeText(context, "Started Game", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Started Game", Toast.LENGTH_LONG).show()
+        }
     }
 
     val onError = {
-        Toast.makeText(context, "Failed to start game", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Failed to start game", Toast.LENGTH_LONG).show()
+        }
     }
 
-    GameState.startGameRequest(context, onSuccess, onError)
+    GameState.launchTask {
+        GameState.startGameRequest(onSuccess, onError)
+    }
 }

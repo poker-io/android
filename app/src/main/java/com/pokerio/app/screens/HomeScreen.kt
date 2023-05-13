@@ -2,15 +2,14 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
@@ -20,9 +19,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.UnitUnitProvider
@@ -94,44 +96,51 @@ private fun StartGameCard(
         navigateToLobby()
     }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .testTag("StartGameCard")
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(10.dp)
+    Column {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .testTag("start_game_card")
         ) {
-            OutlinedTextField(
-                value = gameCode,
-                onValueChange = { gameCode = it },
-                label = { Text(stringResource(R.string.label_game_code)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedIconButton(
-                onClick = { joinGame(context, gameCode, onSuccess) },
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
+            Column(modifier = Modifier.padding(10.dp)) {
+                OutlinedTextField(
+                    value = gameCode,
+                    onValueChange = { gameCode = it },
+                    label = { Text(stringResource(R.string.label_game_code)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        disabledBorderColor = MaterialTheme.colorScheme.primary
+                    )
                 )
-            ) {
-                Icon(
-                    Icons.Rounded.PlayArrow,
-                    contentDescription =
-                    stringResource(id = R.string.contentDescription_join_game_button)
-                )
+                Button(
+                    onClick = { joinGame(context, gameCode, onSuccess) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Icon(
+                        Icons.Rounded.PlayArrow,
+                        contentDescription =
+                        stringResource(id = R.string.contentDescription_join_game_button)
+                    )
+                }
             }
-            Button(
-                onClick = { createGame(context, onSuccess) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(PaddingValues(top = 10.dp)),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(stringResource(R.string.new_game))
+        }
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+                .testTag("create_game_card")
+        ) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                OutlinedButton(
+                    onClick = { createGame(context, onSuccess) },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(stringResource(R.string.new_game))
+                }
             }
         }
     }
@@ -145,13 +154,21 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
         return
     }
 
-    val onError = {
-        Toast
-            .makeText(context, context.getString(R.string.error_failed_to_join_game), Toast.LENGTH_LONG)
-            .show()
+    val onSuccessWrapper = {
+        ContextCompat.getMainExecutor(context).execute(onSuccess)
     }
 
-    GameState.joinGameRequest(gameCode, context, onSuccess, onError)
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast
+                .makeText(context, context.getString(R.string.error_failed_to_join_game), Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.joinGameRequest(gameCode, context, onSuccessWrapper, onError)
+    }
 }
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
@@ -161,5 +178,7 @@ private fun createGame(context: Context, onSuccess: () -> Unit) {
             .show()
     }
 
-    GameState.createGameRequest(context, onSuccess, onError)
+    GameState.launchTask {
+        GameState.createGameRequest(context, onSuccess, onError)
+    }
 }

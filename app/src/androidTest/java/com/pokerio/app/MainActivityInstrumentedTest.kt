@@ -52,7 +52,7 @@ class MainActivityInstrumentedTest {
         }
 
         // Check if we are on the home screen
-        val startGameCard = androidTestRule.onNodeWithTag("StartGameCard")
+        val startGameCard = androidTestRule.onNodeWithTag("start_game_card")
         startGameCard.assertExists()
         startGameCard.assertIsDisplayed()
     }

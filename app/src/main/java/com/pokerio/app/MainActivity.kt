@@ -1,61 +1,77 @@
 package com.pokerio.app
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pokerio.app.screens.Game
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.pokerio.app.screens.GameScreen
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
-import com.pokerio.app.utils.discard
+import com.pokerio.app.utils.ThemeUtils
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Dark theme is disabled for now
+        val useDarkTheme = false
 
         setContent {
-            AppTheme(useDarkTheme = false) {
-                MainActivityComposable()
+            AppTheme(useDarkTheme) {
+                MainActivityComposable(useDarkTheme)
             }
         }
     }
 }
 
 @Composable
-fun MainActivityComposable() {
+fun MainActivityComposable(
+    useDarkTheme: Boolean = isSystemInDarkTheme()
+) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = Color.Transparent,
+        darkIcons = !useDarkTheme
+    )
+
     val navController = rememberNavController()
     val context = LocalContext.current
 
     val navigateToSettings = {
-        navController.navigate("settings")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.navigate("settings")
+        }
     }
     val navigateBack = {
-        navController.navigateUp().discard()
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack()
+        }
     }
     val exitInitialSetup = {
-        navController.navigateUp()
-        navController.navigate("home")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.popBackStack()
+            navController.navigate("home")
+        }
     }
     val navigateToLobby = {
-        navController.navigate("lobby")
+        ContextCompat.getMainExecutor(context).execute {
+            navController.navigate("lobby")
+        }
     }
 
     GameState.resetGameState()
@@ -100,7 +116,7 @@ fun MainActivityComposable() {
         composable("settings") { SettingsScreen(navigateBack = navigateBack) }
         composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
         composable("lobby") { LobbyScreen(navigateToSettings = navigateToSettings) }
-        composable("game") { Game() }
+        composable("game") { GameScreen() }
     }
 }
 
@@ -109,22 +125,8 @@ private fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (useDarkTheme) {
-            dynamicDarkColorScheme(LocalContext.current)
-        } else {
-            dynamicLightColorScheme(LocalContext.current)
-        }
-    } else {
-        if (useDarkTheme) {
-            darkColorScheme()
-        } else {
-            lightColorScheme()
-        }
-    }
-
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = ThemeUtils.lightColorScheme,
         content = content
     )
 }

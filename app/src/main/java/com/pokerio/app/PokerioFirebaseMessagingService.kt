@@ -27,6 +27,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
+
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
 
@@ -38,7 +39,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             )
         }
 
-        fun settingsUpdated(data: MutableMap<String, String>) {
+        fun settingsUpdated(data: Map<String, String>) {
             PokerioLogger.debug("Received updatedSettings FCM message")
 
             GameState.changeGameSettings(
@@ -49,13 +50,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
         fun playerKicked(data: Map<String, String>) {
             PokerioLogger.debug("Received playerKicked FCM message")
-
             GameState.removePlayer(data["playerHash"]!!)
         }
 
         fun playerLeft(data: Map<String, String>) {
             PokerioLogger.debug("Received playerLeft FCM message")
-
             GameState.removePlayer(data["playerHash"]!!, data["gameMaster"]!!)
         }
 

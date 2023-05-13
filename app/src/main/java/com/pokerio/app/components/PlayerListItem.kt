@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
@@ -89,12 +90,18 @@ fun PlayerListItem(
 
 fun kickPlayer(context: Context, playerID: String) {
     val onSuccess = {
-        Toast.makeText(context, "Kicked player", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Kicked player", Toast.LENGTH_LONG).show()
+        }
     }
 
     val onError = {
-        Toast.makeText(context, "Failed to kick player", Toast.LENGTH_LONG).show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Failed to kick player", Toast.LENGTH_LONG).show()
+        }
     }
 
-    GameState.kickPlayerRequest(playerID, context, onSuccess, onError)
+    GameState.launchTask {
+        GameState.kickPlayerRequest(playerID, onSuccess, onError)
+    }
 }

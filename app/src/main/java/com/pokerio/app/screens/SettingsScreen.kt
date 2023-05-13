@@ -2,6 +2,7 @@ package com.pokerio.app.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -12,16 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,9 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
+import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.UnitUnitProvider
 import java.lang.Float.max
 import java.lang.Float.min
@@ -55,78 +58,96 @@ fun SettingsScreen(
     val sectionTitleModifier = Modifier.padding(10.dp)
     val spacerModifier = Modifier.padding(10.dp)
 
+    val maxSmallBlindModifier = 0.4f
+
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(
         stringResource(id = R.string.shared_preferences_file),
         Context.MODE_PRIVATE
     )
 
-    DisposableEffect(LocalLifecycleOwner.current) {
-        onDispose {
-            // Unregister callback when we leave the view
-            val onError = {
-                Toast.makeText(
-                    context,
-                    "Failed to update settings",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            val onSuccess = {
-                Toast.makeText(
-                    context,
-                    "Successfully updated settings",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-            GameState.exitSettingsRequest(
-                context = context,
-                onError = onError,
-                onSuccess = onSuccess
-            )
-        }
-    }
-
     val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
     var nickname by remember { mutableStateOf(getInitialNickname(context)) }
+    var nicknameCorrect by remember { mutableStateOf(true) }
     val onNicknameUpdate = { newValue: String ->
         nickname = newValue
-
-        with(sharedPreferences.edit()) {
-            putString(nicknameSharedKey, newValue)
-            apply()
-        }
-    }
-
-    // TODO: What if someone lowers starting funds and now the small blind doesn't make sense?
-    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
-    var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
-    val onStartingFundsUpdate = { newValue: Int ->
-        startingFunds = newValue
-
-        with(sharedPreferences.edit()) {
-            putInt(startingFundsSharedKey, newValue)
-            apply()
-        }
+        nicknameCorrect = Player.validateNickname(nickname)
     }
 
     val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
     var smallBlind by remember { mutableStateOf(getInitialSmallBlind(context)) }
     val onSmallBlindUpdate = { newValue: Int ->
         smallBlind = newValue
+    }
 
-        with(sharedPreferences.edit()) {
-            putInt(smallBlindSharedKey, newValue)
-            apply()
+    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
+    var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
+    val onStartingFundsUpdate = { newValue: Int ->
+        startingFunds = newValue
+        if (startingFunds * maxSmallBlindModifier < smallBlind) {
+            onSmallBlindUpdate((startingFunds * maxSmallBlindModifier).toInt())
         }
     }
 
+    val onNavigateBack = {
+        // Update shared preferences values on exit
+        with(sharedPreferences.edit()) {
+            if (nicknameCorrect) {
+                putString(nicknameSharedKey, nickname)
+            }
+            putInt(startingFundsSharedKey, startingFunds)
+            putInt(smallBlindSharedKey, smallBlind)
+            apply()
+        }
+
+        // Unregister callback when we leave the view
+        val onError = {
+            ContextCompat.getMainExecutor(context).execute {
+                Toast.makeText(
+                    context,
+                    "Failed to update settings",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+        val onSuccess = {
+            ContextCompat.getMainExecutor(context).execute {
+                Toast.makeText(
+                    context,
+                    "Successfully updated settings",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        // Notify server about changes if we were in game
+        if (GameState.isInGame()) {
+            GameState.launchTask {
+                GameState.modifyGameRequest(
+                    smallBlind,
+                    startingFunds,
+                    onSuccess,
+                    onError
+                )
+            }
+        }
+
+        navigateBack()
+    }
+
+    BackHandler {
+        onNavigateBack()
+    }
+
     Column {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             title = { Text(stringResource(id = R.string.settings)) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
             navigationIcon = {
                 IconButton(
-                    onClick = { navigateBack() },
+                    onClick = { onNavigateBack() },
                     modifier = Modifier.testTag("settings_back")
                 ) {
                     Icon(
@@ -146,7 +167,13 @@ fun SettingsScreen(
                         .testTag("settings_nickname"),
                     value = nickname,
                     onValueChange = { onNicknameUpdate(it) },
-                    label = { Text(stringResource(id = R.string.nickname)) }
+                    label = { Text(stringResource(id = R.string.nickname)) },
+                    isError = !nicknameCorrect,
+                    supportingText = {
+                        if (!nicknameCorrect) {
+                            Text(stringResource(id = R.string.nickname_error))
+                        }
+                    }
                 )
             }
             Spacer(modifier = spacerModifier)
@@ -172,7 +199,7 @@ fun SettingsScreen(
             Selector(
                 onValueSelected = { onSmallBlindUpdate(it) },
                 minValue = 10f,
-                maxValue = startingFunds * 0.4f,
+                maxValue = startingFunds * maxSmallBlindModifier,
                 initialValue = smallBlind.toFloat()
             )
         }
@@ -188,6 +215,7 @@ fun Selector(
     @PreviewParameter(IntUnitProvider::class) onValueSelected: (value: Int) -> Unit
 ) {
     var currentValue by remember { mutableStateOf(initialValue) }
+    currentValue = minOf(currentValue, maxValue)
 
     fun updateValue(newValue: Float) {
         currentValue = min(max(newValue, minValue), maxValue)
@@ -201,15 +229,23 @@ fun Selector(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(onClick = { updateValue(currentValue - 1000) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue - 1000) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "-1000")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue - 100) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue - 100) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "-100")
                 }
                 OutlinedButton(
                     onClick = { updateValue(currentValue - 10) },
-                    modifier = Modifier.testTag("slider-10")
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("slider-10")
                 ) {
                     Text(text = "-10")
                 }
@@ -221,15 +257,23 @@ fun Selector(
                 modifier = Modifier.testTag("slider_text")
             )
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(onClick = { updateValue(currentValue + 1000) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue + 1000) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "+1000")
                 }
-                OutlinedButton(onClick = { updateValue(currentValue + 100) }) {
+                OutlinedButton(
+                    onClick = { updateValue(currentValue + 100) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "+100")
                 }
                 OutlinedButton(
                     onClick = { updateValue(currentValue + 10) },
-                    modifier = Modifier.testTag("slider+10")
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("slider+10")
                 ) {
                     Text(text = "+10")
                 }
