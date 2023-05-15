@@ -10,9 +10,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonArray
 import java.net.URL
 import java.security.MessageDigest
 
@@ -37,7 +35,7 @@ object GameState {
     private var nextId = 0
 
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://10.0.2.2:42069"
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
@@ -130,16 +128,15 @@ object GameState {
             val url = URL(baseUrl + urlString)
 
             val responseJson = url.readText()
-            val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
             this.gameID = gameID
-            // TODO: This has to be parsed better
-            startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
-            smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
 
-            val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
+            val joinGameResponse = Json.decodeFromString(JoinGameResponseSerializer, responseJson)
+            startingFunds = joinGameResponse.startingFunds
+            smallBlind = joinGameResponse.smallBlind
+            val gameMasterHash = joinGameResponse.gameMasterHash
 
-            responseObject["players"]!!.jsonArray.forEach {
+            joinGameResponse.players.forEach {
                 val playerResponse = Json.decodeFromString(PlayerResponseSerializer, it.toString())
                 val newPlayer = Player(
                     playerResponse.nickname,
@@ -224,7 +221,6 @@ object GameState {
 
             url.readText()
 
-            resetGameState()
             onSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -248,6 +244,7 @@ object GameState {
 
             url.readText()
 
+            resetGameState()
             onSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -307,6 +304,10 @@ object GameState {
     }
 
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
+        if (!isInGame()) {
+            return
+        }
+
         // Check if this player is being removed
         val isThisPlayerRemoved = players.find {
             sha256(it.playerID) == playerHash
@@ -387,3 +388,15 @@ data class PlayerResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = PlayerResponse::class)
 object PlayerResponseSerializer
+
+data class JoinGameResponse(
+    val gameMasterHash: String,
+    val startingFunds: Int,
+    val smallBlind: Int,
+    val players: JsonArray
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = JoinGameResponse::class)
+object JoinGameResponseSerializer
