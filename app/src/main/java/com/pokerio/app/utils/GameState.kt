@@ -132,7 +132,7 @@ object GameState {
             val responseJson = url.readText()
             val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
-            this@GameState.gameID = gameID
+            this.gameID = gameID
             // TODO: This has to be parsed better
             startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
             smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
@@ -140,10 +140,14 @@ object GameState {
             val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
 
             responseObject["players"]!!.jsonArray.forEach {
-                val playerNickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
-                val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
+                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, it.toString())
+                val newPlayer = Player(
+                    playerResponse.nickname,
+                    playerResponse.playerHash,
+                    playerResponse.playerHash == gameMasterHash
+                )
 
-                addPlayer(Player(playerNickname, playerHash, playerHash == gameMasterHash))
+                addPlayer(newPlayer)
             }
 
             // This player is not included in the player list, so we need to add them separately
@@ -373,3 +377,13 @@ data class CreateGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
+
+data class PlayerResponse(
+    val nickname: String,
+    val playerHash: String
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = PlayerResponse::class)
+object PlayerResponseSerializer
