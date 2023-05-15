@@ -308,38 +308,37 @@ object GameState {
             return
         }
 
-        // Check if this player is being removed
-        val isThisPlayerRemoved = players.find {
-            sha256(it.playerID) == playerHash
-        } != null
+        val isThisPlayerRemoved = players.find { sha256(it.playerID) == playerHash } != null
+
         if (isThisPlayerRemoved) {
             resetGameState()
-        } else {
-            val removedPlayer = players.find { it.playerID == playerHash }
-                ?: throw Exception("Player to be removed not found")
-
-            if (removedPlayer.isAdmin && newAdmin == null) {
-                throw Exception("Admin removed without new admin given")
-            } else if (removedPlayer.isAdmin) {
-                val isThisPlayerNewAdmin = players.find {
-                    sha256(it.playerID) == newAdmin
-                } != null
-
-                if (isThisPlayerNewAdmin) {
-                    isPlayerAdmin = true
-                    val thisPlayer = players.find {
-                        sha256(it.playerID) == newAdmin
-                    }
-                    thisPlayer!!.isAdmin = true
-                } else {
-                    val newAdminPlayer = players.find { it.playerID == newAdmin }
-                    newAdminPlayer!!.isAdmin = true
-                }
-            }
-
-            players.removeIf { it.playerID == playerHash }
-            playerRemovedCallbacks.forEach { it.value(removedPlayer) }
+            return
         }
+
+        val removedPlayer = players.find { it.playerID == playerHash }
+            ?: throw Exception("Player to be removed not found")
+
+        if (removedPlayer.isAdmin && newAdmin == null) {
+            throw Exception("Admin removed without new admin given")
+        }
+
+        if (removedPlayer.isAdmin) {
+            val isThisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin } != null
+
+            if (isThisPlayerNewAdmin) {
+                val thisPlayer = players.find { sha256(it.playerID) == newAdmin }
+
+                isPlayerAdmin = true
+                thisPlayer!!.isAdmin = true
+            } else {
+                val newAdminPlayer = players.find { it.playerID == newAdmin }
+
+                newAdminPlayer!!.isAdmin = true
+            }
+        }
+
+        players.removeIf { it.playerID == playerHash }
+        playerRemovedCallbacks.forEach { it.value(removedPlayer) }
     }
 
     fun startGame(data: Map<String, String>) {
