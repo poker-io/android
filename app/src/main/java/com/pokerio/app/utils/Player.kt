@@ -8,7 +8,7 @@ class Player(
 ) {
     companion object {
         fun validateNickname(nickname: String): Boolean {
-            return nickname.isNotBlank() && nickname.length <= 20
+            return nickname.isNotBlank() && nickname.length <= GameState.MAX_NICKNAME_LEN
         }
     }
 }

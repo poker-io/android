@@ -5,6 +5,7 @@ import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.After
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.security.MessageDigest
@@ -33,9 +34,9 @@ class GameStateTest {
         val testPlayer = Player("Hi, I'm a test player", "42069")
 
         var playerAddedCalledCounter = 0
-        val onPlayerAdded = { it: Player ->
+        val onPlayerAdded = { player: Player ->
             playerAddedCalledCounter++
-            assertTrue("Player passed to callback incorrectly", it == testPlayer)
+            assertTrue("Player passed to callback incorrectly", player == testPlayer)
         }
         val playerAddedCallbackId = GameState.addOnPlayerJoinedCallback(onPlayerAdded)
 
@@ -55,9 +56,9 @@ class GameStateTest {
         val testPlayer = Player("Hi, I'm a test player", "42069")
 
         var playerRemovedCalledCounter = 0
-        val onPlayerRemoved = { it: Player ->
+        val onPlayerRemoved = { player: Player ->
             playerRemovedCalledCounter++
-            assertTrue("Player passed to callback incorrectly", it == testPlayer)
+            assertTrue("Player passed to callback incorrectly", player == testPlayer)
         }
         val playerRemovedCallbackId = GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
 
@@ -143,9 +144,9 @@ class GameStateTest {
         val thisPlayerId = "testId2"
 
         var onPlayerRemovedCalled = 0
-        val onPlayerRemoved = { it: Player ->
-            assert(it.nickname == player1Nickname)
-            assert(it.playerID == player1Id)
+        val onPlayerRemoved = { player: Player ->
+            assert(player.nickname == player1Nickname)
+            assert(player.playerID == player1Id)
 
             onPlayerRemovedCalled += 1
         }
@@ -217,16 +218,12 @@ class GameStateTest {
 
         assert(GameState.players.size == 2)
 
-        var exceptionThrown = false
-        try {
+        assertThrows(IllegalArgumentException::class.java) {
             GameState.removePlayer(player1Id)
-        } catch (e: Exception) {
-            exceptionThrown = true
         }
 
         assert(GameState.players.size == 2)
         assert(onPlayerRemovedCalled == 0)
-        assert(exceptionThrown)
     }
 
     @Test
@@ -279,16 +276,12 @@ class GameStateTest {
 
         assert(GameState.players.size == 2)
 
-        var exceptionThrown = false
-        try {
+        assertThrows(IllegalArgumentException::class.java) {
             GameState.removePlayer("trashId")
-        } catch (e: Exception) {
-            exceptionThrown = true
         }
 
         assert(GameState.players.size == 2)
         assert(onPlayerRemovedCalled == 0)
-        assert(exceptionThrown)
     }
 
     @Test
@@ -297,7 +290,7 @@ class GameStateTest {
         val sha256TestString = MessageDigest
             .getInstance("SHA-256")
             .digest(testString.toByteArray())
-            .fold("") { str, it -> str + "%02x".format(it) }
+            .fold("") { str, byte -> str + "%02x".format(byte) }
 
         assertTrue("sha256 doesn't match", GameState.sha256(testString) == sha256TestString)
     }

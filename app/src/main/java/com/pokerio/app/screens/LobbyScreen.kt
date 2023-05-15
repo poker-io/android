@@ -138,15 +138,15 @@ fun LobbyScreen(
                 .fillMaxHeight()
                 .testTag("player_list")
         ) {
-            (1..8).forEach {
+            for (i in 1..GameState.MAX_PLAYERS) {
                 AnimatedVisibility(
-                    visible = it <= numberOfPlayers,
+                    visible = i <= numberOfPlayers,
                     enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                     exit = scaleOut(),
                     modifier = Modifier.padding(vertical = 6.dp)
                 ) {
-                    if (it <= numberOfPlayers) {
-                        PlayerListItem(player = GameState.players[it - 1])
+                    if (i <= numberOfPlayers) {
+                        PlayerListItem(player = GameState.players[i - 1])
                     }
                 }
             }

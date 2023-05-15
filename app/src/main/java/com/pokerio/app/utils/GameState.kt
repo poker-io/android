@@ -38,6 +38,10 @@ object GameState {
 
     // Constants
     private const val BASE_URL = "http://158.101.160.143:42069"
+    const val STARTING_FUNDS_DEFAULT = 1000
+    const val SMALL_BLIND_DEFAULT = 100
+    const val MAX_PLAYERS = 8
+    const val MAX_NICKNAME_LEN = 20
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
@@ -66,12 +70,12 @@ object GameState {
 
         val preferredSmallBlind = sharedPreferences.getInt(
             context.getString(R.string.sharedPreferences_small_blind),
-            1000
+            SMALL_BLIND_DEFAULT
         )
 
         val preferredStartingFunds = sharedPreferences.getInt(
             context.getString(R.string.sharedPreferences_starting_funds),
-            100
+            STARTING_FUNDS_DEFAULT
         )
 
         // Make request
@@ -98,7 +102,7 @@ object GameState {
             isPlayerAdmin = true
             onSuccess()
         } catch (e: Exception) {
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to create game, reason: $e")
             onError()
         }
     }
@@ -151,8 +155,7 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to join game, reason: $e")
             onError()
         }
     }
@@ -175,8 +178,7 @@ object GameState {
             url.readText()
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to modify game, reason: $e")
             onError()
         }
     }
@@ -199,8 +201,7 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to kick player, reason: $e")
             onError()
         }
     }
@@ -223,8 +224,7 @@ object GameState {
             resetGameState()
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to leave game, reason: $e")
             onError()
         }
     }
@@ -246,8 +246,7 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to start game, reason: $e")
             onError()
         }
     }
@@ -311,11 +310,11 @@ object GameState {
             resetGameState()
         } else {
             val removedPlayer = players.find { it.playerID == playerHash }
-                ?: throw Exception("Player to be removed not found")
+            require(removedPlayer != null)
 
-            if (removedPlayer.isAdmin && newAdmin == null) {
-                throw Exception("Admin removed without new admin given")
-            } else if (removedPlayer.isAdmin) {
+            if (removedPlayer.isAdmin) {
+                require(newAdmin != null)
+
                 val isThisPlayerNewAdmin = players.find {
                     sha256(it.playerID) == newAdmin
                 } != null
@@ -349,7 +348,7 @@ object GameState {
         return MessageDigest
             .getInstance("SHA-256")
             .digest(string.toByteArray())
-            .fold("") { str, it -> str + "%02x".format(it) }
+            .fold("") { str, byte -> str + "%02x".format(byte) }
     }
 
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
