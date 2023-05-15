@@ -221,6 +221,7 @@ object GameState {
 
             url.readText()
 
+            resetGameState()
             onSuccess()
         } catch (e: Exception) {
             e.printStackTrace()

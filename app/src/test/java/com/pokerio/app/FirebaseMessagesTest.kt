@@ -54,6 +54,8 @@ class FirebaseMessagesTest {
     fun playerKickedTest() {
         val playerNickname = "testPlayer1"
         val playerId = GameState.sha256("testId1")
+
+        GameState.gameID = "gameID"
         GameState.addPlayer(Player(playerNickname, playerId))
 
         val map = HashMap<String, String>()
@@ -72,6 +74,7 @@ class FirebaseMessagesTest {
         val thisPlayerId = "testId2"
         val thisPlayerIdSha = GameState.sha256(thisPlayerId)
 
+        GameState.gameID = "gameID"
         GameState.addPlayer(Player(playerNickname, playerId, true))
         GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
 
