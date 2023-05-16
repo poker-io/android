@@ -320,7 +320,7 @@ object GameState {
             ?: throw Exception("Player to be removed not found")
 
         if (removedPlayer.isAdmin && newAdmin == null) {
-            throw Exception("Admin removed without new admin given")
+            throw Exception("Admin removed, but new admin was not set")
         }
 
         if (removedPlayer.isAdmin) {
