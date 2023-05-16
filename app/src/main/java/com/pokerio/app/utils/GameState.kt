@@ -13,8 +13,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.io.IOException
 import java.net.URL
 import java.security.MessageDigest
+import kotlin.jvm.Throws
 
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
@@ -87,7 +89,7 @@ object GameState {
                     "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
             val url = URL(baseUrl + urlString)
 
-            val responseJson = url.readText()
+            val responseJson = url.readText() // Throws IOException
             val responseObject =
                 Json.decodeFromString(CreateGameResponseSerializer, responseJson)
 
@@ -177,7 +179,7 @@ object GameState {
             val url = URL(baseUrl + urlString)
             url.readText()
             onSuccess()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             PokerioLogger.error("Failed to modify game, reason: $e")
             onError()
         }
@@ -200,7 +202,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             PokerioLogger.error("Failed to kick player, reason: $e")
             onError()
         }
@@ -223,7 +225,7 @@ object GameState {
 
             resetGameState()
             onSuccess()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             PokerioLogger.error("Failed to leave game, reason: $e")
             onError()
         }
@@ -245,7 +247,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             PokerioLogger.error("Failed to start game, reason: $e")
             onError()
         }
@@ -301,6 +303,7 @@ object GameState {
         playerJoinedCallbacks.forEach { it.value(player) }
     }
 
+    @Throws(IllegalArgumentException::class)
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
         // Check if this player is being removed
         val isThisPlayerRemoved = players.find {

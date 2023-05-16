@@ -48,6 +48,9 @@ import java.lang.Float.max
 import java.lang.Float.min
 
 const val MAX_SMALL_BLIND_MODIFIER = 0.4f
+const val DIFF_MAX = 1000
+const val DIFF_MID = 100
+const val DIFF_MIN = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -230,24 +233,24 @@ fun Selector(
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 1000) },
+                    onClick = { updateValue(currentValue - DIFF_MAX) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "-1000")
+                    Text(text = "-$DIFF_MAX")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 100) },
+                    onClick = { updateValue(currentValue - DIFF_MID) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "-100")
+                    Text(text = "-$DIFF_MID")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 10) },
+                    onClick = { updateValue(currentValue - DIFF_MIN) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("slider-10")
                 ) {
-                    Text(text = "-10")
+                    Text(text = "-$DIFF_MIN")
                 }
             }
             Text(
@@ -258,24 +261,24 @@ fun Selector(
             )
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 1000) },
+                    onClick = { updateValue(currentValue + DIFF_MAX) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "+1000")
+                    Text(text = "+$DIFF_MAX")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 100) },
+                    onClick = { updateValue(currentValue + DIFF_MID) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "+100")
+                    Text(text = "+$DIFF_MID")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 10) },
+                    onClick = { updateValue(currentValue + DIFF_MIN) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("slider+10")
                 ) {
-                    Text(text = "+10")
+                    Text(text = "+$DIFF_MIN")
                 }
             }
         }

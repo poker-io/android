@@ -28,25 +28,21 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        // Dark theme is disabled for now
-        val useDarkTheme = false
 
         setContent {
-            AppTheme(useDarkTheme) {
-                MainActivityComposable(useDarkTheme)
+            AppTheme {
+                MainActivityComposable()
             }
         }
     }
 }
 
 @Composable
-fun MainActivityComposable(
-    useDarkTheme: Boolean = isSystemInDarkTheme()
-) {
+fun MainActivityComposable() {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = Color.Transparent,
-        darkIcons = !useDarkTheme
+        darkIcons = true
     )
 
     val navController = rememberNavController()
@@ -122,7 +118,6 @@ fun MainActivityComposable(
 
 @Composable
 private fun AppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
