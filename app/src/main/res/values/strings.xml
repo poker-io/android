@@ -9,8 +9,8 @@
     <string name="new_game">New game</string>
     <string name="error_game_code_empty">Game code cannot be empty!</string>
     <string name="error_game_code_incorrect">Game code is incorrect!</string>
-    <string name="error_failed_to_join_game">Failed to join game</string>
-    <string name="error_failed_to_create_game">Failed to create game</string>
+    <string name="failed_join">Failed to join game</string>
+    <string name="failed_create">Failed to create game</string>
 
     <!-- Settings screen -->
     <string name="settings">Settings</string>
@@ -25,6 +25,9 @@
     <string name="leave_game">Leave game</string>
     <string name="update_settings">Update settings</string>
     <string name="start_game">Start game</string>
+    <string name="failed_kick">Failed to kick player</string>
+    <string name="failed_leave">Failed to leave game</string>
+    <string name="failed_start">Failed to start game</string>
 
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>
