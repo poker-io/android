@@ -87,7 +87,7 @@ object GameState {
                     "&smallBlind=$preferredSmallBlind&startingFunds=$preferredStartingFunds"
             val url = URL(baseUrl + urlString)
 
-            val responseJson = url.readText() // Throws IOException
+            val responseJson = url.readText()
             val responseObject =
                 Json.decodeFromString(CreateGameResponseSerializer, responseJson)
 
