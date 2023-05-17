@@ -43,6 +43,7 @@ import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.components.PlayerListItem
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -186,14 +187,12 @@ fun LobbyScreen(
 
 private fun leaveGame(context: Context) {
     val onSuccess = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Left game", Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.debug("Left game")
     }
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Failed to leave game", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.failed_leave), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -204,14 +203,12 @@ private fun leaveGame(context: Context) {
 
 private fun startGame(context: Context) {
     val onSuccess = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Started Game", Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.debug("Started game")
     }
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Failed to start game", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.failed_start), Toast.LENGTH_LONG).show()
         }
     }
 

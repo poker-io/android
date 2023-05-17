@@ -149,7 +149,7 @@ private fun StartGameCard(
 private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) {
     if (gameCode.isBlank()) {
         Toast
-            .makeText(context, context.getText(R.string.error_game_code_empty), Toast.LENGTH_LONG)
+            .makeText(context, context.getString(R.string.error_game_code_empty), Toast.LENGTH_LONG)
             .show()
         return
     }
@@ -161,7 +161,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
             Toast
-                .makeText(context, context.getString(R.string.error_failed_to_join_game), Toast.LENGTH_LONG)
+                .makeText(context, context.getString(R.string.failed_join), Toast.LENGTH_LONG)
                 .show()
         }
     }
@@ -174,7 +174,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
     val onError = {
         Toast
-            .makeText(context, context.getString(R.string.error_failed_to_create_game), Toast.LENGTH_LONG)
+            .makeText(context, context.getString(R.string.failed_create), Toast.LENGTH_LONG)
             .show()
     }
 
