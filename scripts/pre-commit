@@ -10,7 +10,7 @@ git stash pop -q
 echo "=> Done linting"
 
 if [ $status != 0 ]; then
-    exit 1
+    exit $status
 fi
 
 echo "=> Checking detekt"

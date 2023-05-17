@@ -249,7 +249,6 @@ object GameState {
 
             url.readText()
 
-            resetGameState()
             onSuccess()
         } catch (e: IOException) {
             PokerioLogger.error("Failed to start game, reason: $e")
