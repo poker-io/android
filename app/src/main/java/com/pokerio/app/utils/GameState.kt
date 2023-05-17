@@ -310,10 +310,8 @@ object GameState {
         }
 
         val isThisPlayerRemoved = players.find { sha256(it.playerID) == playerHash } != null
-
         if (isThisPlayerRemoved) {
-            resetGameState()
-            return
+            return resetGameState()
         }
 
         val removedPlayer = players.find { it.playerID == playerHash }
@@ -324,21 +322,18 @@ object GameState {
         }
 
         if (removedPlayer.isAdmin) {
-            val isThisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin } != null
+            val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
 
-            if (isThisPlayerNewAdmin) {
-                val thisPlayer = players.find { sha256(it.playerID) == newAdmin }
-
+            if (thisPlayerNewAdmin != null) {
                 isPlayerAdmin = true
-                thisPlayer!!.isAdmin = true
+                thisPlayerNewAdmin.isAdmin = true
             } else {
                 val newAdminPlayer = players.find { it.playerID == newAdmin }
-
                 newAdminPlayer!!.isAdmin = true
             }
         }
 
-        players.removeIf { it.playerID == playerHash }
+        players.remove(removedPlayer)
         playerRemovedCallbacks.forEach { it.value(removedPlayer) }
     }
 
