@@ -119,7 +119,8 @@ class ServerRequestTest {
                 "players": [
                     {
                         "nickname": "test1",
-                        "playerHash": "$gameMasterHash"
+                        "playerHash": "$gameMasterHash",
+                        "turn": -1
                     }
                 ]
             }

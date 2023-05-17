@@ -37,7 +37,7 @@ object GameState {
     private var nextId = 0
 
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://192.168.86.30:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -91,7 +91,7 @@ object GameState {
             val responseObject =
                 Json.decodeFromString(CreateGameResponseSerializer, responseJson)
 
-            gameID = responseObject.gameKey.toString()
+            gameID = responseObject.gameId.toString()
             startingFunds = responseObject.startingFunds
             smallBlind = responseObject.smallBlind
 
@@ -142,14 +142,15 @@ object GameState {
             smallBlind = joinGameResponse.smallBlind
             val gameMasterHash = joinGameResponse.gameMasterHash
 
-            joinGameResponse.players.forEach {
-                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, it.toString())
+            joinGameResponse.players.forEach { jsonElement ->
+                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, jsonElement.toString())
                 val newPlayer = Player(
                     playerResponse.nickname,
                     playerResponse.playerHash,
                     playerResponse.playerHash == gameMasterHash
                 )
 
+                println("New player: ${newPlayer.playerID}")
                 addPlayer(newPlayer)
             }
 
@@ -158,6 +159,7 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
+            e.printStackTrace()
             PokerioLogger.error("Failed to join game, reason: $e")
             onError()
         }
@@ -307,6 +309,7 @@ object GameState {
 
     @Throws(IllegalArgumentException::class)
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
+        println("Player to remove: $playerHash")
         if (!isInGame()) {
             return
         }
@@ -317,13 +320,10 @@ object GameState {
         }
 
         val removedPlayer = players.find { it.playerID == playerHash }
-            ?: throw Exception("Player to be removed not found")
-
-        if (removedPlayer.isAdmin && newAdmin == null) {
-            throw Exception("Admin removed, but new admin was not set")
-        }
+        require(removedPlayer != null)
 
         if (removedPlayer.isAdmin) {
+            require(newAdmin != null)
             val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
 
             if (thisPlayerNewAdmin != null) {
@@ -366,7 +366,7 @@ object GameState {
 }
 
 data class CreateGameResponse(
-    val gameKey: Int,
+    val gameId: Int,
     val startingFunds: Int,
     val smallBlind: Int
 )
@@ -378,7 +378,8 @@ object CreateGameResponseSerializer
 
 data class PlayerResponse(
     val nickname: String,
-    val playerHash: String
+    val playerHash: String,
+    val turn: Int
 )
 
 @Generated

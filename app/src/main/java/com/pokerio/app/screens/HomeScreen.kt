@@ -173,9 +173,11 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
     val onError = {
-        Toast
-            .makeText(context, context.getString(R.string.failed_create), Toast.LENGTH_LONG)
-            .show()
+        ContextCompat.getMainExecutor(context).execute {
+            Toast
+                .makeText(context, context.getString(R.string.failed_create), Toast.LENGTH_LONG)
+                .show()
+        }
     }
 
     GameState.launchTask {
