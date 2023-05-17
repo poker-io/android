@@ -149,7 +149,7 @@ private fun StartGameCard(
 private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) {
     if (gameCode.isBlank()) {
         Toast
-            .makeText(context, context.getText(R.string.error_game_code_empty), Toast.LENGTH_LONG)
+            .makeText(context, context.getString(R.string.error_game_code_empty), Toast.LENGTH_LONG)
             .show()
         return
     }
