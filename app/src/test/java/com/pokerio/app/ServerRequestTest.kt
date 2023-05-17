@@ -56,7 +56,7 @@ class ServerRequestTest {
         server.enqueue(
             MockResponse().setBody(
                 """{
-                    "gameKey": $gameKey,
+                    "gameId": $gameKey,
                     "startingFunds": $startingFunds,
                     "smallBlind": $smallBlind
                 }
@@ -119,7 +119,8 @@ class ServerRequestTest {
                 "players": [
                     {
                         "nickname": "test1",
-                        "playerHash": "$gameMasterHash"
+                        "playerHash": "$gameMasterHash",
+                        "turn": -1
                     }
                 ]
             }

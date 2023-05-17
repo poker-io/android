@@ -48,6 +48,11 @@ import com.pokerio.app.utils.UnitUnitProvider
 import java.lang.Float.max
 import java.lang.Float.min
 
+const val MAX_SMALL_BLIND_MODIFIER = 0.4f
+const val DIFF_MAX = 1000
+const val DIFF_MID = 100
+const val DIFF_MIN = 10
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
@@ -58,8 +63,6 @@ fun SettingsScreen(
     val sectionTitleFontWeight = FontWeight.Bold
     val sectionTitleModifier = Modifier.padding(10.dp)
     val spacerModifier = Modifier.padding(10.dp)
-
-    val maxSmallBlindModifier = 0.4f
 
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences(
@@ -85,8 +88,8 @@ fun SettingsScreen(
     var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
     val onStartingFundsUpdate = { newValue: Int ->
         startingFunds = newValue
-        if (startingFunds * maxSmallBlindModifier < smallBlind) {
-            onSmallBlindUpdate((startingFunds * maxSmallBlindModifier).toInt())
+        if (startingFunds * MAX_SMALL_BLIND_MODIFIER < smallBlind) {
+            onSmallBlindUpdate((startingFunds * MAX_SMALL_BLIND_MODIFIER).toInt())
         }
     }
 
@@ -194,7 +197,7 @@ fun SettingsScreen(
             Selector(
                 onValueSelected = { onSmallBlindUpdate(it) },
                 minValue = 10f,
-                maxValue = startingFunds * maxSmallBlindModifier,
+                maxValue = startingFunds * MAX_SMALL_BLIND_MODIFIER,
                 initialValue = smallBlind.toFloat()
             )
         }
@@ -225,24 +228,24 @@ fun Selector(
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 1000) },
+                    onClick = { updateValue(currentValue - DIFF_MAX) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "-1000")
+                    Text(text = "-$DIFF_MAX")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 100) },
+                    onClick = { updateValue(currentValue - DIFF_MID) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "-100")
+                    Text(text = "-$DIFF_MID")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue - 10) },
+                    onClick = { updateValue(currentValue - DIFF_MIN) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("slider-10")
                 ) {
-                    Text(text = "-10")
+                    Text(text = "-$DIFF_MIN")
                 }
             }
             Text(
@@ -253,24 +256,24 @@ fun Selector(
             )
             Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 1000) },
+                    onClick = { updateValue(currentValue + DIFF_MAX) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "+1000")
+                    Text(text = "+$DIFF_MAX")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 100) },
+                    onClick = { updateValue(currentValue + DIFF_MID) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "+100")
+                    Text(text = "+$DIFF_MID")
                 }
                 OutlinedButton(
-                    onClick = { updateValue(currentValue + 10) },
+                    onClick = { updateValue(currentValue + DIFF_MIN) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("slider+10")
                 ) {
-                    Text(text = "+10")
+                    Text(text = "+$DIFF_MIN")
                 }
             }
         }
@@ -303,7 +306,7 @@ private fun getInitialStartingFunds(context: Context): Int {
 
     return sharedPreferences.getInt(
         context.getString(R.string.sharedPreferences_starting_funds),
-        1000
+        GameState.STARTING_FUNDS_DEFAULT
     )
 }
 
@@ -315,6 +318,6 @@ private fun getInitialSmallBlind(context: Context): Int {
 
     return sharedPreferences.getInt(
         context.getString(R.string.sharedPreferences_small_blind),
-        100
+        GameState.SMALL_BLIND_DEFAULT
     )
 }

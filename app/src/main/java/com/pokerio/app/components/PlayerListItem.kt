@@ -34,6 +34,8 @@ import com.pokerio.app.utils.PlayerProvider
 import com.pokerio.app.utils.PokerioLogger
 import java.lang.Integer.min
 
+const val ID_CUTOFF = 7
+
 @Preview
 @Composable
 fun PlayerListItem(
@@ -57,7 +59,7 @@ fun PlayerListItem(
                     modifier = Modifier.testTag("nickname")
                 )
                 Text(
-                    text = "ID: ${player.playerID.substring(0, min(player.playerID.length, 7))}",
+                    text = "ID: ${player.playerID.substring(0, min(player.playerID.length, ID_CUTOFF))}",
                     fontSize = 16.sp,
                     color = Color.Gray,
                     modifier = Modifier.testTag("player_id")

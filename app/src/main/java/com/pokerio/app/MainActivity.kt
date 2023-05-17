@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -24,29 +23,31 @@ import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.ThemeUtils
 
+const val NAV_INITIAL_SETUP = "initialSetup"
+const val NAV_HOME = "home"
+const val NAV_SETTINGS = "settings"
+const val NAV_LOBBY = "lobby"
+const val NAV_GAME = "game"
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        // Dark theme is disabled for now
-        val useDarkTheme = false
 
         setContent {
-            AppTheme(useDarkTheme) {
-                MainActivityComposable(useDarkTheme)
+            AppTheme {
+                MainActivityComposable()
             }
         }
     }
 }
 
 @Composable
-fun MainActivityComposable(
-    useDarkTheme: Boolean = isSystemInDarkTheme()
-) {
+fun MainActivityComposable() {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = Color.Transparent,
-        darkIcons = !useDarkTheme
+        darkIcons = true
     )
 
     val navController = rememberNavController()
@@ -54,7 +55,7 @@ fun MainActivityComposable(
 
     val navigateToSettings = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.navigate("settings")
+            navController.navigate(NAV_SETTINGS)
         }
     }
     val navigateBack = {
@@ -65,25 +66,25 @@ fun MainActivityComposable(
     val exitInitialSetup = {
         ContextCompat.getMainExecutor(context).execute {
             navController.popBackStack()
-            navController.navigate("home")
+            navController.navigate(NAV_HOME)
         }
     }
     val navigateToLobby = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.navigate("lobby")
+            navController.navigate(NAV_LOBBY)
         }
     }
 
     GameState.resetGameState()
     GameState.onGameReset = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.popBackStack("home", inclusive = false)
+            navController.popBackStack(NAV_HOME, inclusive = false)
         }
     }
     GameState.onGameStart = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.popBackStack()
-            navController.navigate("game")
+            navController.popBackStack(NAV_HOME, inclusive = false)
+            navController.navigate(NAV_GAME)
         }
     }
 
@@ -92,37 +93,26 @@ fun MainActivityComposable(
         stringResource(id = R.string.shared_preferences_file),
         Context.MODE_PRIVATE
     )
-    val nicknameSet = (
-        sharedPreferences.getString(
-            stringResource(id = R.string.sharedPreferences_nickname),
-            ""
-        ) ?: ""
-        ).isNotBlank()
-    val startDestination =
-        if (nicknameSet) {
-            "home"
-        } else {
-            "initialSetup"
-        }
+    val nicknameSet =
+        sharedPreferences.getString(stringResource(id = R.string.sharedPreferences_nickname), "")!!.isNotBlank()
+    val startDestination = if (nicknameSet) NAV_HOME else NAV_INITIAL_SETUP
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable("home") {
+        composable(NAV_HOME) {
             HomeScreen(
                 navigateToSettings = navigateToSettings,
                 navigateToLobby = navigateToLobby
             )
         }
-
-        composable("settings") { SettingsScreen(navigateBack = navigateBack) }
-        composable("initialSetup") { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
-        composable("lobby") { LobbyScreen(navigateToSettings = navigateToSettings) }
-        composable("game") { GameScreen() }
+        composable(NAV_SETTINGS) { SettingsScreen(navigateBack = navigateBack) }
+        composable(NAV_INITIAL_SETUP) { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
+        composable(NAV_LOBBY) { LobbyScreen(navigateToSettings = navigateToSettings) }
+        composable(NAV_GAME) { GameScreen() }
     }
 }
 
 @Composable
 private fun AppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

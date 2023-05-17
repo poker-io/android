@@ -1,16 +1,26 @@
 #!/bin/sh
 
-echo "=> Running kotlin linter"
+echo "=> Checking kotlin lint"
 
 git stash -q --keep-index
-
-./gradlew ktlintFormat
-
+./gradlew ktlintCheck
 status=$?
-
 git stash pop -q
 
 echo "=> Done linting"
+
+if [ $status != 0 ]; then
+    exit $status
+fi
+
+echo "=> Checking detekt"
+
+git stash -q --keep-index
+./gradlew detekt
+status=$?
+git stash pop -q
+
+echo "=> Done detekt"
 
 exit $status
 

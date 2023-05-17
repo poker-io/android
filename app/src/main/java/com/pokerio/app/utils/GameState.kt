@@ -11,8 +11,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import java.io.IOException
 import java.net.URL
 import java.security.MessageDigest
+import kotlin.jvm.Throws
 
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
@@ -36,6 +38,9 @@ object GameState {
 
     // Constants
     private const val BASE_URL = "http://158.101.160.143:42069"
+    const val STARTING_FUNDS_DEFAULT = 1000
+    const val SMALL_BLIND_DEFAULT = 100
+    const val MAX_PLAYERS = 8
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
@@ -64,12 +69,12 @@ object GameState {
 
         val preferredSmallBlind = sharedPreferences.getInt(
             context.getString(R.string.sharedPreferences_small_blind),
-            1000
+            SMALL_BLIND_DEFAULT
         )
 
         val preferredStartingFunds = sharedPreferences.getInt(
             context.getString(R.string.sharedPreferences_starting_funds),
-            100
+            STARTING_FUNDS_DEFAULT
         )
 
         // Make request
@@ -85,7 +90,7 @@ object GameState {
             val responseObject =
                 Json.decodeFromString(CreateGameResponseSerializer, responseJson)
 
-            gameID = responseObject.gameKey.toString()
+            gameID = responseObject.gameId.toString()
             startingFunds = responseObject.startingFunds
             smallBlind = responseObject.smallBlind
 
@@ -96,7 +101,7 @@ object GameState {
             isPlayerAdmin = true
             onSuccess()
         } catch (e: Exception) {
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to create game, reason: $e")
             onError()
         }
     }
@@ -136,8 +141,8 @@ object GameState {
             smallBlind = joinGameResponse.smallBlind
             val gameMasterHash = joinGameResponse.gameMasterHash
 
-            joinGameResponse.players.forEach {
-                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, it.toString())
+            joinGameResponse.players.forEach { jsonElement ->
+                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, jsonElement.toString())
                 val newPlayer = Player(
                     playerResponse.nickname,
                     playerResponse.playerHash,
@@ -152,8 +157,7 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+            PokerioLogger.error("Failed to join game, reason: $e")
             onError()
         }
     }
@@ -175,9 +179,8 @@ object GameState {
             val url = URL(baseUrl + urlString)
             url.readText()
             onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+        } catch (e: IOException) {
+            PokerioLogger.error("Failed to modify game, reason: $e")
             onError()
         }
     }
@@ -199,9 +202,8 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+        } catch (e: IOException) {
+            PokerioLogger.error("Failed to kick player, reason: $e")
             onError()
         }
     }
@@ -223,9 +225,8 @@ object GameState {
 
             resetGameState()
             onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+        } catch (e: IOException) {
+            PokerioLogger.error("Failed to leave game, reason: $e")
             onError()
         }
     }
@@ -245,11 +246,9 @@ object GameState {
 
             url.readText()
 
-            resetGameState()
             onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            PokerioLogger.error(e.toString())
+        } catch (e: IOException) {
+            PokerioLogger.error("Failed to start game, reason: $e")
             onError()
         }
     }
@@ -304,6 +303,7 @@ object GameState {
         playerJoinedCallbacks.forEach { it.value(player) }
     }
 
+    @Throws(IllegalArgumentException::class)
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
         if (!isInGame()) {
             return
@@ -315,13 +315,10 @@ object GameState {
         }
 
         val removedPlayer = players.find { it.playerID == playerHash }
-            ?: throw Exception("Player to be removed not found")
-
-        if (removedPlayer.isAdmin && newAdmin == null) {
-            throw Exception("Admin removed, but new admin was not set")
-        }
+        require(removedPlayer != null)
 
         if (removedPlayer.isAdmin) {
+            require(newAdmin != null)
             val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
 
             if (thisPlayerNewAdmin != null) {
@@ -349,7 +346,7 @@ object GameState {
         return MessageDigest
             .getInstance("SHA-256")
             .digest(string.toByteArray())
-            .fold("") { str, it -> str + "%02x".format(it) }
+            .fold("") { str, byte -> str + "%02x".format(byte) }
     }
 
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
@@ -364,7 +361,7 @@ object GameState {
 }
 
 data class CreateGameResponse(
-    val gameKey: Int,
+    val gameId: Int,
     val startingFunds: Int,
     val smallBlind: Int
 )
@@ -376,7 +373,8 @@ object CreateGameResponseSerializer
 
 data class PlayerResponse(
     val nickname: String,
-    val playerHash: String
+    val playerHash: String,
+    val turn: Int
 )
 
 @Generated
