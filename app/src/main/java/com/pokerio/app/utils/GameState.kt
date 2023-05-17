@@ -150,7 +150,6 @@ object GameState {
                     playerResponse.playerHash == gameMasterHash
                 )
 
-                println("New player: ${newPlayer.playerID}")
                 addPlayer(newPlayer)
             }
 
@@ -307,7 +306,6 @@ object GameState {
 
     @Throws(IllegalArgumentException::class)
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
-        println("Player to remove: $playerHash")
         if (!isInGame()) {
             return
         }
