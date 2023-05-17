@@ -18,6 +18,7 @@ class GameStateTest {
 
     @Test
     fun addRemovePlayerTest() {
+        GameState.gameID = "gameID"
         val testPlayer = Player("Hi, I'm a test player", "42069")
 
         assertTrue("GameState.players not empty!", GameState.players.size == 0)
@@ -61,6 +62,7 @@ class GameStateTest {
         }
         val playerRemovedCallbackId = GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
 
+        GameState.gameID = "gameID"
         GameState.addPlayer(testPlayer)
         assertTrue("onPlayerRemoved callback should not have been called", playerRemovedCalledCounter == 0)
         GameState.removePlayer(testPlayer.playerID)
@@ -150,6 +152,7 @@ class GameStateTest {
             onPlayerRemovedCalled += 1
         }
 
+        GameState.gameID = "gameID"
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id))
         GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
@@ -177,6 +180,7 @@ class GameStateTest {
             onPlayerRemovedCalled += 1
         }
 
+        GameState.gameID = "gameID"
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id, true))
         GameState.addPlayer(Player(player2Nickname, player2Id))
@@ -211,6 +215,7 @@ class GameStateTest {
             onPlayerRemovedCalled += 1
         }
 
+        GameState.gameID = "gameID"
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id, true))
         GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
@@ -247,6 +252,7 @@ class GameStateTest {
             onGameResetCalled += 1
         }
 
+        GameState.gameID = "gameID"
         GameState.onGameReset = onGameReset
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id))
@@ -273,6 +279,7 @@ class GameStateTest {
             onPlayerRemovedCalled += 1
         }
 
+        GameState.gameID = "gameID"
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id))
         GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))

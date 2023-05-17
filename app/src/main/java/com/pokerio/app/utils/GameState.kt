@@ -10,9 +10,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonArray
 import java.net.URL
 import java.security.MessageDigest
 
@@ -130,20 +128,23 @@ object GameState {
             val url = URL(baseUrl + urlString)
 
             val responseJson = url.readText()
-            val responseObject = Json.parseToJsonElement(responseJson).jsonObject
 
-            this@GameState.gameID = gameID
-            // TODO: This has to be parsed better
-            startingFunds = responseObject["startingFunds"]!!.jsonPrimitive.content.toInt()
-            smallBlind = responseObject["smallBlind"]!!.jsonPrimitive.content.toInt()
+            this.gameID = gameID
 
-            val gameMasterHash = responseObject["gameMasterHash"]!!.jsonPrimitive.content
+            val joinGameResponse = Json.decodeFromString(JoinGameResponseSerializer, responseJson)
+            startingFunds = joinGameResponse.startingFunds
+            smallBlind = joinGameResponse.smallBlind
+            val gameMasterHash = joinGameResponse.gameMasterHash
 
-            responseObject["players"]!!.jsonArray.forEach {
-                val playerNickname = it.jsonObject["nickname"]!!.jsonPrimitive.content
-                val playerHash = it.jsonObject["playerHash"]!!.jsonPrimitive.content
+            joinGameResponse.players.forEach {
+                val playerResponse = Json.decodeFromString(PlayerResponseSerializer, it.toString())
+                val newPlayer = Player(
+                    playerResponse.nickname,
+                    playerResponse.playerHash,
+                    playerResponse.playerHash == gameMasterHash
+                )
 
-                addPlayer(Player(playerNickname, playerHash, playerHash == gameMasterHash))
+                addPlayer(newPlayer)
             }
 
             // This player is not included in the player list, so we need to add them separately
@@ -244,6 +245,7 @@ object GameState {
 
             url.readText()
 
+            resetGameState()
             onSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -303,38 +305,36 @@ object GameState {
     }
 
     fun removePlayer(playerHash: String, newAdmin: String? = null) {
-        // Check if this player is being removed
-        val isThisPlayerRemoved = players.find {
-            sha256(it.playerID) == playerHash
-        } != null
-        if (isThisPlayerRemoved) {
-            resetGameState()
-        } else {
-            val removedPlayer = players.find { it.playerID == playerHash }
-                ?: throw Exception("Player to be removed not found")
-
-            if (removedPlayer.isAdmin && newAdmin == null) {
-                throw Exception("Admin removed without new admin given")
-            } else if (removedPlayer.isAdmin) {
-                val isThisPlayerNewAdmin = players.find {
-                    sha256(it.playerID) == newAdmin
-                } != null
-
-                if (isThisPlayerNewAdmin) {
-                    isPlayerAdmin = true
-                    val thisPlayer = players.find {
-                        sha256(it.playerID) == newAdmin
-                    }
-                    thisPlayer!!.isAdmin = true
-                } else {
-                    val newAdminPlayer = players.find { it.playerID == newAdmin }
-                    newAdminPlayer!!.isAdmin = true
-                }
-            }
-
-            players.removeIf { it.playerID == playerHash }
-            playerRemovedCallbacks.forEach { it.value(removedPlayer) }
+        if (!isInGame()) {
+            return
         }
+
+        val isThisPlayerRemoved = players.find { sha256(it.playerID) == playerHash } != null
+        if (isThisPlayerRemoved) {
+            return resetGameState()
+        }
+
+        val removedPlayer = players.find { it.playerID == playerHash }
+            ?: throw Exception("Player to be removed not found")
+
+        if (removedPlayer.isAdmin && newAdmin == null) {
+            throw Exception("Admin removed, but new admin was not set")
+        }
+
+        if (removedPlayer.isAdmin) {
+            val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
+
+            if (thisPlayerNewAdmin != null) {
+                isPlayerAdmin = true
+                thisPlayerNewAdmin.isAdmin = true
+            } else {
+                val newAdminPlayer = players.find { it.playerID == newAdmin }
+                newAdminPlayer!!.isAdmin = true
+            }
+        }
+
+        players.remove(removedPlayer)
+        playerRemovedCallbacks.forEach { it.value(removedPlayer) }
     }
 
     fun startGame(data: Map<String, String>) {
@@ -373,3 +373,25 @@ data class CreateGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = CreateGameResponse::class)
 object CreateGameResponseSerializer
+
+data class PlayerResponse(
+    val nickname: String,
+    val playerHash: String
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = PlayerResponse::class)
+object PlayerResponseSerializer
+
+data class JoinGameResponse(
+    val gameMasterHash: String,
+    val startingFunds: Int,
+    val smallBlind: Int,
+    val players: JsonArray
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = JoinGameResponse::class)
+object JoinGameResponseSerializer
