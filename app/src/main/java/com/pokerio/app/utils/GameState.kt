@@ -159,7 +159,6 @@ object GameState {
 
             onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
             PokerioLogger.error("Failed to join game, reason: $e")
             onError()
         }
