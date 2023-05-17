@@ -7,8 +7,10 @@ class Player(
     var funds: Int = 0
 ) {
     companion object {
+        const val MAX_NICKNAME_LEN = 20
+
         fun validateNickname(nickname: String): Boolean {
-            return nickname.isNotBlank() && nickname.length <= GameState.MAX_NICKNAME_LEN
+            return nickname.isNotBlank() && nickname.length <= MAX_NICKNAME_LEN
         }
     }
 }

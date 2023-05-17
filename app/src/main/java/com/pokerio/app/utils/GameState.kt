@@ -41,7 +41,6 @@ object GameState {
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
-    const val MAX_NICKNAME_LEN = 20
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
