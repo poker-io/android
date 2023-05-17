@@ -56,7 +56,7 @@ class ServerRequestTest {
         server.enqueue(
             MockResponse().setBody(
                 """{
-                    "gameKey": $gameKey,
+                    "gameId": $gameKey,
                     "startingFunds": $startingFunds,
                     "smallBlind": $smallBlind
                 }
