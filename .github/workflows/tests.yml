@@ -36,7 +36,9 @@ jobs:
     - name: Run instrumented tests with Gradle
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 33
+        arch: arm64-v8a
+        avd-name: Android-api33-arm64-v8a
         script: ./gradlew createDebugAndroidTestCoverageReport
 
     - name: Upload coverage reports to Codecov
