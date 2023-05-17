@@ -43,6 +43,7 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
 import com.pokerio.app.utils.Player
+import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
 import java.lang.Float.max
 import java.lang.Float.min
@@ -105,19 +106,13 @@ fun SettingsScreen(
             ContextCompat.getMainExecutor(context).execute {
                 Toast.makeText(
                     context,
-                    "Failed to update settings",
+                    context.getString(R.string.failed_update),
                     Toast.LENGTH_LONG
                 ).show()
             }
         }
         val onSuccess = {
-            ContextCompat.getMainExecutor(context).execute {
-                Toast.makeText(
-                    context,
-                    "Successfully updated settings",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            PokerioLogger.debug("Successfully updated settings")
         }
 
         // Notify server about changes if we were in game

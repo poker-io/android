@@ -31,6 +31,7 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PlayerProvider
+import com.pokerio.app.utils.PokerioLogger
 import java.lang.Integer.min
 
 @Preview
@@ -90,14 +91,12 @@ fun PlayerListItem(
 
 fun kickPlayer(context: Context, playerID: String) {
     val onSuccess = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Kicked player", Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.debug("Kicked player")
     }
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Failed to kick player", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.failed_kick), Toast.LENGTH_LONG).show()
         }
     }
 
