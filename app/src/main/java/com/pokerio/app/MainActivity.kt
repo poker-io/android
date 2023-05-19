@@ -21,13 +21,8 @@ import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.Screens
 import com.pokerio.app.utils.ThemeUtils
-
-const val NAV_INITIAL_SETUP = "initialSetup"
-const val NAV_HOME = "home"
-const val NAV_SETTINGS = "settings"
-const val NAV_LOBBY = "lobby"
-const val NAV_GAME = "game"
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +50,7 @@ fun MainActivityComposable() {
 
     val navigateToSettings = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.navigate(NAV_SETTINGS)
+            navController.navigate(Screens.Settings.route)
         }
     }
     val navigateBack = {
@@ -66,24 +61,24 @@ fun MainActivityComposable() {
     val exitInitialSetup = {
         ContextCompat.getMainExecutor(context).execute {
             navController.popBackStack()
-            navController.navigate(NAV_HOME)
+            navController.navigate(Screens.Home.route)
         }
     }
     val navigateToLobby = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.navigate(NAV_LOBBY)
+            navController.navigate(Screens.Lobby.route)
         }
     }
 
     GameState.onGameReset = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.popBackStack(NAV_HOME, inclusive = false)
+            navController.popBackStack(Screens.Home.route, inclusive = false)
         }
     }
     GameState.onGameStart = {
         ContextCompat.getMainExecutor(context).execute {
             navController.popBackStack()
-            navController.navigate(NAV_GAME)
+            navController.navigate(Screens.Game.route)
         }
     }
 
@@ -94,19 +89,19 @@ fun MainActivityComposable() {
     )
     val nicknameSet =
         sharedPreferences.getString(stringResource(id = R.string.sharedPreferences_nickname), "")!!.isNotBlank()
-    val startDestination = if (nicknameSet) NAV_HOME else NAV_INITIAL_SETUP
+    val startDestination = if (nicknameSet) Screens.Home.route else Screens.Initial.route
 
     NavHost(navController, startDestination) {
-        composable(NAV_HOME) {
+        composable(Screens.Home.route) {
             HomeScreen(
                 navigateToSettings = navigateToSettings,
                 navigateToLobby = navigateToLobby
             )
         }
-        composable(NAV_SETTINGS) { SettingsScreen(navigateBack = navigateBack) }
-        composable(NAV_INITIAL_SETUP) { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
-        composable(NAV_LOBBY) { LobbyScreen(navigateToSettings = navigateToSettings) }
-        composable(NAV_GAME) { GameScreen() }
+        composable(Screens.Settings.route) { SettingsScreen(navigateBack = navigateBack) }
+        composable(Screens.Initial.route) { InitialSetupScreen(exitInitialSetup = { exitInitialSetup() }) }
+        composable(Screens.Lobby.route) { LobbyScreen(navigateToSettings = navigateToSettings) }
+        composable(Screens.Game.route) { GameScreen() }
     }
 }
 
