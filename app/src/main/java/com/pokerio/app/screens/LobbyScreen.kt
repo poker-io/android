@@ -9,16 +9,15 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
@@ -41,7 +40,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.pokerio.app.R
-import com.pokerio.app.components.PlayerListItem
+import com.pokerio.app.components.PlayerListItemView
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
@@ -57,7 +56,7 @@ fun LobbyScreen(
     var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
-    val scrollState = ScrollState(0)
+    val scrollState = rememberScrollState(0)
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears
@@ -97,10 +96,12 @@ fun LobbyScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f, false)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
@@ -131,23 +132,23 @@ fun LobbyScreen(
                     Text(text = "$smallBlind", modifier = Modifier.testTag("small_blind"))
                 }
             }
-        }
-        Column(
-            modifier = Modifier
-                .verticalScroll(scrollState, true)
-                .padding(vertical = 12.dp)
-                .fillMaxHeight()
-                .testTag("player_list")
-        ) {
-            for (i in 1..GameState.MAX_PLAYERS) {
-                AnimatedVisibility(
-                    visible = i <= numberOfPlayers,
-                    enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
-                    exit = scaleOut(),
-                    modifier = Modifier.padding(vertical = 6.dp)
-                ) {
-                    if (i <= numberOfPlayers) {
-                        PlayerListItem(player = GameState.players[i - 1])
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState, true)
+                    .padding(vertical = 12.dp)
+                    .testTag("player_list")
+                    .weight(1f, false)
+            ) {
+                for (i in 1..GameState.MAX_PLAYERS) {
+                    AnimatedVisibility(
+                        visible = i <= numberOfPlayers,
+                        enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                        exit = scaleOut(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    ) {
+                        if (i <= numberOfPlayers) {
+                            PlayerListItemView(player = GameState.players[i - 1])
+                        }
                     }
                 }
             }

@@ -25,8 +25,8 @@ object GameState {
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var isPlayerAdmin: Boolean = false
-    var card1: Card? = null
-    var card2: Card? = null
+    var gameCard1: GameCard? = null
+    var gameCard2: GameCard? = null
 
     // Callbacks
     var onGameReset = {}
@@ -260,8 +260,8 @@ object GameState {
         startingFunds = -1
         smallBlind = -1
         isPlayerAdmin = false
-        card1 = null
-        card2 = null
+        gameCard1 = null
+        gameCard2 = null
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -335,8 +335,8 @@ object GameState {
     }
 
     fun startGame(data: Map<String, String>) {
-        card1 = Card(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
-        card2 = Card(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
+        gameCard1 = GameCard(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
+        gameCard2 = GameCard(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
         players.forEach { it.funds = startingFunds }
 
         onGameStart()
