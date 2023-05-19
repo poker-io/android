@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.pokerio.app.components.CardItem
+import com.pokerio.app.components.CardView
 import com.pokerio.app.utils.GameState
 
 @Preview
@@ -44,8 +44,8 @@ fun GameScreen() {
     Column {
         Text(text = "Player cards:")
         Row {
-            CardItem(GameState.gameCard1)
-            CardItem(GameState.gameCard2)
+            CardView(GameState.gameCard1)
+            CardView(GameState.gameCard2)
         }
         GameState.players.forEach {
             Column {

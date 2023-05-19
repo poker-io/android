@@ -21,7 +21,7 @@ val CARD_SHAPE = RoundedCornerShape(6.dp)
 
 @Composable
 @Preview
-fun CardItem(
+fun CardView(
     gameCard: GameCard? = null
 ) {
     if (gameCard == null) {

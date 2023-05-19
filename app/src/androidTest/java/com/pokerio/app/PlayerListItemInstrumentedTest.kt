@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.pokerio.app.components.PlayerListItem
+import com.pokerio.app.components.PlayerListItemView
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.Rule
@@ -25,7 +25,7 @@ class PlayerListItemInstrumentedTest {
         val player = Player(nickname, id, true)
 
         composeTestRule.setContent {
-            PlayerListItem(player = player)
+            PlayerListItemView(player = player)
         }
 
         val nicknameText = composeTestRule.onNodeWithTag("nickname")
@@ -51,7 +51,7 @@ class PlayerListItemInstrumentedTest {
         val player = Player(nickname, id, true)
 
         composeTestRule.setContent {
-            PlayerListItem(player = player)
+            PlayerListItemView(player = player)
         }
 
         val nicknameText = composeTestRule.onNodeWithTag("nickname")
@@ -77,7 +77,7 @@ class PlayerListItemInstrumentedTest {
         val player = Player(nickname, id, false)
 
         composeTestRule.setContent {
-            PlayerListItem(player = player)
+            PlayerListItemView(player = player)
         }
 
         val nicknameText = composeTestRule.onNodeWithTag("nickname")
@@ -103,7 +103,7 @@ class PlayerListItemInstrumentedTest {
         val player = Player(nickname, id, false)
 
         composeTestRule.setContent {
-            PlayerListItem(player = player)
+            PlayerListItemView(player = player)
         }
 
         val nicknameText = composeTestRule.onNodeWithTag("nickname")
@@ -129,7 +129,7 @@ class PlayerListItemInstrumentedTest {
         val player = Player(nickname, id, false)
 
         composeTestRule.setContent {
-            PlayerListItem(player = player)
+            PlayerListItemView(player = player)
         }
 
         val nicknameText = composeTestRule.onNodeWithTag("nickname")

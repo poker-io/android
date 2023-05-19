@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.pokerio.app.R
-import com.pokerio.app.components.PlayerListItem
+import com.pokerio.app.components.PlayerListItemView
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
@@ -147,7 +147,7 @@ fun LobbyScreen(
                         modifier = Modifier.padding(vertical = 6.dp)
                     ) {
                         if (i <= numberOfPlayers) {
-                            PlayerListItem(player = GameState.players[i - 1])
+                            PlayerListItemView(player = GameState.players[i - 1])
                         }
                     }
                 }
