@@ -123,11 +123,13 @@ fun TopGameSettings(
         )
         SingleGameSettingView(
             tag = stringResource(id = R.string.funds),
-            value = funds
+            value = funds,
+            modifier = Modifier.testTag("setting_funds")
         )
         SingleGameSettingView(
             tag = stringResource(id = R.string.small_blind),
-            value = smallBlind
+            value = smallBlind,
+            modifier = Modifier.testTag("setting_small_blind")
         )
     }
 }
@@ -202,9 +204,13 @@ fun BottomButtons(
 @Composable
 fun SingleGameSettingView(
     tag: String,
-    value: Any
+    value: Any,
+    modifier: Modifier = Modifier
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
         Text(
             text = tag,
             fontWeight = FontWeight.Light
