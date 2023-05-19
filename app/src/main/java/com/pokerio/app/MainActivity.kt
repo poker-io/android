@@ -75,7 +75,6 @@ fun MainActivityComposable() {
         }
     }
 
-    GameState.resetGameState()
     GameState.onGameReset = {
         ContextCompat.getMainExecutor(context).execute {
             navController.popBackStack(NAV_HOME, inclusive = false)

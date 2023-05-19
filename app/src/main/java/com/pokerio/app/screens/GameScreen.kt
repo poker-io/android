@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowInsetsControllerCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pokerio.app.components.CardItem
 import com.pokerio.app.utils.GameState
 
@@ -19,13 +21,25 @@ import com.pokerio.app.utils.GameState
 fun GameScreen() {
     val context = LocalContext.current
     val orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
+    val systemUiController = rememberSystemUiController()
 
     DisposableEffect(orientation) {
         val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
         val originalOrientation = activity.requestedOrientation
         activity.requestedOrientation = orientation
+
+        systemUiController.isNavigationBarVisible = false
+        systemUiController.isSystemBarsVisible = false
+        systemUiController.isStatusBarVisible = false
+        systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
         onDispose {
             activity.requestedOrientation = originalOrientation
+
+            systemUiController.isNavigationBarVisible = true
+            systemUiController.isSystemBarsVisible = true
+            systemUiController.isStatusBarVisible = true
+            systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
     }
 
