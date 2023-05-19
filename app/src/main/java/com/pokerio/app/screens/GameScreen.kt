@@ -46,7 +46,6 @@ fun GameScreen() {
         Row {
             CardView(GameState.gameCard1)
             CardView(GameState.gameCard2)
-            CardView()
         }
         GameState.players.forEach {
             Column {
