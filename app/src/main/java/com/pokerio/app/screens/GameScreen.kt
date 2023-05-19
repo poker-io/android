@@ -1,8 +1,6 @@
 package com.pokerio.app.screens
 
 import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +10,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pokerio.app.components.CardItem
 import com.pokerio.app.utils.GameState
@@ -24,21 +23,20 @@ fun GameScreen() {
     val systemUiController = rememberSystemUiController()
 
     DisposableEffect(orientation) {
-        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
+        // Set orientation
+        val activity = context as Activity
         val originalOrientation = activity.requestedOrientation
         activity.requestedOrientation = orientation
 
-        systemUiController.isNavigationBarVisible = false
-        systemUiController.isSystemBarsVisible = false
-        systemUiController.isStatusBarVisible = false
+        // Hide system UI
+        systemUiController.setSystemUiVisible(false)
         systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         onDispose {
+            // Restore previous state
             activity.requestedOrientation = originalOrientation
 
-            systemUiController.isNavigationBarVisible = true
-            systemUiController.isSystemBarsVisible = true
-            systemUiController.isStatusBarVisible = true
+            systemUiController.setSystemUiVisible(true)
             systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
     }
@@ -58,8 +56,8 @@ fun GameScreen() {
     }
 }
 
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
+private fun SystemUiController.setSystemUiVisible(value: Boolean) {
+    isNavigationBarVisible = value
+    isSystemBarsVisible = value
+    isStatusBarVisible = value
 }
