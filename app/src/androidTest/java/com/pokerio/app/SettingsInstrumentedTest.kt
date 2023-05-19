@@ -143,6 +143,8 @@ class SettingsInstrumentedTest {
 
         val textField = androidTestRule.onNodeWithTag("settings_nickname")
         textField.assertDoesNotExist()
+
+        GameState.resetGameState()
     }
 
     @Test

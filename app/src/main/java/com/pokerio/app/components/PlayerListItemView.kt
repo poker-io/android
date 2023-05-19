@@ -38,7 +38,7 @@ const val ID_CUTOFF = 7
 
 @Preview
 @Composable
-fun PlayerListItem(
+fun PlayerListItemView(
     @PreviewParameter(PlayerProvider::class) player: Player
 ) {
     val context = LocalContext.current
