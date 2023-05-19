@@ -1,7 +1,9 @@
 package com.pokerio.app.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -14,28 +16,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.utils.GameCard
 
-val CARD_MODIFIER = Modifier
-    .width(57.dp)
-    .height(80.dp)
+val CARD_WIDTH = 57.dp
+val CARD_HEIGHT = 80.dp
 val CARD_SHAPE = RoundedCornerShape(6.dp)
 
 @Composable
 @Preview
 fun CardView(
-    gameCard: GameCard? = null
+    gameCard: GameCard? = null,
+    paddingValues: PaddingValues = PaddingValues(4.dp)
 ) {
     if (gameCard == null) {
-        CardReverse()
+        CardReverse(paddingValues)
     } else {
-        CardObverse(gameCard)
+        CardObverse(gameCard, paddingValues)
     }
 }
 
 @Composable
-@Preview
-fun CardReverse() {
+fun CardReverse(
+    paddingValues: PaddingValues
+) {
     Card(
-        modifier = CARD_MODIFIER,
+        modifier = Modifier
+            .padding(paddingValues)
+            .height(CARD_HEIGHT)
+            .width(CARD_WIDTH),
         colors = CardDefaults.cardColors(
             containerColor = Color.Red
         ),
@@ -45,10 +51,14 @@ fun CardReverse() {
 
 @Composable
 fun CardObverse(
-    gameCard: GameCard
+    gameCard: GameCard,
+    paddingValues: PaddingValues
 ) {
     Card(
-        modifier = CARD_MODIFIER
+        modifier = Modifier
+            .padding(paddingValues)
+            .height(CARD_HEIGHT)
+            .width(CARD_WIDTH)
             .border(2.dp, Color.Black, CARD_SHAPE),
         shape = CARD_SHAPE
     ) {
