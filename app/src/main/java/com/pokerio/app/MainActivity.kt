@@ -83,7 +83,7 @@ fun MainActivityComposable() {
     }
     GameState.onGameStart = {
         ContextCompat.getMainExecutor(context).execute {
-            navController.popBackStack(NAV_HOME, inclusive = false)
+            navController.popBackStack()
             navController.navigate(NAV_GAME)
         }
     }
@@ -97,7 +97,7 @@ fun MainActivityComposable() {
         sharedPreferences.getString(stringResource(id = R.string.sharedPreferences_nickname), "")!!.isNotBlank()
     val startDestination = if (nicknameSet) NAV_HOME else NAV_INITIAL_SETUP
 
-    NavHost(navController = navController, startDestination = startDestination) {
+    NavHost(navController, startDestination) {
         composable(NAV_HOME) {
             HomeScreen(
                 navigateToSettings = navigateToSettings,
