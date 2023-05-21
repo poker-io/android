@@ -43,7 +43,9 @@ fun CardReverse(
         modifier = Modifier
             .padding(paddingValues)
             .height(CARD_HEIGHT)
-            .width(CARD_WIDTH),
+            .width(CARD_WIDTH)
+            .border(2.dp, Color.Black, CARD_SHAPE)
+            .padding(6.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Red
         ),
