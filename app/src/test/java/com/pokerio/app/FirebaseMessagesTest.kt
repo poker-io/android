@@ -232,6 +232,32 @@ class FirebaseMessagesTest {
         assertTrue(GameState.players[0].folded)
     }
 
+    @Test
+    fun handleActionWonTest() {
+        val playerNickname = "test1"
+        val playerID = GameState.sha256("testHash1")
+        val thisPlayerNickname = "test2"
+        val thisPlayerID = "testHash2"
+
+        GameState.addPlayer(Player(playerNickname, playerID, true))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
+        GameState.addPlayer(GameState.thisPlayer)
+
+        val map = HashMap<String, String>()
+        map["player"] = playerID
+
+        var onWonCalled = 0
+        val onWon = { player: Player ->
+            onWonCalled++
+            assert(player.nickname == playerNickname)
+        }
+        GameState.onWon = onWon
+
+        PokerioFirebaseMessagingService.actionWon(map)
+
+        assert(onWonCalled == 1)
+    }
+
     @After
     fun tearDown() {
         // Clean up after each test

@@ -38,6 +38,7 @@ import com.pokerio.app.R
 import com.pokerio.app.components.CardView
 import com.pokerio.app.components.PlayerView
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PokerioLogger
 import java.lang.NumberFormatException
 
@@ -65,6 +66,8 @@ fun GameScreen() {
             debugNumberOfActions++
         }
 
+        GameState.onWon = { onWon(context, it) }
+
         onDispose {
             // Restore previous state
             activity.requestedOrientation = originalOrientation
@@ -73,6 +76,8 @@ fun GameScreen() {
             systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
 
             GameState.removeOnNewActionCallback(callbackId)
+
+            GameState.onWon = {}
         }
     }
 
@@ -272,6 +277,12 @@ private fun onFold(context: Context) {
 
     GameState.launchTask {
         GameState.actionFoldRequest(onSuccess, onError)
+    }
+}
+
+private fun onWon(context: Context, player: Player) {
+    ContextCompat.getMainExecutor(context).execute {
+        Toast.makeText(context, "${player.nickname} " + context.getString(R.string.won) + "!", Toast.LENGTH_LONG).show()
     }
 }
 

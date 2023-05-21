@@ -45,6 +45,7 @@
     <string name="cancel">Cancel</string>
     <string name="previous_bet">Previous bet</string>
     <string name="minimum_bet">Minimum bet</string>
+    <string name="won">won</string>
 
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>

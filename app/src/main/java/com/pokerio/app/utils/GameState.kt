@@ -42,6 +42,7 @@ object GameState {
     // Callbacks
     var onGameReset = {}
     var onGameStart = {}
+    var onWon: (Player) -> Unit = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val settingsChangedCallbacks = HashMap<Int, () -> Unit>()
@@ -395,6 +396,15 @@ object GameState {
         winningsPool += player.bet
 
         newActionCallbacks.forEach { it.value(player) }
+    }
+
+    fun handleActionWon(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        onWon(player)
     }
 
     fun resetGameState() {
