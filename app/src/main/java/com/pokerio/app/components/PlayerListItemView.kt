@@ -76,7 +76,7 @@ fun PlayerListItemView(
                         contentDescription = stringResource(id = R.string.contentDescription_admin)
                     )
                 }
-            } else if (GameState.isPlayerAdmin) {
+            } else if (GameState.thisPlayer.isAdmin) {
                 IconButton(
                     onClick = { kickPlayer(context, player.playerID) },
                     modifier = Modifier.testTag("kick_button")

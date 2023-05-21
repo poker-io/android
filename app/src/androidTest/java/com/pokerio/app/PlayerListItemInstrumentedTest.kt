@@ -19,7 +19,7 @@ class PlayerListItemInstrumentedTest {
 
     @Test
     fun testPlayerAdminHostAdmin() {
-        GameState.isPlayerAdmin = true
+        GameState.thisPlayer.isAdmin = true
         val nickname = "TestPlayer"
         val id = "ThisIsALongId"
         val player = Player(nickname, id, true)
@@ -45,7 +45,7 @@ class PlayerListItemInstrumentedTest {
 
     @Test
     fun testPlayerAdminHostNotAdmin() {
-        GameState.isPlayerAdmin = false
+        GameState.thisPlayer.isAdmin = false
         val nickname = "TestPlayer"
         val id = "ThisIsALongId"
         val player = Player(nickname, id, true)
@@ -71,7 +71,7 @@ class PlayerListItemInstrumentedTest {
 
     @Test
     fun testPlayerNotAdminHostAdmin() {
-        GameState.isPlayerAdmin = true
+        GameState.thisPlayer.isAdmin = true
         val nickname = "TestPlayer"
         val id = "ThisIsALongId"
         val player = Player(nickname, id, false)
@@ -97,7 +97,7 @@ class PlayerListItemInstrumentedTest {
 
     @Test
     fun testPlayerNotAdminHostNotAdmin() {
-        GameState.isPlayerAdmin = false
+        GameState.thisPlayer.isAdmin = false
         val nickname = "TestPlayer"
         val id = "ThisIsALongId"
         val player = Player(nickname, id, false)
@@ -123,7 +123,7 @@ class PlayerListItemInstrumentedTest {
 
     @Test
     fun shortIDTest() {
-        GameState.isPlayerAdmin = false
+        GameState.thisPlayer.isAdmin = false
         val nickname = "TestPlayer"
         val id = "123"
         val player = Player(nickname, id, false)

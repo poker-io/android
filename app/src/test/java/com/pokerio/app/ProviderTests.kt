@@ -1,6 +1,7 @@
 package com.pokerio.app
 
 import com.pokerio.app.utils.IntUnitProvider
+import com.pokerio.app.utils.PlayerProvider
 import com.pokerio.app.utils.UnitUnitProvider
 import org.junit.Test
 
@@ -17,6 +18,14 @@ class ProviderTests {
     @Test
     fun unitUnitProviderTest() {
         val provider = UnitUnitProvider()
+        val iterator = provider.values.iterator()
+
+        assert(iterator.hasNext())
+    }
+
+    @Test
+    fun playerProvider() {
+        val provider = PlayerProvider()
         val iterator = provider.values.iterator()
 
         assert(iterator.hasNext())

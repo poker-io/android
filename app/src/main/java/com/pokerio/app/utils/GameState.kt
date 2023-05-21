@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import java.io.IOException
@@ -19,29 +20,34 @@ import kotlin.jvm.Throws
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
 object GameState {
+    // Constants
+    private const val BASE_URL = "http://192.168.86.30:42069"
+    const val STARTING_FUNDS_DEFAULT = 1000
+    const val SMALL_BLIND_DEFAULT = 100
+    const val MAX_PLAYERS = 8
+    const val MIN_PLAYERS = 2
+    const val CARDS_ON_TABLE = 5
+
     // Class fields
     var gameID = ""
     val players = mutableListOf<Player>()
     var startingFunds: Int = -1
     var smallBlind: Int = -1
-    var isPlayerAdmin: Boolean = false
+    var thisPlayer: Player = Player("", "")
     var gameCard1: GameCard? = null
     var gameCard2: GameCard? = null
+    val cards = Array<GameCard?>(CARDS_ON_TABLE) { null }
+    var winningsPool = 0
 
     // Callbacks
     var onGameReset = {}
     var onGameStart = {}
+    var onWon: (Player) -> Unit = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
-    private var settingsChangedCallback = HashMap<Int, () -> Unit>()
+    private val settingsChangedCallbacks = HashMap<Int, () -> Unit>()
+    private val newActionCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
-
-    // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
-    const val STARTING_FUNDS_DEFAULT = 1000
-    const val SMALL_BLIND_DEFAULT = 100
-    const val MAX_PLAYERS = 8
-    const val MIN_PLAYERS = 2
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
@@ -97,9 +103,9 @@ object GameState {
 
             // We have to add the creator to the list of players
             players.clear()
-            addPlayer(Player(nickname, creatorID, true))
+            thisPlayer = Player(nickname, creatorID, true)
+            addPlayer(thisPlayer)
 
-            isPlayerAdmin = true
             onSuccess()
         } catch (e: Exception) {
             PokerioLogger.error("Failed to create game, reason: $e")
@@ -154,7 +160,8 @@ object GameState {
             }
 
             // This player is not included in the player list, so we need to add them separately
-            addPlayer(Player(nickname, playerID))
+            thisPlayer = Player(nickname, playerID)
+            addPlayer(thisPlayer)
 
             onSuccess()
         } catch (e: Exception) {
@@ -179,6 +186,7 @@ object GameState {
                 "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
             val url = URL(baseUrl + urlString)
             url.readText()
+
             onSuccess()
         } catch (e: IOException) {
             PokerioLogger.error("Failed to modify game, reason: $e")
@@ -254,18 +262,165 @@ object GameState {
         }
     }
 
+    suspend fun actionCallRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionCall?playerToken={$myID}&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action call during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    fun handleActionCall(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        val newBet = getMaxBet()
+
+        player.funds -= (newBet - player.bet)
+        player.bet = newBet
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
+    suspend fun actionCheckRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionCheck?playerToken=$myID&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action check during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    fun handleActionCheck(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
+    suspend fun actionRaiseRequest(
+        newAmount: Int,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$newAmount"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action raise during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    fun handleActionRaise(playerHash: String, newAmount: Int) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        player.funds -= (newAmount - player.bet)
+        player.bet = newAmount
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
+    suspend fun actionFoldRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionFold?playerToken=$myID&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action fold during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    fun handleActionFold(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        player.folded = true
+        winningsPool += player.bet
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
+    fun handleActionWon(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        onWon(player)
+    }
+
     fun resetGameState() {
         // Class fields
         gameID = ""
         players.clear()
         startingFunds = -1
         smallBlind = -1
-        isPlayerAdmin = false
+        thisPlayer = Player("", "")
         gameCard1 = null
         gameCard2 = null
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
+        settingsChangedCallbacks.clear()
+        newActionCallbacks.clear()
         // Not resetting nextId, because someone might be holding on to an old one and we don't
         // want then to remove new callbacks by mistake
 
@@ -291,12 +446,21 @@ object GameState {
     }
 
     fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
-        settingsChangedCallback[nextId] = callback
+        settingsChangedCallbacks[nextId] = callback
+        return nextId++
+    }
+
+    fun removeOnNewActionCallback(id: Int) {
+        newActionCallbacks.remove(id)
+    }
+
+    fun addOnNewActionCallback(callback: (Player) -> Unit): Int {
+        newActionCallbacks[nextId] = callback
         return nextId++
     }
 
     fun removeOnSettingsChangedCallback(id: Int) {
-        settingsChangedCallback.remove(id)
+        settingsChangedCallbacks.remove(id)
     }
 
     fun addPlayer(player: Player) {
@@ -310,7 +474,7 @@ object GameState {
             return
         }
 
-        val isThisPlayerRemoved = players.find { sha256(it.playerID) == playerHash } != null
+        val isThisPlayerRemoved = (playerHash == sha256(thisPlayer.playerID))
         if (isThisPlayerRemoved) {
             return resetGameState()
         }
@@ -320,11 +484,10 @@ object GameState {
 
         if (removedPlayer.isAdmin) {
             require(newAdmin != null)
-            val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
+            val isThisPlayerNewAdmin = (newAdmin == sha256(thisPlayer.playerID))
 
-            if (thisPlayerNewAdmin != null) {
-                isPlayerAdmin = true
-                thisPlayerNewAdmin.isAdmin = true
+            if (isThisPlayerNewAdmin) {
+                thisPlayer.isAdmin = true
             } else {
                 val newAdminPlayer = players.find { it.playerID == newAdmin }
                 newAdminPlayer!!.isAdmin = true
@@ -335,10 +498,32 @@ object GameState {
         playerRemovedCallbacks.forEach { it.value(removedPlayer) }
     }
 
-    fun startGame(data: Map<String, String>) {
-        gameCard1 = GameCard(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
-        gameCard2 = GameCard(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
+    @OptIn(ExperimentalSerializationApi::class)
+    fun startGame(card1: String, card2: String, playersString: String) {
+        gameCard1 = GameCard(card1.slice(0..1), card1.slice(2..2))
+        gameCard2 = GameCard(card2.slice(0..1), card2.slice(2..2))
         players.forEach { it.funds = startingFunds }
+
+        val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)
+        playersJsonArray.forEach { playerWithTurnJson ->
+            println(playerWithTurnJson.toString())
+            val playerWithTurn = Json.decodeFromString(PlayerWithTurnResponseSerializer, playerWithTurnJson.toString())
+
+            if (sha256(thisPlayer.playerID) == playerWithTurn.playerHash) {
+                thisPlayer.turn = playerWithTurn.turn
+            } else {
+                val player = players.find { it.playerID == playerWithTurn.playerHash }!!
+                player.turn = playerWithTurn.turn
+            }
+        }
+
+        players.sortBy { it.turn }
+        val smallBlindIndex: Int = players.lastIndex - 1
+        val bigBlindIndex: Int = players.lastIndex
+        players[smallBlindIndex].bet = smallBlind
+        players[smallBlindIndex].funds -= smallBlind
+        players[bigBlindIndex].bet = smallBlind * 2
+        players[bigBlindIndex].funds -= smallBlind * 2
 
         onGameStart()
     }
@@ -353,11 +538,16 @@ object GameState {
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
-        settingsChangedCallback.forEach { it.value() }
+        settingsChangedCallbacks.forEach { it.value() }
     }
 
     fun isInGame(): Boolean {
         return gameID.isNotBlank()
+    }
+
+    @Throws(NoSuchElementException::class)
+    fun getMaxBet(): Int {
+        return players.maxOf { it.bet }
     }
 }
 
@@ -394,3 +584,14 @@ data class JoinGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = JoinGameResponse::class)
 object JoinGameResponseSerializer
+
+data class PlayerWithTurnResponse(
+    val nickname: String,
+    val playerHash: String,
+    val turn: Int
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = PlayerWithTurnResponse::class)
+object PlayerWithTurnResponseSerializer

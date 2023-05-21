@@ -4,7 +4,10 @@ class Player(
     val nickname: String,
     val playerID: String,
     var isAdmin: Boolean = false,
-    var funds: Int = 0
+    var funds: Int = 0,
+    var bet: Int = 0,
+    var folded: Boolean = false,
+    var turn: Int = 0
 ) {
     companion object {
         const val MAX_NICKNAME_LEN = 20

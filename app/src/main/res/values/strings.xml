@@ -30,6 +30,23 @@
     <string name="failed_leave">Failed to leave game</string>
     <string name="failed_start">Failed to start game</string>
 
+    <!-- Game screen -->
+    <string name="winnings_pool">Winnings pool</string>
+    <string name="call">Call</string>
+    <string name="call_failed">Call action failed</string>
+    <string name="raise">Raise</string>
+    <string name="raise_failed">Raise action failed</string>
+    <string name="check">Check</string>
+    <string name="check_failed">Check action failed</string>
+    <string name="fold">Fold</string>
+    <string name="fold_failed">Fold action failed</string>
+    <string name="confirm_raise">Confirm raise</string>
+    <string name="raise_amount">Raise amount</string>
+    <string name="cancel">Cancel</string>
+    <string name="previous_bet">Previous bet</string>
+    <string name="minimum_bet">Minimum bet</string>
+    <string name="won">won</string>
+
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>
     <string name="contentDescription_settings_icon">Settings icon</string>
