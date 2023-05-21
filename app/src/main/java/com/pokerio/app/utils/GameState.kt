@@ -328,6 +328,18 @@ object GameState {
         }
     }
 
+    fun handleActionRaise(playerHash: String, newAmount: Int) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        player.funds -= (newAmount - player.bet)
+        player.bet = newAmount
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
     suspend fun actionFoldRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -473,6 +485,12 @@ object GameState {
         }
 
         players.sortBy { it.turn }
+        val smallBlindIndex: Int = players.lastIndex - 1
+        val bigBlindIndex: Int = players.lastIndex
+        players[smallBlindIndex].bet = smallBlind
+        players[smallBlindIndex].funds -= smallBlind
+        players[bigBlindIndex].bet = smallBlind * 2
+        players[bigBlindIndex].funds -= smallBlind * 2
 
         onGameStart()
     }

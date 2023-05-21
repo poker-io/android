@@ -3,7 +3,6 @@ package com.pokerio.app.screens
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,8 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -35,6 +38,7 @@ import com.pokerio.app.components.CardView
 import com.pokerio.app.components.PlayerView
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.PokerioLogger
+import java.lang.NumberFormatException
 
 @Preview
 @Composable
@@ -169,21 +173,27 @@ private fun onCheck(context: Context) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RaiseDialog(
     onClose: () -> Unit
 ) {
     val context = LocalContext.current
+    val prevAmount = GameState.thisPlayer.bet
     val minAmount = GameState.getMaxBet() + 1
-    var newAmount = minAmount
+    var newAmount by remember { mutableStateOf(minAmount.toString()) }
+    var amountCorrect by remember { mutableStateOf(true) }
 
     AlertDialog(
         onDismissRequest = { onClose() },
         confirmButton = {
-            TextButton(onClick = {
-                onRaise(context, newAmount)
-                onClose()
-            }) {
+            TextButton(
+                onClick = {
+                    onRaise(context, newAmount.toInt())
+                    onClose()
+                },
+                enabled = amountCorrect
+            ) {
                 Text(stringResource(R.string.confirm_raise))
             }
         },
@@ -194,10 +204,24 @@ fun RaiseDialog(
         },
         title = { Text(stringResource(R.string.raise_amount)) },
         text = {
-            NumberPicker(context).apply {
-                minValue = minAmount
-                maxValue = GameState.thisPlayer.funds + GameState.thisPlayer.bet
-                setOnValueChangedListener { _, _, newVal -> newAmount = newVal }
+            Column {
+                Text("Your previous bet: $prevAmount")
+                Text("Minimum bet: $minAmount")
+                OutlinedTextField(
+                    value = newAmount,
+                    onValueChange = {
+                        try {
+                            newAmount = it
+                            val value = it.toInt()
+                            amountCorrect = value >= minAmount
+                        } catch (e: NumberFormatException) {
+                            PokerioLogger.error(e.toString())
+                            amountCorrect = false
+                        }
+                    },
+                    isError = !amountCorrect,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
             }
         }
     )
