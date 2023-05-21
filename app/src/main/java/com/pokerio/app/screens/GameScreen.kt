@@ -130,8 +130,10 @@ fun GameScreen() {
             }
         }
     }
-    RaiseDialog {
-        raiseDialogOpen = false
+    if (raiseDialogOpen) {
+        RaiseDialog {
+            raiseDialogOpen = false
+        }
     }
 }
 

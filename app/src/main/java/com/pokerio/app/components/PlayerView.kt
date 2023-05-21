@@ -9,7 +9,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -24,7 +26,8 @@ fun PlayerView(
     @PreviewParameter(PlayerProvider::class) player: Player
 ) {
     Column(
-        modifier = Modifier.width(IntrinsicSize.Min)
+        modifier = Modifier.width(IntrinsicSize.Min),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             modifier = Modifier
@@ -48,7 +51,10 @@ fun PlayerView(
             Text("Bet: ${player.bet}")
         }
         if (player.folded) {
-            Text(stringResource(R.string.fold))
+            Text(
+                stringResource(R.string.fold),
+                color = Color.Gray
+            )
         }
     }
 }

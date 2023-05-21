@@ -248,7 +248,7 @@ object GameState {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
             // Prepare url
-            val urlString = "/startGame?creatorToken=$myID&gameId=$gameID"
+            val urlString = "/startGame?creatorToken=$myID"
             val url = URL(baseUrl + urlString)
 
             url.readText()
