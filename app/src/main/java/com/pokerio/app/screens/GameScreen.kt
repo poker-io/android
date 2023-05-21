@@ -43,6 +43,7 @@ fun GameScreen() {
     val orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     val systemUiController = rememberSystemUiController()
     var raiseDialogOpen by remember { mutableStateOf(false) }
+    var debugNumberOfActions by remember { mutableStateOf(0) }
 
     DisposableEffect(orientation) {
         // Set orientation
@@ -54,12 +55,19 @@ fun GameScreen() {
         systemUiController.setSystemUiVisible(false)
         systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
+        // Setup callbacks
+        val callbackId = GameState.addOnNewActionCallback {
+            debugNumberOfActions++
+        }
+
         onDispose {
             // Restore previous state
             activity.requestedOrientation = originalOrientation
 
             systemUiController.setSystemUiVisible(true)
             systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+
+            GameState.removeOnNewActionCallback(callbackId)
         }
     }
 
@@ -75,8 +83,8 @@ fun GameScreen() {
                 PlayerView(it)
             }
             Column {
-                Text(stringResource(R.string.winnings_pool))
-                Text(GameState.winningsPool.toString())
+                Text(stringResource(R.string.winnings_pool) + ": ${GameState.winningsPool}")
+                Text("DEBUG: $debugNumberOfActions")
             }
         }
         Row(

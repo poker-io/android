@@ -12,11 +12,12 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         when (message.data["type"]) {
-            "playerJoined" -> playerJoined(message.data)
-            "settingsUpdated" -> settingsUpdated(message.data)
-            "playerKicked" -> playerKicked(message.data)
-            "playerLeft" -> playerLeft(message.data)
-            "startGame" -> startGame(message.data)
+            PLAYER_JOINED -> playerJoined(message.data)
+            SETTINGS_UPDATED -> settingsUpdated(message.data)
+            PLAYER_KICKED -> playerKicked(message.data)
+            PLAYER_LEFT -> playerLeft(message.data)
+            START_GAME -> startGame(message.data)
+            ACTION_FOLD -> actionFold(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -27,6 +28,12 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
+        const val PLAYER_JOINED = "playerJoined"
+        const val SETTINGS_UPDATED = "settingsUpdated"
+        const val PLAYER_KICKED = "playerKicked"
+        const val PLAYER_LEFT = "playerLeft"
+        const val START_GAME = "startGame"
+        const val ACTION_FOLD = "fold"
 
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
@@ -61,6 +68,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         fun startGame(data: Map<String, String>) {
             PokerioLogger.debug("Received startGame FCM message")
             GameState.startGame(data)
+        }
+
+        fun actionFold(data: Map<String, String>) {
+            PokerioLogger.debug("Received fold FCM message")
+            GameState.handleActionFold(data["player"]!!)
         }
     }
 }

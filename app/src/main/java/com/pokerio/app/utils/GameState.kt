@@ -43,7 +43,8 @@ object GameState {
     var onGameStart = {}
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
-    private var settingsChangedCallback = HashMap<Int, () -> Unit>()
+    private val settingsChangedCallbacks = HashMap<Int, () -> Unit>()
+    private val newActionCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
 
     // Methods
@@ -349,6 +350,18 @@ object GameState {
         }
     }
 
+    fun handleActionFold(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        player.folded = true
+        winningsPool += player.bet
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
     fun resetGameState() {
         // Class fields
         gameID = ""
@@ -361,6 +374,8 @@ object GameState {
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
+        settingsChangedCallbacks.clear()
+        newActionCallbacks.clear()
         // Not resetting nextId, because someone might be holding on to an old one and we don't
         // want then to remove new callbacks by mistake
 
@@ -386,12 +401,21 @@ object GameState {
     }
 
     fun addOnSettingsChangedCallback(callback: () -> Unit): Int {
-        settingsChangedCallback[nextId] = callback
+        settingsChangedCallbacks[nextId] = callback
+        return nextId++
+    }
+
+    fun removeOnNewActionCallback(id: Int) {
+        newActionCallbacks.remove(id)
+    }
+
+    fun addOnNewActionCallback(callback: (Player) -> Unit): Int {
+        newActionCallbacks[nextId] = callback
         return nextId++
     }
 
     fun removeOnSettingsChangedCallback(id: Int) {
-        settingsChangedCallback.remove(id)
+        settingsChangedCallbacks.remove(id)
     }
 
     fun addPlayer(player: Player) {
@@ -463,7 +487,7 @@ object GameState {
     fun changeGameSettings(newStartingFunds: Int, newSmallBlind: Int) {
         startingFunds = newStartingFunds
         smallBlind = newSmallBlind
-        settingsChangedCallback.forEach { it.value() }
+        settingsChangedCallbacks.forEach { it.value() }
     }
 
     fun isInGame(): Boolean {
