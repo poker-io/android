@@ -494,6 +494,7 @@ object GameState {
         return gameID.isNotBlank()
     }
 
+    @Throws(NoSuchElementException::class)
     fun getMaxBet(): Int {
         return players.maxOf { it.bet }
     }

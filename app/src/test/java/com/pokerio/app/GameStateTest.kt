@@ -112,6 +112,30 @@ class GameStateTest {
     }
 
     @Test
+    fun onNewActionCallbackTest() {
+        val playerNickname = "test"
+        val playerID = GameState.sha256("testId")
+
+        GameState.addPlayer(Player(playerNickname, playerID))
+
+        var onNewActionCalled = 0
+        val onNewAction = { player: Player ->
+            onNewActionCalled++
+
+            assert(player.nickname == playerNickname)
+            assert(player.playerID == playerID)
+        }
+
+        val callbackId = GameState.addOnNewActionCallback(onNewAction)
+        GameState.handleActionFold(playerID)
+        assertTrue("onNewAction not called", onNewActionCalled == 1)
+
+        GameState.removeOnNewActionCallback(callbackId)
+        GameState.handleActionFold(playerID)
+        assertTrue("onNewAction called after removal", onNewActionCalled == 1)
+    }
+
+    @Test
     fun resetGameStateTest() {
         var resetCalled = false
         val onResetState = {
@@ -302,6 +326,59 @@ class GameStateTest {
             .fold("") { str, byte -> str + "%02x".format(byte) }
 
         assertTrue("sha256 doesn't match", GameState.sha256(testString) == sha256TestString)
+    }
+
+    @Test
+    fun startGameTest() {
+        val playerNickname = "test1"
+        val playerID = GameState.sha256("testHash1")
+        val thisPlayerNickname = "test2"
+        val thisPlayerID = "testHash2"
+        val thisPlayerHash = GameState.sha256(thisPlayerID)
+
+        GameState.addPlayer(Player(playerNickname, playerID, true))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
+        GameState.addPlayer(GameState.thisPlayer)
+
+        var onGameStartedCalled = 0
+        GameState.onGameStart = { onGameStartedCalled++ }
+
+        val playersString = """[
+            |   {
+            |       "nickname": "$playerNickname",
+            |       "playerHash": "$playerID",
+            |       "turn": 1
+            |   },
+            |   {
+            |       "nickname": "$thisPlayerNickname",
+            |       "playerHash": "$thisPlayerHash",
+            |       "turn": 0
+            |   }
+            |]
+        """.trimMargin()
+
+        GameState.startGame("01T", "02T", playersString)
+
+        assert(GameState.players[0].nickname == thisPlayerNickname)
+        assert(GameState.players[0].playerID == thisPlayerID)
+        assert(GameState.players[1].nickname == playerNickname)
+        assert(GameState.players[1].playerID == playerID)
+        assert(GameState.gameCard1.toString() == "01T")
+        assert(GameState.gameCard2.toString() == "02T")
+        assert(onGameStartedCalled == 1)
+    }
+
+    @Test
+    fun testGetMaxBet() {
+        assertThrows(NoSuchElementException::class.java) {
+            GameState.getMaxBet()
+        }
+
+        GameState.addPlayer(Player("test1", "testHash1", bet = 100))
+        GameState.addPlayer(Player("test2", "testHash2", bet = 101))
+        GameState.addPlayer(Player("test3", "testHash3", bet = 102))
+
+        assert(GameState.getMaxBet() == 102)
     }
 
     @After

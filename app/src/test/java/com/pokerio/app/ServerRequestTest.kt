@@ -359,6 +359,182 @@ class ServerRequestTest {
         assert(onErrorCalled == 1)
     }
 
+    @Test
+    fun actionCallRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertTrue("actionCall should not error", false)
+        }
+
+        runBlocking {
+            GameState.actionCallRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun actionCallRequestIncorrectTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertTrue("actionCall should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.actionCallRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
+    }
+
+    @Test
+    fun actionCheckRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertTrue("actionCheck should not error", false)
+        }
+
+        runBlocking {
+            GameState.actionCheckRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun actionCheckRequestIncorrectTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertTrue("actionCheck should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.actionCheckRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
+    }
+
+    @Test
+    fun actionRaiseRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertTrue("actionRaise should not error", false)
+        }
+
+        runBlocking {
+            GameState.actionRaiseRequest(120, onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun actionRaiseRequestIncorrectTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertTrue("actionRaise should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.actionRaiseRequest(120, onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
+    }
+
+    @Test
+    fun actionFoldRequestTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(200))
+
+        var onSuccessCalled = 0
+        val onSuccess = {
+            onSuccessCalled += 1
+        }
+
+        val onError = {
+            assertTrue("actionFold should not error", false)
+        }
+
+        runBlocking {
+            GameState.actionFoldRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onSuccessCalled == 1)
+    }
+
+    @Test
+    fun actionFoldRequestIncorrectTest() {
+        GameState.gameID = "123456"
+
+        server.enqueue(MockResponse().setResponseCode(400))
+
+        val onSuccess = {
+            assertTrue("actionFold should error", false)
+        }
+
+        var onErrorCalled = 0
+        val onError = {
+            onErrorCalled += 1
+        }
+
+        runBlocking {
+            GameState.actionFoldRequest(onSuccess, onError, url, "idTest")
+        }
+
+        assert(onErrorCalled == 1)
+    }
+
     @After
     fun tearDown() {
         server.shutdown()
