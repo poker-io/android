@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -112,22 +113,34 @@ fun GameScreen() {
                 columns = GridCells.Fixed(2)
             ) {
                 item {
-                    Button(onClick = { onCall(context) }) {
+                    Button(
+                        onClick = { onCall(context) },
+                        modifier = Modifier.testTag("call_button")
+                    ) {
                         Text(stringResource(R.string.call) + " (${GameState.getMaxBet()})")
                     }
                 }
                 item {
-                    Button(onClick = { raiseDialogOpen = true }) {
+                    Button(
+                        onClick = { raiseDialogOpen = true },
+                        modifier = Modifier.testTag("raise_button")
+                    ) {
                         Text(stringResource(R.string.raise))
                     }
                 }
                 item {
-                    Button(onClick = { onCheck(context) }) {
+                    Button(
+                        onClick = { onCheck(context) },
+                        modifier = Modifier.testTag("check_button")
+                    ) {
                         Text(stringResource(R.string.check))
                     }
                 }
                 item {
-                    Button(onClick = { onFold(context) }) {
+                    Button(
+                        onClick = { onFold(context) },
+                        modifier = Modifier.testTag("fold_button")
+                    ) {
                         Text(stringResource(R.string.fold))
                     }
                 }
@@ -198,7 +211,10 @@ fun RaiseDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = { onClose() }) {
+            TextButton(
+                onClick = { onClose() },
+                modifier = Modifier.testTag("raise_dialog_close")
+            ) {
                 Text(stringResource(R.string.cancel))
             }
         },
