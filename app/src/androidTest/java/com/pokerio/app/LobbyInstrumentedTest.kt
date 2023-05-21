@@ -37,7 +37,7 @@ class LobbyInstrumentedTest {
     @Test
     fun testUIAdmin() {
         GameState.players.clear()
-        GameState.isPlayerAdmin = true
+        GameState.thisPlayer.isAdmin = true
         GameState.addPlayer(Player("test1", "123", true))
 
         composeTestRule.setContent {
@@ -52,7 +52,7 @@ class LobbyInstrumentedTest {
     @Test
     fun testUINonAdmin() {
         GameState.players.clear()
-        GameState.isPlayerAdmin = false
+        GameState.thisPlayer.isAdmin = false
         GameState.addPlayer(Player("test1", "123", true))
         GameState.addPlayer(Player("test2", "124", false))
 
@@ -68,7 +68,7 @@ class LobbyInstrumentedTest {
     @Test
     fun testRecomposeOnSettingsChange() {
         GameState.players.clear()
-        GameState.isPlayerAdmin = false
+        GameState.thisPlayer.isAdmin = false
         GameState.startingFunds = 0
         GameState.smallBlind = 0
         GameState.addPlayer(Player("test1", "123", true))

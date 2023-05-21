@@ -76,7 +76,8 @@ class FirebaseMessagesTest {
 
         GameState.gameID = "gameID"
         GameState.addPlayer(Player(playerNickname, playerId, true))
-        GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerId)
+        GameState.addPlayer(GameState.thisPlayer)
 
         val map = HashMap<String, String>()
         map["playerHash"] = playerId

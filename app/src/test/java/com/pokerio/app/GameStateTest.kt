@@ -122,7 +122,7 @@ class GameStateTest {
         GameState.players.add(Player("testPlayer", "hash"))
         GameState.startingFunds = 123123
         GameState.smallBlind = 123123
-        GameState.isPlayerAdmin = true
+        GameState.thisPlayer.isAdmin = true
         GameState.onGameReset = onResetState
         GameState.gameCard1 = GameCard("E", "E")
         GameState.gameCard2 = GameCard("E", "E")
@@ -132,7 +132,7 @@ class GameStateTest {
         assertTrue("players list not reset", GameState.players.isEmpty())
         assertTrue("startingFunds not reset", GameState.startingFunds == -1)
         assertTrue("smallBlind not reset", GameState.smallBlind == -1)
-        assertFalse("isPlayerAdmin not reset", GameState.isPlayerAdmin)
+        assertFalse("isPlayerAdmin not reset", GameState.thisPlayer.isAdmin)
         assertTrue("onGameReset not called", resetCalled)
         assertTrue("card1 not reset", GameState.gameCard1 == null)
         assertTrue("card2 not reset", GameState.gameCard2 == null)
@@ -185,7 +185,8 @@ class GameStateTest {
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id, true))
         GameState.addPlayer(Player(player2Nickname, player2Id))
-        GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerId)
+        GameState.addPlayer(GameState.thisPlayer)
 
         assert(GameState.players.size == 3)
 
@@ -253,7 +254,8 @@ class GameStateTest {
         GameState.onGameReset = onGameReset
         GameState.addOnPlayerRemovedCallback(onPlayerRemoved)
         GameState.addPlayer(Player(player1Nickname, player1Id))
-        GameState.addPlayer(Player(thisPlayerNickname, thisPlayerId))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerId)
+        GameState.addPlayer(GameState.thisPlayer)
 
         assert(GameState.players.size == 2)
 
