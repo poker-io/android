@@ -112,13 +112,18 @@ fun GameScreen() {
                 columns = GridCells.Fixed(2)
             ) {
                 item {
+                    Button(onClick = { onCall(context) }) {
+                        Text(stringResource(R.string.call) + " (${GameState.getMaxBet()})")
+                    }
+                }
+                item {
                     Button(onClick = { raiseDialogOpen = true }) {
                         Text(stringResource(R.string.raise))
                     }
                 }
                 item {
                     Button(onClick = { onCheck(context) }) {
-                        Text(stringResource(R.string.check) + " (${GameState.getMaxBet()})")
+                        Text(stringResource(R.string.check))
                     }
                 }
                 item {
@@ -133,6 +138,22 @@ fun GameScreen() {
         RaiseDialog {
             raiseDialogOpen = false
         }
+    }
+}
+
+private fun onCall(context: Context) {
+    val onSuccess = {
+        PokerioLogger.debug("Call action")
+    }
+
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, context.getString(R.string.call_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.actionCallRequest(onSuccess, onError)
     }
 }
 
@@ -184,8 +205,8 @@ fun RaiseDialog(
         title = { Text(stringResource(R.string.raise_amount)) },
         text = {
             Column {
-                Text("Your previous bet: $prevAmount")
-                Text("Minimum bet: $minAmount")
+                Text(stringResource(R.string.previous_bet) + ": $prevAmount")
+                Text(stringResource(R.string.minimum_bet) + ": $minAmount")
                 OutlinedTextField(
                     value = newAmount,
                     onValueChange = {

@@ -43,6 +43,8 @@
     <string name="confirm_raise">Confirm raise</string>
     <string name="raise_amount">Raise amount</string>
     <string name="cancel">Cancel</string>
+    <string name="previous_bet">Previous bet</string>
+    <string name="minimum_bet">Minimum bet</string>
 
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>

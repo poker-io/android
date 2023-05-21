@@ -137,6 +137,83 @@ class FirebaseMessagesTest {
     }
 
     @Test
+    fun handleActionCallTest() {
+        val playerNickname = "test1"
+        val playerID = GameState.sha256("testHash1")
+        val thisPlayerNickname = "test2"
+        val thisPlayerID = "testHash2"
+        val thisPlayerHash = GameState.sha256(thisPlayerID)
+
+        GameState.addPlayer(Player(playerNickname, playerID, true))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
+        GameState.addPlayer(GameState.thisPlayer)
+
+        val funds = 1000
+        val bet = 100
+        GameState.thisPlayer.funds = funds
+        GameState.thisPlayer.bet = bet
+        val map = HashMap<String, String>()
+        map["player"] = thisPlayerHash
+        PokerioFirebaseMessagingService.actionCall(map)
+
+        assert(GameState.thisPlayer.funds == funds)
+        assert(GameState.thisPlayer.bet == bet)
+    }
+
+    @Test
+    fun handleActionCheckTest() {
+        val playerNickname = "test1"
+        val playerID = GameState.sha256("testHash1")
+        val thisPlayerNickname = "test2"
+        val thisPlayerID = "testHash2"
+        val thisPlayerHash = GameState.sha256(thisPlayerID)
+
+        GameState.addPlayer(Player(playerNickname, playerID, true))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
+        GameState.addPlayer(GameState.thisPlayer)
+
+        val funds = 1000
+        val bet = 100
+        GameState.thisPlayer.funds = funds
+        GameState.thisPlayer.bet = bet
+        val map = HashMap<String, String>()
+        map["player"] = thisPlayerHash
+        PokerioFirebaseMessagingService.actionCheck(map)
+
+        assert(GameState.thisPlayer.funds == funds)
+        assert(GameState.thisPlayer.bet == bet)
+    }
+
+    @Test
+    fun handleActionRaiseTest() {
+        val playerNickname = "test1"
+        val playerID = GameState.sha256("testHash1")
+        val thisPlayerNickname = "test2"
+        val thisPlayerID = "testHash2"
+        val thisPlayerHash = GameState.sha256(thisPlayerID)
+
+        GameState.addPlayer(Player(playerNickname, playerID, true))
+        GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
+        GameState.addPlayer(GameState.thisPlayer)
+
+        val funds = 1000
+        val bet = 100
+        val raise = 200
+
+        GameState.thisPlayer.funds = funds
+        GameState.thisPlayer.bet = bet
+
+        val map = HashMap<String, String>()
+        map["player"] = thisPlayerHash
+        map["actionPayload"] = raise.toString()
+
+        PokerioFirebaseMessagingService.actionRaise(map)
+
+        assert(GameState.thisPlayer.funds == funds - (raise - bet))
+        assert(GameState.thisPlayer.bet == raise)
+    }
+
+    @Test
     fun handleActionFoldTest() {
         val playerNickname = "test1"
         val playerID = GameState.sha256("testHash1")

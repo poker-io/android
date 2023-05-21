@@ -21,7 +21,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://192.168.86.30:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -261,6 +261,42 @@ object GameState {
         }
     }
 
+    suspend fun actionCallRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionCall?playerToken={$myID}&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action call during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    fun handleActionCall(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        val newBet = getMaxBet()
+
+        player.funds -= (newBet - player.bet)
+        player.bet = newBet
+
+        newActionCallbacks.forEach { it.value(player) }
+    }
+
     suspend fun actionCheckRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -289,11 +325,6 @@ object GameState {
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
         require(player != null)
 
-        val newBet = getMaxBet()
-
-        player.funds -= (newBet - player.bet)
-        player.bet = newBet
-
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -306,10 +337,9 @@ object GameState {
     ) {
         try {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
-            val amount = newAmount - thisPlayer.bet
 
             // Prepare url
-            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$amount"
+            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$newAmount"
             val url = URL(baseUrl + urlString)
 
             url.readText()
