@@ -55,7 +55,6 @@ fun LobbyScreen(
     var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.thisPlayer.isAdmin) }
-    val scrollState = rememberScrollState(0)
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears

@@ -47,7 +47,7 @@ object GameState {
     private val settingsChangedCallbacks = HashMap<Int, () -> Unit>()
     private val newActionCallbacks = HashMap<Int, (Player) -> Unit>()
     private var nextId = 0
-  
+
     // Methods
     fun launchTask(task: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {

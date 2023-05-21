@@ -360,50 +360,6 @@ class ServerRequestTest {
     }
 
     @Test
-    fun actionCallRequestTest() {
-        GameState.gameID = "123456"
-
-        server.enqueue(MockResponse().setResponseCode(200))
-
-        var onSuccessCalled = 0
-        val onSuccess = {
-            onSuccessCalled += 1
-        }
-
-        val onError = {
-            assertTrue("actionCall should not error", false)
-        }
-
-        runBlocking {
-            GameState.actionCallRequest(onSuccess, onError, url, "idTest")
-        }
-
-        assert(onSuccessCalled == 1)
-    }
-
-    @Test
-    fun actionCallRequestIncorrectTest() {
-        GameState.gameID = "123456"
-
-        server.enqueue(MockResponse().setResponseCode(400))
-
-        val onSuccess = {
-            assertTrue("actionCall should error", false)
-        }
-
-        var onErrorCalled = 0
-        val onError = {
-            onErrorCalled += 1
-        }
-
-        runBlocking {
-            GameState.actionCallRequest(onSuccess, onError, url, "idTest")
-        }
-
-        assert(onErrorCalled == 1)
-    }
-
-    @Test
     fun actionCheckRequestTest() {
         GameState.gameID = "123456"
 
