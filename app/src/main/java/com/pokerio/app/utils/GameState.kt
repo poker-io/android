@@ -454,12 +454,12 @@ object GameState {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun startGame(data: Map<String, String>) {
-        gameCard1 = GameCard(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
-        gameCard2 = GameCard(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
+    fun startGame(card1: String, card2: String, playersString: String) {
+        gameCard1 = GameCard(card1.slice(0..1), card1.slice(2..2))
+        gameCard2 = GameCard(card2.slice(0..1), card2.slice(2..2))
         players.forEach { it.funds = startingFunds }
 
-        val playersJsonArray = Json.decodeFromString<JsonArray>(data["players"]!!)
+        val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)
         playersJsonArray.forEach { playerWithTurnJson ->
             println(playerWithTurnJson.toString())
             val playerWithTurn = Json.decodeFromString(PlayerWithTurnResponseSerializer, playerWithTurnJson.toString())

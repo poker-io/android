@@ -67,7 +67,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
         fun startGame(data: Map<String, String>) {
             PokerioLogger.debug("Received startGame FCM message")
-            GameState.startGame(data)
+            GameState.startGame(
+                data["card1"]!!,
+                data["card2"]!!,
+                data["players"]!!
+            )
         }
 
         fun actionFold(data: Map<String, String>) {
