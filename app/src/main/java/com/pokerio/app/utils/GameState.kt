@@ -247,7 +247,7 @@ object GameState {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
             // Prepare url
-            val urlString = "/startGame?creatorToken=$myID"
+            val urlString = "/startGame?creatorToken=$myID&gameId=$gameID"
             val url = URL(baseUrl + urlString)
 
             url.readText()
@@ -255,6 +255,81 @@ object GameState {
             onSuccess()
         } catch (e: IOException) {
             PokerioLogger.error("Failed to start game, reason: $e")
+            onError()
+        }
+    }
+
+    suspend fun actionCallRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionCall?playerToken={$myID}&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action call during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    suspend fun actionCheckRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionCheck?playerToken=$myID&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action check during gameplay failed, reason: $e")
+            onError()
+        }
+    }
+
+    suspend fun actionRaiseRequest(
+        raiseAmount: Int,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+    }
+
+    suspend fun actionFoldRequest(
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        baseUrl: String = BASE_URL,
+        firebaseId: String? = null
+    ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+
+            // Prepare url
+            val urlString = "/actionFold?playerToken=$myID&gameId=$gameID"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action fold during gameplay failed, reason: $e")
             onError()
         }
     }

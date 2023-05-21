@@ -1,7 +1,9 @@
 package com.pokerio.app.screens
 
 import android.app.Activity
+import android.content.Context
 import android.content.pm.ActivityInfo
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,12 +18,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pokerio.app.components.CardView
 import com.pokerio.app.components.PlayerView
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.PokerioLogger
 
 @Preview
 @Composable
@@ -86,27 +90,78 @@ fun GameScreen() {
                 columns = GridCells.Fixed(2)
             ) {
                 item {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { onCall(context) }) {
                         Text("Call")
                     }
                 }
                 item {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { onRaise(context) }) {
                         Text("Raise")
                     }
                 }
                 item {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { onCheck(context) }) {
                         Text("Check")
                     }
                 }
                 item {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { onFold(context) }) {
                         Text("Fold")
                     }
                 }
             }
         }
+    }
+}
+
+private fun onCall(context: Context) {
+    val onSuccess = {
+        PokerioLogger.debug("Call action")
+    }
+
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Call action failed", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.actionCallRequest(onSuccess, onError)
+    }
+}
+
+private fun onCheck(context: Context) {
+    val onSuccess = {
+        PokerioLogger.debug("Check action")
+    }
+
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Check action failed", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.actionCheckRequest(onSuccess, onError)
+    }
+}
+
+private fun onRaise(context: Context) {
+}
+
+private fun onFold(context: Context) {
+    val onSuccess = {
+        PokerioLogger.debug("Fold action")
+    }
+
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, "Fold action failed", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.actionFoldRequest(onSuccess, onError)
     }
 }
 
