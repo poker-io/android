@@ -2,6 +2,7 @@ package com.pokerio.app.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.utils.GameCard
@@ -62,6 +64,11 @@ fun CardObverse(
             .border(2.dp, Color.Black, CARD_SHAPE),
         shape = CARD_SHAPE
     ) {
-        Text(text = gameCard.toString())
+        Text(
+            text = gameCard.toString(),
+            modifier = Modifier
+                .fillMaxSize(),
+            textAlign = TextAlign.Center
+        )
     }
 }

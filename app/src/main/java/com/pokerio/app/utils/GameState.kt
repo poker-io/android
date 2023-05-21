@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import java.io.IOException
@@ -19,14 +20,23 @@ import kotlin.jvm.Throws
 // This is an object - a static object if you will that will exist in the global context. There
 // will always be one and only one instance of this object
 object GameState {
+    // Constants
+    private const val BASE_URL = "http://192.168.86.30:42069"
+    const val STARTING_FUNDS_DEFAULT = 1000
+    const val SMALL_BLIND_DEFAULT = 100
+    const val MAX_PLAYERS = 8
+    const val CARDS_ON_TABLE = 5
+
     // Class fields
     var gameID = ""
     val players = mutableListOf<Player>()
     var startingFunds: Int = -1
     var smallBlind: Int = -1
-    var isPlayerAdmin: Boolean = false
+    var thisPlayer: Player = Player("", "")
     var gameCard1: GameCard? = null
     var gameCard2: GameCard? = null
+    val cards = Array<GameCard?>(CARDS_ON_TABLE) { null }
+    var winningsPool = 0
 
     // Callbacks
     var onGameReset = {}
@@ -35,12 +45,6 @@ object GameState {
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private var settingsChangedCallback = HashMap<Int, () -> Unit>()
     private var nextId = 0
-
-    // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
-    const val STARTING_FUNDS_DEFAULT = 1000
-    const val SMALL_BLIND_DEFAULT = 100
-    const val MAX_PLAYERS = 8
 
     // Methods
     fun launchTask(task: suspend () -> Unit) {
@@ -96,9 +100,9 @@ object GameState {
 
             // We have to add the creator to the list of players
             players.clear()
-            addPlayer(Player(nickname, creatorID, true))
+            thisPlayer = Player(nickname, creatorID, true)
+            addPlayer(thisPlayer)
 
-            isPlayerAdmin = true
             onSuccess()
         } catch (e: Exception) {
             PokerioLogger.error("Failed to create game, reason: $e")
@@ -153,7 +157,8 @@ object GameState {
             }
 
             // This player is not included in the player list, so we need to add them separately
-            addPlayer(Player(nickname, playerID))
+            thisPlayer = Player(nickname, playerID)
+            addPlayer(thisPlayer)
 
             onSuccess()
         } catch (e: Exception) {
@@ -178,6 +183,7 @@ object GameState {
                 "/modifyGame?creatorToken=$playerID&smallBlind=$smallBlind&startingFunds=$startingFunds"
             val url = URL(baseUrl + urlString)
             url.readText()
+
             onSuccess()
         } catch (e: IOException) {
             PokerioLogger.error("Failed to modify game, reason: $e")
@@ -259,7 +265,7 @@ object GameState {
         players.clear()
         startingFunds = -1
         smallBlind = -1
-        isPlayerAdmin = false
+        thisPlayer = Player("", "")
         gameCard1 = null
         gameCard2 = null
         // Callbacks
@@ -309,7 +315,7 @@ object GameState {
             return
         }
 
-        val isThisPlayerRemoved = players.find { sha256(it.playerID) == playerHash } != null
+        val isThisPlayerRemoved = (playerHash == sha256(thisPlayer.playerID))
         if (isThisPlayerRemoved) {
             return resetGameState()
         }
@@ -319,11 +325,10 @@ object GameState {
 
         if (removedPlayer.isAdmin) {
             require(newAdmin != null)
-            val thisPlayerNewAdmin = players.find { sha256(it.playerID) == newAdmin }
+            val isThisPlayerNewAdmin = (newAdmin == sha256(thisPlayer.playerID))
 
-            if (thisPlayerNewAdmin != null) {
-                isPlayerAdmin = true
-                thisPlayerNewAdmin.isAdmin = true
+            if (isThisPlayerNewAdmin) {
+                thisPlayer.isAdmin = true
             } else {
                 val newAdminPlayer = players.find { it.playerID == newAdmin }
                 newAdminPlayer!!.isAdmin = true
@@ -334,10 +339,26 @@ object GameState {
         playerRemovedCallbacks.forEach { it.value(removedPlayer) }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun startGame(data: Map<String, String>) {
         gameCard1 = GameCard(data["card1"]!!.slice(0..1), data["card1"]!!.slice(2..2))
         gameCard2 = GameCard(data["card2"]!!.slice(0..1), data["card2"]!!.slice(2..2))
         players.forEach { it.funds = startingFunds }
+
+        val playersJsonArray = Json.decodeFromString<JsonArray>(data["players"]!!)
+        playersJsonArray.forEach { playerWithTurnJson ->
+            println(playerWithTurnJson.toString())
+            val playerWithTurn = Json.decodeFromString(PlayerWithTurnResponseSerializer, playerWithTurnJson.toString())
+
+            if (sha256(thisPlayer.playerID) == playerWithTurn.playerHash) {
+                thisPlayer.turn = playerWithTurn.turn
+            } else {
+                val player = players.find { it.playerID == playerWithTurn.playerHash }!!
+                player.turn = playerWithTurn.turn
+            }
+        }
+
+        players.sortBy { it.turn }
 
         onGameStart()
     }
@@ -393,3 +414,14 @@ data class JoinGameResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = JoinGameResponse::class)
 object JoinGameResponseSerializer
+
+data class PlayerWithTurnResponse(
+    val nickname: String,
+    val playerHash: String,
+    val turn: Int
+)
+
+@Generated
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(forClass = PlayerWithTurnResponse::class)
+object PlayerWithTurnResponseSerializer
