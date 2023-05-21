@@ -260,28 +260,6 @@ object GameState {
         }
     }
 
-    suspend fun actionCallRequest(
-        onSuccess: () -> Unit,
-        onError: () -> Unit,
-        baseUrl: String = BASE_URL,
-        firebaseId: String? = null
-    ) {
-        try {
-            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
-
-            // Prepare url
-            val urlString = "/actionCall?playerToken={$myID}&gameId=$gameID"
-            val url = URL(baseUrl + urlString)
-
-            url.readText()
-
-            onSuccess()
-        } catch (e: IOException) {
-            PokerioLogger.error("Action call during gameplay failed, reason: $e")
-            onError()
-        }
-    }
-
     suspend fun actionCheckRequest(
         onSuccess: () -> Unit,
         onError: () -> Unit,
@@ -302,6 +280,20 @@ object GameState {
             PokerioLogger.error("Action check during gameplay failed, reason: $e")
             onError()
         }
+    }
+
+    fun handleActionCheck(playerHash: String) {
+        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
+        require(player != null)
+
+        val newBet = getMaxBet()
+
+        player.funds -= (newBet - player.bet)
+        player.bet = newBet
+
+        newActionCallbacks.forEach { it.value(player) }
     }
 
     suspend fun actionRaiseRequest(

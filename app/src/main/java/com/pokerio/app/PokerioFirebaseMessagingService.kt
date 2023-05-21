@@ -19,6 +19,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             START_GAME -> startGame(message.data)
             ACTION_FOLD -> actionFold(message.data)
             ACTION_RAISE -> actionRaise(message.data)
+            ACTION_CHECK -> actionCheck(message.data)
             else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
         }
     }
@@ -36,6 +37,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         const val START_GAME = "startGame"
         const val ACTION_FOLD = "fold"
         const val ACTION_RAISE = "raise"
+        const val ACTION_CHECK = "check"
 
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
@@ -84,6 +86,11 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         fun actionRaise(data: Map<String, String>) {
             PokerioLogger.debug("Received raise FCM message")
             GameState.handleActionRaise(data["player"]!!, data["actionPayload"]!!.toInt())
+        }
+
+        fun actionCheck(data: Map<String, String>) {
+            PokerioLogger.debug("Received check FCM message")
+            GameState.handleActionCheck(data["player"]!!)
         }
     }
 }
