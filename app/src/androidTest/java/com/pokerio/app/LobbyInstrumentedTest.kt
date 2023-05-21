@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import com.pokerio.app.screens.LobbyScreen
@@ -73,19 +74,25 @@ class LobbyInstrumentedTest {
         GameState.smallBlind = 0
         GameState.addPlayer(Player("test1", "123", true))
         GameState.addPlayer(Player("test2", "124", false))
+
         composeTestRule.setContent {
             LobbyScreen(navigateToSettings = {})
         }
-        composeTestRule.onNodeWithTag("funds").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("funds")
-            .assertTextEquals("${GameState.startingFunds}")
-        composeTestRule.onNodeWithTag("small_blind").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("small_blind")
-            .assertTextEquals("${GameState.smallBlind}")
+
+        val fundsValue = composeTestRule
+            .onNodeWithTag("setting_funds")
+            .onChildAt(1)
+        fundsValue.assertIsDisplayed()
+        fundsValue.assertTextEquals("${GameState.startingFunds}")
+
+        val smallBlindValue = composeTestRule
+            .onNodeWithTag("setting_small_blind")
+            .onChildAt(1)
+        smallBlindValue.assertIsDisplayed()
+        smallBlindValue.assertTextEquals("${GameState.smallBlind}")
+
         GameState.changeGameSettings(1200, 100)
-        composeTestRule.onNodeWithTag("funds")
-            .assertTextEquals("${GameState.startingFunds}")
-        composeTestRule.onNodeWithTag("small_blind")
-            .assertTextEquals("${GameState.smallBlind}")
+        fundsValue.assertTextEquals("${GameState.startingFunds}")
+        smallBlindValue.assertTextEquals("${GameState.smallBlind}")
     }
 }

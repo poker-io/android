@@ -5,7 +5,7 @@
     <string name="select_nickname">Please select a nickname</string>
 
     <!-- Home screen -->
-    <string name="label_game_code">Game code</string>
+    <string name="game_code">Game code</string>
     <string name="new_game">New game</string>
     <string name="error_game_code_empty">Game code cannot be empty!</string>
     <string name="error_game_code_incorrect">Game code is incorrect!</string>

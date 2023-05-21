@@ -25,6 +25,7 @@ object GameState {
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
+    const val MIN_PLAYERS = 2
     const val CARDS_ON_TABLE = 5
 
     // Class fields
