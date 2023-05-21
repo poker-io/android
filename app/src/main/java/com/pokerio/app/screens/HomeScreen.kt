@@ -106,7 +106,7 @@ private fun StartGameCard(
                 OutlinedTextField(
                     value = gameCode,
                     onValueChange = { gameCode = it },
-                    label = { Text(stringResource(R.string.label_game_code)) },
+                    label = { Text(stringResource(R.string.game_code)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = TextFieldDefaults.outlinedTextFieldColors(

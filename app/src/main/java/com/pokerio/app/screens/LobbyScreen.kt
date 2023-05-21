@@ -45,7 +45,6 @@ import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
 fun LobbyScreen(
@@ -56,7 +55,6 @@ fun LobbyScreen(
     var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
     var isAdmin by remember { mutableStateOf(GameState.isPlayerAdmin) }
-    val scrollState = rememberScrollState(0)
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears
@@ -97,92 +95,129 @@ fun LobbyScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f, false)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp)
+            TopGameSettings(numberOfPlayers, funds, smallBlind)
+            PlayerList(numberOfPlayers)
+        }
+        BottomButtons(context, isAdmin, numberOfPlayers, navigateToSettings)
+    }
+}
+
+@Composable
+fun TopGameSettings(
+    numberOfPlayers: Int,
+    funds: Int,
+    smallBlind: Int
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+    ) {
+        SingleGameSettingView(
+            tag = stringResource(id = R.string.game_code),
+            value = GameState.gameID
+        )
+        SingleGameSettingView(
+            tag = stringResource(id = R.string.players),
+            value = "$numberOfPlayers/8"
+        )
+        SingleGameSettingView(
+            tag = stringResource(id = R.string.funds),
+            value = funds,
+            modifier = Modifier.testTag("setting_funds")
+        )
+        SingleGameSettingView(
+            tag = stringResource(id = R.string.small_blind),
+            value = smallBlind,
+            modifier = Modifier.testTag("setting_small_blind")
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun PlayerList(
+    numberOfPlayers: Int
+) {
+    val scrollState = rememberScrollState(0)
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState, true)
+            .padding(vertical = 12.dp)
+            .testTag("player_list")
+    ) {
+        for (i in 1..GameState.MAX_PLAYERS) {
+            AnimatedVisibility(
+                visible = i <= numberOfPlayers,
+                enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                exit = scaleOut(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                modifier = Modifier.padding(vertical = 6.dp)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(id = R.string.label_game_code),
-                        fontWeight = FontWeight.Light
-                    )
-                    Text(text = GameState.gameID)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(id = R.string.players),
-                        fontWeight = FontWeight.Light
-                    )
-                    Text(text = "$numberOfPlayers/8")
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(id = R.string.funds),
-                        fontWeight = FontWeight.Light
-                    )
-                    Text(text = "$funds", modifier = Modifier.testTag("funds"))
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(id = R.string.small_blind),
-                        fontWeight = FontWeight.Light
-                    )
-                    Text(text = "$smallBlind", modifier = Modifier.testTag("small_blind"))
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .verticalScroll(scrollState, true)
-                    .padding(vertical = 12.dp)
-                    .testTag("player_list")
-                    .weight(1f, false)
-            ) {
-                for (i in 1..GameState.MAX_PLAYERS) {
-                    AnimatedVisibility(
-                        visible = i <= numberOfPlayers,
-                        enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
-                        exit = scaleOut(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
-                        modifier = Modifier.padding(vertical = 6.dp)
-                    ) {
-                        if (i <= numberOfPlayers) {
-                            PlayerListItemView(player = GameState.players[i - 1])
-                        }
-                    }
+                if (i <= numberOfPlayers) {
+                    PlayerListItemView(player = GameState.players[i - 1])
                 }
             }
         }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+    }
+}
+
+@Composable
+fun BottomButtons(
+    context: Context,
+    isAdmin: Boolean,
+    numberOfPlayers: Int,
+    navigateToSettings: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedButton(
+            onClick = { leaveGame(context) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("leave_game")
         ) {
+            Text(text = stringResource(id = R.string.leave_game))
+        }
+        if (isAdmin) {
             OutlinedButton(
-                onClick = { leaveGame(context) },
+                onClick = { navigateToSettings() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("leave_game")
+                    .testTag("update_settings")
             ) {
-                Text(text = stringResource(id = R.string.leave_game))
+                Text(text = stringResource(id = R.string.update_settings))
             }
-            if (isAdmin) {
-                OutlinedButton(
-                    onClick = { navigateToSettings() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("update_settings")
-                ) {
-                    Text(text = stringResource(id = R.string.update_settings))
-                }
-                Button(
-                    onClick = { startGame(context) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("start_game")
-                ) {
-                    Text(text = stringResource(id = R.string.start_game))
-                }
+            Button(
+                onClick = { startGame(context) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("start_game"),
+                enabled = GameState.MIN_PLAYERS <= numberOfPlayers && numberOfPlayers <= GameState.MAX_PLAYERS
+            ) {
+                Text(text = stringResource(id = R.string.start_game))
             }
         }
+    }
+}
+
+@Composable
+fun SingleGameSettingView(
+    tag: String,
+    value: Any,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text(
+            text = tag,
+            fontWeight = FontWeight.Light
+        )
+        Text(text = value.toString())
     }
 }
 
