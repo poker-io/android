@@ -304,12 +304,27 @@ object GameState {
     }
 
     suspend fun actionRaiseRequest(
-        raiseAmount: Int,
+        newAmount: Int,
         onSuccess: () -> Unit,
         onError: () -> Unit,
         baseUrl: String = BASE_URL,
         firebaseId: String? = null
     ) {
+        try {
+            val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
+            val amount = newAmount - thisPlayer.bet
+
+            // Prepare url
+            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$amount"
+            val url = URL(baseUrl + urlString)
+
+            url.readText()
+
+            onSuccess()
+        } catch (e: IOException) {
+            PokerioLogger.error("Action raise during gameplay failed, reason: $e")
+            onError()
+        }
     }
 
     suspend fun actionFoldRequest(

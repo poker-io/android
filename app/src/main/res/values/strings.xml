@@ -40,6 +40,9 @@
     <string name="check_failed">Check action failed</string>
     <string name="fold">Fold</string>
     <string name="fold_failed">Fold action failed</string>
+    <string name="confirm_raise">Confirm raise</string>
+    <string name="raise_amount">Raise amount</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Content description -->
     <string name="contentDescription_join_game_button">Join game button</string>

@@ -3,6 +3,7 @@ package com.pokerio.app.screens
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,10 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -35,6 +42,7 @@ fun GameScreen() {
     val context = LocalContext.current
     val orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     val systemUiController = rememberSystemUiController()
+    var raiseDialogOpen by remember { mutableStateOf(false) }
 
     DisposableEffect(orientation) {
         // Set orientation
@@ -93,11 +101,11 @@ fun GameScreen() {
             ) {
                 item {
                     Button(onClick = { onCall(context) }) {
-                        Text(stringResource(R.string.call))
+                        Text(stringResource(R.string.call) + " (${GameState.getMaxBet()})")
                     }
                 }
                 item {
-                    Button(onClick = { onRaise(context) }) {
+                    Button(onClick = { raiseDialogOpen = true }) {
                         Text(stringResource(R.string.raise))
                     }
                 }
@@ -113,6 +121,9 @@ fun GameScreen() {
                 }
             }
         }
+    }
+    RaiseDialog {
+        raiseDialogOpen = false
     }
 }
 
@@ -148,7 +159,54 @@ private fun onCheck(context: Context) {
     }
 }
 
-private fun onRaise(context: Context) {
+@Composable
+fun RaiseDialog(
+    onClose: () -> Unit
+) {
+    val context = LocalContext.current
+    val minAmount = GameState.getMaxBet() + 1
+    var newAmount = minAmount
+
+    AlertDialog(
+        onDismissRequest = { onClose() },
+        confirmButton = {
+            TextButton(onClick = {
+                onRaise(context, newAmount)
+                onClose()
+            }) {
+                Text(stringResource(R.string.confirm_raise))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onClose() }) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+        title = { Text(stringResource(R.string.raise_amount)) },
+        text = {
+            NumberPicker(context).apply {
+                minValue = minAmount
+                maxValue = GameState.thisPlayer.funds + GameState.thisPlayer.bet
+                setOnValueChangedListener { _, _, newVal -> newAmount = newVal }
+            }
+        }
+    )
+}
+
+private fun onRaise(context: Context, newAmount: Int) {
+    val onSuccess = {
+        PokerioLogger.debug("Raise action")
+    }
+
+    val onError = {
+        ContextCompat.getMainExecutor(context).execute {
+            Toast.makeText(context, context.getString(R.string.raise_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    GameState.launchTask {
+        GameState.actionRaiseRequest(newAmount, onSuccess, onError)
+    }
 }
 
 private fun onFold(context: Context) {
