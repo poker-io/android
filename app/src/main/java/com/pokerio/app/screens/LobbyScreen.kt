@@ -98,7 +98,7 @@ fun LobbyScreen(
             TopGameSettings(numberOfPlayers, funds, smallBlind)
             PlayerList(numberOfPlayers)
         }
-        BottomButtons(context, isAdmin, navigateToSettings)
+        BottomButtons(context, isAdmin, numberOfPlayers, navigateToSettings)
     }
 }
 
@@ -167,6 +167,7 @@ fun PlayerList(
 fun BottomButtons(
     context: Context,
     isAdmin: Boolean,
+    numberOfPlayers: Int,
     navigateToSettings: () -> Unit
 ) {
     Column(
@@ -193,7 +194,8 @@ fun BottomButtons(
                 onClick = { startGame(context) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("start_game")
+                    .testTag("start_game"),
+                enabled = GameState.MIN_PLAYERS <= numberOfPlayers && numberOfPlayers <= GameState.MAX_PLAYERS
             ) {
                 Text(text = stringResource(id = R.string.start_game))
             }
