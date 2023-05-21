@@ -454,6 +454,10 @@ object GameState {
     fun isInGame(): Boolean {
         return gameID.isNotBlank()
     }
+
+    fun getMaxBet(): Int {
+        return players.maxOf { it.bet }
+    }
 }
 
 data class CreateGameResponse(

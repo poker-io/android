@@ -17,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.pokerio.app.R
 import com.pokerio.app.components.CardView
 import com.pokerio.app.components.PlayerView
 import com.pokerio.app.utils.GameState
@@ -65,7 +67,7 @@ fun GameScreen() {
                 PlayerView(it)
             }
             Column {
-                Text("Winnings pool:")
+                Text(stringResource(R.string.winnings_pool))
                 Text(GameState.winningsPool.toString())
             }
         }
@@ -91,22 +93,22 @@ fun GameScreen() {
             ) {
                 item {
                     Button(onClick = { onCall(context) }) {
-                        Text("Call")
+                        Text(stringResource(R.string.call))
                     }
                 }
                 item {
                     Button(onClick = { onRaise(context) }) {
-                        Text("Raise")
+                        Text(stringResource(R.string.raise))
                     }
                 }
                 item {
                     Button(onClick = { onCheck(context) }) {
-                        Text("Check")
+                        Text(stringResource(R.string.check))
                     }
                 }
                 item {
                     Button(onClick = { onFold(context) }) {
-                        Text("Fold")
+                        Text(stringResource(R.string.fold))
                     }
                 }
             }
@@ -121,7 +123,7 @@ private fun onCall(context: Context) {
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Call action failed", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.call_failed), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -137,7 +139,7 @@ private fun onCheck(context: Context) {
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Check action failed", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.check_failed), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -156,7 +158,7 @@ private fun onFold(context: Context) {
 
     val onError = {
         ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, "Fold action failed", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.fold_failed), Toast.LENGTH_LONG).show()
         }
     }
 
