@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,10 +27,10 @@ val CARD_SHAPE = RoundedCornerShape(6.dp)
 @Composable
 @Preview
 fun CardView(
-    gameCard: GameCard? = null,
+    gameCard: GameCard = GameCard.none(),
     paddingValues: PaddingValues = PaddingValues(4.dp)
 ) {
-    if (gameCard == null) {
+    if (gameCard.isHidden()) {
         CardReverse(paddingValues)
     } else {
         CardObverse(gameCard, paddingValues)
@@ -66,6 +68,7 @@ fun CardObverse(
             .border(2.dp, Color.Black, CARD_SHAPE),
         shape = CARD_SHAPE
     ) {
+        Icon(painterResource(id = gameCard.suit.resId), "TODO")
         Text(
             text = gameCard.toString(),
             modifier = Modifier

@@ -34,8 +34,8 @@ object GameState {
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var thisPlayer: Player = Player("", "")
-    var gameCard1: GameCard? = null
-    var gameCard2: GameCard? = null
+    var gameCard1: GameCard = GameCard.none()
+    var gameCard2: GameCard = GameCard.none()
     val cards = Array<GameCard?>(CARDS_ON_TABLE) { null }
     var winningsPool = 0
 
@@ -414,8 +414,8 @@ object GameState {
         startingFunds = -1
         smallBlind = -1
         thisPlayer = Player("", "")
-        gameCard1 = null
-        gameCard2 = null
+        gameCard1 = GameCard.none()
+        gameCard2 = GameCard.none()
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -500,8 +500,8 @@ object GameState {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun startGame(card1: String, card2: String, playersString: String) {
-        gameCard1 = GameCard(card1.slice(0..1), card1.slice(2..2))
-        gameCard2 = GameCard(card2.slice(0..1), card2.slice(2..2))
+        gameCard1 = GameCard.fromString(card1)
+        gameCard2 = GameCard.fromString(card2)
         players.forEach { it.funds = startingFunds }
 
         val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)
