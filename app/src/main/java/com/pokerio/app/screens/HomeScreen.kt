@@ -39,8 +39,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.pokerio.app.R
-import com.pokerio.app.components.CardView
-import com.pokerio.app.utils.GameCard
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.UnitUnitProvider
 
@@ -56,7 +54,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CardView(gameCard = GameCard.fromString("09K"))
         StartGameCard(navigateToLobby = navigateToLobby)
         BottomRow(navigateToSettings = navigateToSettings)
     }

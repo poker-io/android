@@ -89,7 +89,7 @@ fun CardObverse(
             )
             Icon(
                 painter = painterResource(id = gameCard.suit.resId),
-                contentDescription = "TODO",
+                contentDescription = gameCard.suit.toString(),
                 modifier = Modifier
                     .width(CARD_WIDTH * 1 / 2)
                     .height(CARD_WIDTH * 1 / 2),
