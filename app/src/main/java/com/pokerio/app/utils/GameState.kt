@@ -21,7 +21,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://10.0.2.2:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -36,7 +36,7 @@ object GameState {
     var thisPlayer: Player = Player("", "")
     var gameCard1: GameCard = GameCard.none()
     var gameCard2: GameCard = GameCard.none()
-    val cards = Array<GameCard?>(CARDS_ON_TABLE) { null }
+    val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
     var winningsPool = 0
 
     // Callbacks

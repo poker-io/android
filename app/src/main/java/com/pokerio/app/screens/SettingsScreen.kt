@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -30,12 +31,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -201,7 +212,52 @@ fun SettingsScreen(
                 initialValue = smallBlind.toFloat()
             )
         }
+        Credits()
     }
+}
+
+@Composable
+fun Credits() {
+    if (GameState.isInGame()) {
+        return
+    }
+
+    val uriHandler = LocalUriHandler.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.credit_arthur_camara),
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp,
+            fontStyle = FontStyle.Italic,
+            color = Color.Gray
+        )
+        ClickableText(
+            text = buildLink("https://arthurcamara.co/", MaterialTheme.colorScheme.primary),
+            onClick = {
+                uriHandler.openUri("https://arthurcamara.co/")
+            }
+        )
+    }
+}
+
+fun buildLink(
+    link: String,
+    color: Color,
+    sp: TextUnit = 10.sp
+): AnnotatedString = buildAnnotatedString {
+    pushStringAnnotation(tag = link, annotation = link)
+    withStyle(
+        style = SpanStyle(color = color, textDecoration = TextDecoration.Underline, fontSize = sp)
+    ) {
+        append(link)
+    }
+    pop()
 }
 
 @Preview
