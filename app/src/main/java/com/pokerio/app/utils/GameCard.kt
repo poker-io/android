@@ -15,6 +15,16 @@ class GameCard private constructor(val suit: Suit, val value: Int) {
         return suit == Suit.None
     }
 
+    fun valueString(): String {
+        return when (value) {
+            ACE -> "A"
+            JACK -> "J"
+            QUEEN -> "Q"
+            KING -> "K"
+            else -> value.toString()
+        }
+    }
+
     override fun toString(): String = suit.toString() + value
 
     companion object {
@@ -24,7 +34,12 @@ class GameCard private constructor(val suit: Suit, val value: Int) {
         private const val SUIT_START = 2
         private const val SUIT_END = 2
         private const val MIN_VALUE = 1
-        private const val MAX_VALUE = 12
+        private const val MAX_VALUE = 13
+
+        private const val ACE = 1
+        private const val JACK = 11
+        private const val QUEEN = 12
+        private const val KING = 13
 
         private const val HEART = "K"
         private const val DIAMOND = "O"

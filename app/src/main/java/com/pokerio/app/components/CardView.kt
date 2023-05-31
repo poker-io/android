@@ -17,9 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pokerio.app.utils.GameCard
@@ -27,6 +30,8 @@ import com.pokerio.app.utils.GameCard
 val CARD_WIDTH = 57.dp
 val CARD_HEIGHT = 80.dp
 val CARD_SHAPE = RoundedCornerShape(6.dp)
+
+const val UPSIDE_DOWN = 180f
 
 @Composable
 @Preview
@@ -51,7 +56,8 @@ fun CardReverse(
             .height(CARD_HEIGHT)
             .width(CARD_WIDTH)
             .border(1.dp, Color.Gray, CARD_SHAPE)
-            .padding(6.dp),
+            .padding(6.dp)
+            .testTag("card_reverse"),
         colors = CardDefaults.cardColors(
             containerColor = Color.Red
         ),
@@ -72,7 +78,8 @@ fun CardObverse(
             .padding(paddingValues)
             .height(CARD_HEIGHT)
             .width(CARD_WIDTH)
-            .border(1.dp, Color.Gray, CARD_SHAPE),
+            .border(1.dp, Color.Gray, CARD_SHAPE)
+            .testTag("card_obverse"),
         shape = CARD_SHAPE
     ) {
         Column(
@@ -81,8 +88,9 @@ fun CardObverse(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = gameCard.value.toString(),
-                textAlign = TextAlign.Left,
+                text = gameCard.valueString(),
+                textAlign = TextAlign.Start,
+                textDecoration = TextDecoration.Underline,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
@@ -96,11 +104,13 @@ fun CardObverse(
                 tint = Color.Unspecified
             )
             Text(
-                text = gameCard.value.toString(),
-                textAlign = TextAlign.Right,
+                text = gameCard.valueString(),
+                textAlign = TextAlign.Start,
+                textDecoration = TextDecoration.Underline,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
+                    .rotate(UPSIDE_DOWN)
             )
         }
     }
