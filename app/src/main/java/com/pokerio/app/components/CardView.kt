@@ -1,8 +1,11 @@
 package com.pokerio.app.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -12,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -46,7 +50,7 @@ fun CardReverse(
             .padding(paddingValues)
             .height(CARD_HEIGHT)
             .width(CARD_WIDTH)
-            .border(2.dp, Color.Black, CARD_SHAPE)
+            .border(1.dp, Color.Gray, CARD_SHAPE)
             .padding(6.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Red
@@ -61,19 +65,43 @@ fun CardObverse(
     paddingValues: PaddingValues
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
         modifier = Modifier
             .padding(paddingValues)
             .height(CARD_HEIGHT)
             .width(CARD_WIDTH)
-            .border(2.dp, Color.Black, CARD_SHAPE),
+            .border(1.dp, Color.Gray, CARD_SHAPE),
         shape = CARD_SHAPE
     ) {
-        Icon(painterResource(id = gameCard.suit.resId), "TODO")
-        Text(
-            text = gameCard.toString(),
-            modifier = Modifier
-                .fillMaxSize(),
-            textAlign = TextAlign.Center
-        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = gameCard.value.toString(),
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp)
+            )
+            Icon(
+                painter = painterResource(id = gameCard.suit.resId),
+                contentDescription = "TODO",
+                modifier = Modifier
+                    .width(CARD_WIDTH * 1 / 2)
+                    .height(CARD_WIDTH * 1 / 2),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = gameCard.value.toString(),
+                textAlign = TextAlign.Right,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp)
+            )
+        }
     }
 }
