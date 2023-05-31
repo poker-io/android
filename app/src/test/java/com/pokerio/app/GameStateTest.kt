@@ -148,8 +148,8 @@ class GameStateTest {
         GameState.smallBlind = 123123
         GameState.thisPlayer.isAdmin = true
         GameState.onGameReset = onResetState
-        GameState.gameCard1 = GameCard("E", "E")
-        GameState.gameCard2 = GameCard("E", "E")
+        GameState.gameCard1 = GameCard.none()
+        GameState.gameCard2 = GameCard.none()
 
         GameState.resetGameState()
         assertTrue("gameID not reset", GameState.gameID.isEmpty())
@@ -158,8 +158,8 @@ class GameStateTest {
         assertTrue("smallBlind not reset", GameState.smallBlind == -1)
         assertFalse("isPlayerAdmin not reset", GameState.thisPlayer.isAdmin)
         assertTrue("onGameReset not called", resetCalled)
-        assertTrue("card1 not reset", GameState.gameCard1 == null)
-        assertTrue("card2 not reset", GameState.gameCard2 == null)
+        assertTrue("card1 not reset", GameState.gameCard1.isNone())
+        assertTrue("card2 not reset", GameState.gameCard2.isNone())
     }
 
     @Test
@@ -363,8 +363,10 @@ class GameStateTest {
         assert(GameState.players[0].playerID == thisPlayerID)
         assert(GameState.players[1].nickname == playerNickname)
         assert(GameState.players[1].playerID == playerID)
-        assert(GameState.gameCard1.toString() == "01T")
-        assert(GameState.gameCard2.toString() == "02T")
+        assert(GameState.gameCard1.suit == GameCard.Suit.Club)
+        assert(GameState.gameCard1.value == 1)
+        assert(GameState.gameCard2.suit == GameCard.Suit.Club)
+        assert(GameState.gameCard2.value == 2)
         assert(onGameStartedCalled == 1)
     }
 

@@ -1,5 +1,6 @@
 package com.pokerio.app
 
+import com.pokerio.app.utils.GameCard
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import org.junit.After
@@ -131,8 +132,10 @@ class FirebaseMessagesTest {
         assert(GameState.players[0].playerID == thisPlayerID)
         assert(GameState.players[1].nickname == playerNickname)
         assert(GameState.players[1].playerID == playerID)
-        assert(GameState.gameCard1.toString() == "01T")
-        assert(GameState.gameCard2.toString() == "02T")
+        assert(GameState.gameCard1.suit == GameCard.Suit.Club)
+        assert(GameState.gameCard1.value == 1)
+        assert(GameState.gameCard2.suit == GameCard.Suit.Club)
+        assert(GameState.gameCard2.value == 2)
         assert(onGameStartedCalled == 1)
     }
 

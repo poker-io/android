@@ -34,7 +34,7 @@ fun CardView(
     gameCard: GameCard = GameCard.none(),
     paddingValues: PaddingValues = PaddingValues(4.dp)
 ) {
-    if (gameCard.isHidden()) {
+    if (gameCard.isNone()) {
         CardReverse(paddingValues)
     } else {
         CardObverse(gameCard, paddingValues)
