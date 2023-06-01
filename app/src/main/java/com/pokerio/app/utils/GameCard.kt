@@ -25,6 +25,10 @@ class GameCard private constructor(val suit: Suit, val value: Int) {
         }
     }
 
+    fun shouldUnderline(): Boolean {
+        return value == UNDERLINE_6 || value == UNDERLINE_9
+    }
+
     override fun toString(): String = suit.toString() + value
 
     companion object {
@@ -45,6 +49,9 @@ class GameCard private constructor(val suit: Suit, val value: Int) {
         private const val DIAMOND = "O"
         private const val CLUB = "T"
         private const val SPADE = "P"
+
+        private const val UNDERLINE_6 = 6
+        private const val UNDERLINE_9 = 9
 
         fun fromString(string: String): GameCard {
             require(string.length == STRING_LENGTH)

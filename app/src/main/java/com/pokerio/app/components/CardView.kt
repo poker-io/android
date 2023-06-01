@@ -70,6 +70,9 @@ fun CardObverse(
     gameCard: GameCard,
     paddingValues: PaddingValues
 ) {
+    val numberDecoration =
+        if (gameCard.shouldUnderline()) TextDecoration.Underline else TextDecoration.None
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -90,7 +93,7 @@ fun CardObverse(
             Text(
                 text = gameCard.valueString(),
                 textAlign = TextAlign.Start,
-                textDecoration = TextDecoration.Underline,
+                textDecoration = numberDecoration,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
@@ -106,7 +109,7 @@ fun CardObverse(
             Text(
                 text = gameCard.valueString(),
                 textAlign = TextAlign.Start,
-                textDecoration = TextDecoration.Underline,
+                textDecoration = numberDecoration,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
