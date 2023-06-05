@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import java.io.IOException
 import java.net.URL
 import java.security.MessageDigest
 import kotlin.jvm.Throws
@@ -188,7 +187,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to modify game, reason: $e")
             onError()
         }
@@ -211,7 +210,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to kick player, reason: $e")
             onError()
         }
@@ -234,7 +233,7 @@ object GameState {
 
             resetGameState()
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to leave game, reason: $e")
             onError()
         }
@@ -256,7 +255,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to start game, reason: $e")
             onError()
         }
@@ -278,7 +277,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action call during gameplay failed, reason: $e")
             onError()
         }
@@ -314,7 +313,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action check during gameplay failed, reason: $e")
             onError()
         }
@@ -346,7 +345,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action raise during gameplay failed, reason: $e")
             onError()
         }
@@ -380,7 +379,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action fold during gameplay failed, reason: $e")
             onError()
         }
