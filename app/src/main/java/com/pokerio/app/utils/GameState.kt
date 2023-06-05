@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import java.io.IOException
 import java.net.URL
 import java.security.MessageDigest
 import kotlin.jvm.Throws
@@ -21,7 +20,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    private const val BASE_URL = "http://192.168.86.30:42069"
+    private const val BASE_URL = "http://158.101.160.143:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -34,9 +33,9 @@ object GameState {
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var thisPlayer: Player = Player("", "")
-    var gameCard1: GameCard? = null
-    var gameCard2: GameCard? = null
-    val cards = Array<GameCard?>(CARDS_ON_TABLE) { null }
+    var gameCard1: GameCard = GameCard.none()
+    var gameCard2: GameCard = GameCard.none()
+    val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
     var winningsPool = 0
 
     // Callbacks
@@ -188,7 +187,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to modify game, reason: $e")
             onError()
         }
@@ -211,7 +210,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to kick player, reason: $e")
             onError()
         }
@@ -234,7 +233,7 @@ object GameState {
 
             resetGameState()
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to leave game, reason: $e")
             onError()
         }
@@ -256,7 +255,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Failed to start game, reason: $e")
             onError()
         }
@@ -272,13 +271,13 @@ object GameState {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
             // Prepare url
-            val urlString = "/actionCall?playerToken={$myID}&gameId=$gameID"
+            val urlString = "/actionCall?playerToken=$myID&gameId=$gameID"
             val url = URL(baseUrl + urlString)
 
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action call during gameplay failed, reason: $e")
             onError()
         }
@@ -314,7 +313,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action check during gameplay failed, reason: $e")
             onError()
         }
@@ -346,7 +345,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action raise during gameplay failed, reason: $e")
             onError()
         }
@@ -380,7 +379,7 @@ object GameState {
             url.readText()
 
             onSuccess()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             PokerioLogger.error("Action fold during gameplay failed, reason: $e")
             onError()
         }
@@ -414,8 +413,8 @@ object GameState {
         startingFunds = -1
         smallBlind = -1
         thisPlayer = Player("", "")
-        gameCard1 = null
-        gameCard2 = null
+        gameCard1 = GameCard.none()
+        gameCard2 = GameCard.none()
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -500,8 +499,8 @@ object GameState {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun startGame(card1: String, card2: String, playersString: String) {
-        gameCard1 = GameCard(card1.slice(0..1), card1.slice(2..2))
-        gameCard2 = GameCard(card2.slice(0..1), card2.slice(2..2))
+        gameCard1 = GameCard.fromString(card1)
+        gameCard2 = GameCard.fromString(card2)
         players.forEach { it.funds = startingFunds }
 
         val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)

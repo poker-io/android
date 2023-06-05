@@ -11,18 +11,24 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        when (message.data["type"]) {
-            PLAYER_JOINED -> playerJoined(message.data)
-            SETTINGS_UPDATED -> settingsUpdated(message.data)
-            PLAYER_KICKED -> playerKicked(message.data)
-            PLAYER_LEFT -> playerLeft(message.data)
-            START_GAME -> startGame(message.data)
-            ACTION_FOLD -> actionFold(message.data)
-            ACTION_RAISE -> actionRaise(message.data)
-            ACTION_CHECK -> actionCheck(message.data)
-            ACTION_CALL -> actionCall(message.data)
-            ACTION_WON -> actionWon(message.data)
-            else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
+        val type = message.data["type"]
+        try {
+            when (type) {
+                PLAYER_JOINED -> playerJoined(message.data)
+                SETTINGS_UPDATED -> settingsUpdated(message.data)
+                PLAYER_KICKED -> playerKicked(message.data)
+                PLAYER_LEFT -> playerLeft(message.data)
+                START_GAME -> startGame(message.data)
+                ACTION_FOLD -> actionFold(message.data)
+                ACTION_RAISE -> actionRaise(message.data)
+                ACTION_CHECK -> actionCheck(message.data)
+                ACTION_CALL -> actionCall(message.data)
+                ACTION_WON -> actionWon(message.data)
+                else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
+            }
+        } catch (e: Exception) {
+            PokerioLogger.error("Exception occurred while processing '$type' firebase message")
+            e.message?.let { PokerioLogger.error(it) }
         }
     }
 
