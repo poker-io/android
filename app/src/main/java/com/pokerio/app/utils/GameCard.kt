@@ -1,6 +1,7 @@
 package com.pokerio.app.utils
 
 import com.pokerio.app.R
+import kotlin.jvm.Throws
 
 class GameCard private constructor(val suit: Suit, val value: Int) {
     enum class Suit(val resId: Int) {
@@ -53,6 +54,7 @@ class GameCard private constructor(val suit: Suit, val value: Int) {
         private const val UNDERLINE_6 = 6
         private const val UNDERLINE_9 = 9
 
+        @Throws(IllegalArgumentException::class)
         fun fromString(string: String): GameCard {
             require(string.length == STRING_LENGTH)
 
