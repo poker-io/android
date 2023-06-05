@@ -5,6 +5,9 @@ import com.google.firebase.messaging.RemoteMessage
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PokerioLogger
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -24,6 +27,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
                 ACTION_CHECK -> actionCheck(message.data)
                 ACTION_CALL -> actionCall(message.data)
                 ACTION_WON -> actionWon(message.data)
+                NEW_CARDS -> newCards(message.data)
                 else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
             }
         } catch (e: Exception) {
@@ -48,6 +52,7 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         const val ACTION_CHECK = "check"
         const val ACTION_CALL = "call"
         const val ACTION_WON = "won"
+        const val NEW_CARDS = "newCards"
 
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
@@ -111,6 +116,12 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         fun actionWon(data: Map<String, String>) {
             PokerioLogger.debug("Received won FCM message")
             GameState.handleActionWon(data["player"]!!)
+        }
+
+        @OptIn(ExperimentalSerializationApi::class)
+        fun newCards(data: Map<String, String>) {
+            PokerioLogger.debug("Received newCards FCM message")
+            GameState.newCards(Json.decodeFromString(data["cards"]!!))
         }
     }
 }

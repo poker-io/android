@@ -20,7 +20,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    private const val BASE_URL = "http://158.101.160.143:42069"
+    private const val BASE_URL = "http://10.0.2.2:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -45,7 +45,7 @@ object GameState {
     private val playerJoinedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val playerRemovedCallbacks = HashMap<Int, (Player) -> Unit>()
     private val settingsChangedCallbacks = HashMap<Int, () -> Unit>()
-    private val newActionCallbacks = HashMap<Int, (Player) -> Unit>()
+    private val newActionCallbacks = HashMap<Int, (Player?) -> Unit>()
     private var nextId = 0
 
     // Methods
@@ -453,7 +453,7 @@ object GameState {
         newActionCallbacks.remove(id)
     }
 
-    fun addOnNewActionCallback(callback: (Player) -> Unit): Int {
+    fun addOnNewActionCallback(callback: (Player?) -> Unit): Int {
         newActionCallbacks[nextId] = callback
         return nextId++
     }
@@ -525,6 +525,17 @@ object GameState {
         players[bigBlindIndex].funds -= smallBlind * 2
 
         onGameStart()
+    }
+
+    fun newCards(newCards: Array<String>) {
+        var index = cards.indexOfFirst { it.isNone() }
+
+        newCards.forEach {
+            cards[index] = GameCard.fromString(it)
+            index++
+        }
+
+        newActionCallbacks.forEach { it.value(null) }
     }
 
     fun sha256(string: String): String {
