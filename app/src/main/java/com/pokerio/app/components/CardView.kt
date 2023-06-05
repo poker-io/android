@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -30,6 +31,7 @@ import com.pokerio.app.utils.GameCard
 val CARD_WIDTH = 57.dp
 val CARD_HEIGHT = 80.dp
 val CARD_SHAPE = RoundedCornerShape(6.dp)
+val ICON_SIZE = CARD_WIDTH * 1 / 2
 
 const val UPSIDE_DOWN = 180f
 
@@ -102,8 +104,7 @@ fun CardObverse(
                 painter = painterResource(id = gameCard.suit.resId),
                 contentDescription = gameCard.suit.toString(),
                 modifier = Modifier
-                    .width(CARD_WIDTH * 1 / 2)
-                    .height(CARD_WIDTH * 1 / 2),
+                    .size(ICON_SIZE),
                 tint = Color.Unspecified
             )
             Text(

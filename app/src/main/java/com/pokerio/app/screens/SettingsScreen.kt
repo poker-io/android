@@ -223,6 +223,7 @@ fun Credits() {
     }
 
     val uriHandler = LocalUriHandler.current
+    val camaraLink = stringResource(R.string.camara_link)
 
     Column(
         modifier = Modifier
@@ -231,16 +232,16 @@ fun Credits() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.credit_arthur_camara),
+            text = stringResource(R.string.camara_credit),
             textAlign = TextAlign.Center,
             fontSize = 10.sp,
             fontStyle = FontStyle.Italic,
             color = Color.Gray
         )
         ClickableText(
-            text = buildLink("https://arthurcamara.co/", MaterialTheme.colorScheme.primary),
+            text = buildLink(camaraLink, MaterialTheme.colorScheme.primary),
             onClick = {
-                uriHandler.openUri("https://arthurcamara.co/")
+                uriHandler.openUri(camaraLink)
             }
         )
     }
