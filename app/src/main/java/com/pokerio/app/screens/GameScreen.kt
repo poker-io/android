@@ -92,10 +92,10 @@ fun GameScreen() {
             GameState.players.forEach {
                 PlayerView(it)
             }
-            Column {
-                Text(stringResource(R.string.winnings_pool) + ": ${GameState.winningsPool}")
-                Text("DEBUG: $debugNumberOfActions")
-            }
+//            Column {
+//                Text(stringResource(R.string.winnings_pool) + ": ${GameState.winningsPool}")
+//                Text("DEBUG: $debugNumberOfActions")
+//            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
