@@ -422,6 +422,7 @@ object GameState {
         newActionCallbacks.clear()
         // Not resetting nextId, because someone might be holding on to an old one and we don't
         // want then to remove new callbacks by mistake
+        cards.fill(GameCard.none())
 
         onGameReset()
     }
@@ -527,7 +528,7 @@ object GameState {
         onGameStart()
     }
 
-    fun newCards(newCards: Array<String>) {
+    fun newCards(newCards: List<String>) {
         var index = cards.indexOfFirst { it.isNone() }
 
         newCards.forEach {

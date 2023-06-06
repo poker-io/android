@@ -261,6 +261,23 @@ class FirebaseMessagesTest {
         assert(onWonCalled == 1)
     }
 
+    @Test
+    fun handleActionNewCardTest() {
+        val card1 = "01T"
+        val card2 = "02O"
+
+        val map = HashMap<String, String>()
+        map["cards"] = "[\"$card1\", \"$card2\"]"
+
+        PokerioFirebaseMessagingService.newCards(map)
+
+        assert(GameState.cards[0].valueString() == GameCard.fromString(card1).valueString())
+        assert(GameState.cards[1].valueString() == GameCard.fromString(card2).valueString())
+        assert(GameState.cards[2].isNone())
+        assert(GameState.cards[3].isNone())
+        assert(GameState.cards[4].isNone())
+    }
+
     @After
     fun tearDown() {
         // Clean up after each test

@@ -151,6 +151,7 @@ class GameStateTest {
         GameState.onGameReset = onResetState
         GameState.gameCard1 = GameCard.none()
         GameState.gameCard2 = GameCard.none()
+        GameState.cards[0] = GameCard.fromString("01K")
 
         GameState.resetGameState()
         assertTrue("gameID not reset", GameState.gameID.isEmpty())
@@ -161,6 +162,7 @@ class GameStateTest {
         assertTrue("onGameReset not called", resetCalled)
         assertTrue("card1 not reset", GameState.gameCard1.isNone())
         assertTrue("card2 not reset", GameState.gameCard2.isNone())
+        assertTrue("cards array not reset", GameState.cards[0].isNone())
     }
 
     @Test
@@ -382,6 +384,54 @@ class GameStateTest {
         GameState.addPlayer(Player("test3", "testHash3", bet = 102))
 
         assert(GameState.getMaxBet() == 102)
+    }
+
+    @Test
+    fun newCardsTest() {
+        val card1 = "01K"
+        val card2 = "12O"
+        val card3 = "08T"
+        val card4 = "04P"
+        val card5 = "09O"
+
+        // Second round
+        val cardsArray = mutableListOf<String>()
+        cardsArray.clear()
+        cardsArray.add(card1)
+        cardsArray.add(card2)
+        cardsArray.add(card3)
+
+        GameState.newCards(cardsArray)
+
+        assert(GameState.cards[0].valueString() == GameCard.fromString(card1).valueString())
+        assert(GameState.cards[1].valueString() == GameCard.fromString(card2).valueString())
+        assert(GameState.cards[2].valueString() == GameCard.fromString(card3).valueString())
+        assert(GameState.cards[3].isNone())
+        assert(GameState.cards[4].isNone())
+
+        // Third round
+        cardsArray.clear()
+        cardsArray.add(card4)
+
+        GameState.newCards(cardsArray)
+
+        assert(GameState.cards[0].valueString() == GameCard.fromString(card1).valueString())
+        assert(GameState.cards[1].valueString() == GameCard.fromString(card2).valueString())
+        assert(GameState.cards[2].valueString() == GameCard.fromString(card3).valueString())
+        assert(GameState.cards[3].valueString() == GameCard.fromString(card4).valueString())
+        assert(GameState.cards[4].isNone())
+
+        // Last round
+        cardsArray.clear()
+        cardsArray.add(card5)
+
+        GameState.newCards(cardsArray)
+
+        assert(GameState.cards[0].valueString() == GameCard.fromString(card1).valueString())
+        assert(GameState.cards[1].valueString() == GameCard.fromString(card2).valueString())
+        assert(GameState.cards[2].valueString() == GameCard.fromString(card3).valueString())
+        assert(GameState.cards[3].valueString() == GameCard.fromString(card4).valueString())
+        assert(GameState.cards[4].valueString() == GameCard.fromString(card5).valueString())
     }
 
     @Test
