@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 
 class PokerioFirebaseMessagingService : FirebaseMessagingService() {
 
+    @Suppress("complexity.CyclomaticComplexMethod")
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
