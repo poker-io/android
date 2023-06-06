@@ -119,9 +119,10 @@ class GameStateTest {
         GameState.addPlayer(Player(playerNickname, playerID))
 
         var onNewActionCalled = 0
-        val onNewAction = { player: Player ->
+        val onNewAction = { player: Player? ->
             onNewActionCalled++
 
+            require(player != null)
             assert(player.nickname == playerNickname)
             assert(player.playerID == playerID)
         }
