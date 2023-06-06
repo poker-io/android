@@ -1,6 +1,5 @@
 package com.pokerio.app.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -59,7 +57,6 @@ fun PlayerView(
             MaterialTheme.colorScheme.secondaryContainer
         }
 
-
     Column(
         modifier = Modifier
             .width(100.dp)
@@ -70,7 +67,7 @@ fun PlayerView(
             shape = PLAYER_VIEW_CARD_SHAPE,
             colors = CardDefaults.cardColors(
                 containerColor = cardColor
-            ),
+            )
         ) {
             Column(
                 modifier = Modifier.padding(1.dp)
