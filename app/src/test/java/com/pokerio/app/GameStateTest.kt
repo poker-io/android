@@ -383,6 +383,14 @@ class GameStateTest {
         assert(GameState.getMaxBet() == 102)
     }
 
+    @Test
+    fun checkIfServerAddressCorrect() {
+        // We change this all the time for testing locally. Let's just make sure it is correct, when
+        // we want to merge into main
+
+        assert(GameState.BASE_URL == "http://158.101.160.143:42069")
+    }
+
     @After
     fun tearDown() {
         // Clean up after each test
