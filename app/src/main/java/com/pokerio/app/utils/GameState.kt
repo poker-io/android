@@ -31,6 +31,7 @@ object GameState {
     // Class fields
     var gameID = ""
     val players = mutableStateListOf<Player>()
+
 //    val _players: List<Player> = players
     var startingFunds: Int = -1
     var smallBlind: Int = -1
@@ -529,13 +530,13 @@ object GameState {
         players[bigBlindIndex].funds -= smallBlind * 2
 
         addOnNewActionCallback {
-           var index = players.indexOfFirst { player: Player -> player == currentPlayer }
-            if (index != -1){
+            var index = players.indexOfFirst { player: Player -> player == currentPlayer }
+            if (index != -1) {
                 index = (index + 1) % players.size
-                while(players[index] != currentPlayer) {
+                while (players[index] != currentPlayer) {
                     if (!players[index].folded) {
-                       currentPlayer = players[index]
-                       break;
+                        currentPlayer = players[index]
+                        break
                     }
                     index = (index + 1) % players.size
                 }
@@ -568,14 +569,16 @@ object GameState {
     }
 
     fun getSmallBlindPlayerID(): String? {
-        if(players.size < 2)
+        if (players.size < 2) {
             return null
+        }
         return players[players.size - 2].playerID
     }
 
     fun getBigBlindPlayerID(): String? {
-        if(players.size < 2)
+        if (players.size < 2) {
             return null
+        }
         PokerioLogger.debug("getSmallBlindPlayer called ")
         PokerioLogger.debug(players[players.size - 1].playerID)
         return players[players.size - 1].playerID

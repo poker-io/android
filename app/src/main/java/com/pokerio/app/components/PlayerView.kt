@@ -1,24 +1,21 @@
 package com.pokerio.app.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -32,9 +29,6 @@ import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PlayerProvider
-import com.pokerio.app.utils.PokerioLogger
-import com.pokerio.app.utils.ThemeUtils
-
 
 val TEXT_MODIFIER = Modifier.padding(2.dp)
 val AMOUNT_SIZE = 11.sp
@@ -57,33 +51,26 @@ fun PlayerView(
     val smallBlindColor = MaterialTheme.colorScheme.tertiary
     val bigBlindColor = MaterialTheme.colorScheme.onTertiaryContainer
     val cardColor =
-        if (player == GameState.currentPlayer)
+        if (player == GameState.currentPlayer) {
             MaterialTheme.colorScheme.primary
-        else if (player.folded)
+        } else if (player.folded) {
             Color.LightGray
-        else
+        } else {
             MaterialTheme.colorScheme.secondaryContainer
+        }
 
-    val borderColor =
-        if (player.isSmallBlind())
-            smallBlindColor
-        else if (player.isBigBlind())
-            bigBlindColor
-        else
-            cardColor
 
     Column(
         modifier = Modifier
             .width(100.dp)
             .padding(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             shape = PLAYER_VIEW_CARD_SHAPE,
             colors = CardDefaults.cardColors(
                 containerColor = cardColor
             ),
-            border = BorderStroke(1.dp, borderColor)
         ) {
             Column(
                 modifier = Modifier.padding(1.dp)
@@ -100,8 +87,7 @@ fun PlayerView(
                         text = player.nickname,
                         modifier = TEXT_MODIFIER,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-//                        color = nickColor
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 Card(
@@ -154,13 +140,13 @@ fun PlayerView(
                 }
             }
         }
-        if (player.isSmallBlind()){
+        if (player.isSmallBlind()) {
             Text(
                 modifier = Modifier.align(CenterHorizontally),
                 text = stringResource(R.string.small_blind),
                 color = smallBlindColor
             )
-        } else if (player.isBigBlind()){
+        } else if (player.isBigBlind()) {
             Text(
                 modifier = Modifier.align(CenterHorizontally),
                 text = stringResource(R.string.big_blind),
