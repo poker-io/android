@@ -1,6 +1,7 @@
 package com.pokerio.app.utils
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import com.google.firebase.messaging.FirebaseMessaging
 import com.pokerio.app.R
 import kotlinx.coroutines.CoroutineScope
@@ -29,10 +30,12 @@ object GameState {
 
     // Class fields
     var gameID = ""
-    val players = mutableListOf<Player>()
+    val players = mutableStateListOf<Player>()
+//    val _players: List<Player> = players
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var thisPlayer: Player = Player("", "")
+    var currentPlayer: Player = Player("", "")
     var gameCard1: GameCard = GameCard.none()
     var gameCard2: GameCard = GameCard.none()
     val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
@@ -517,12 +520,27 @@ object GameState {
         }
 
         players.sortBy { it.turn }
+        currentPlayer = players[0]
         val smallBlindIndex: Int = players.lastIndex - 1
         val bigBlindIndex: Int = players.lastIndex
         players[smallBlindIndex].bet = smallBlind
         players[smallBlindIndex].funds -= smallBlind
         players[bigBlindIndex].bet = smallBlind * 2
         players[bigBlindIndex].funds -= smallBlind * 2
+
+        addOnNewActionCallback {
+           var index = players.indexOfFirst { player: Player -> player == currentPlayer }
+            if (index != -1){
+                index = (index + 1) % players.size
+                while(players[index] != currentPlayer) {
+                    if (!players[index].folded) {
+                       currentPlayer = players[index]
+                       break;
+                    }
+                    index = (index + 1) % players.size
+                }
+            }
+        }
 
         onGameStart()
     }
@@ -547,6 +565,20 @@ object GameState {
     @Throws(NoSuchElementException::class)
     fun getMaxBet(): Int {
         return players.maxOf { it.bet }
+    }
+
+    fun getSmallBlindPlayerID(): String? {
+        if(players.size < 2)
+            return null
+        return players[players.size - 2].playerID
+    }
+
+    fun getBigBlindPlayerID(): String? {
+        if(players.size < 2)
+            return null
+        PokerioLogger.debug("getSmallBlindPlayer called ")
+        PokerioLogger.debug(players[players.size - 1].playerID)
+        return players[players.size - 1].playerID
     }
 }
 

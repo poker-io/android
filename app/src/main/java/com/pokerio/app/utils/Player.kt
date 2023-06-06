@@ -9,6 +9,15 @@ class Player(
     var folded: Boolean = false,
     var turn: Int = 0
 ) {
+    fun isSmallBlind(): Boolean {
+//        return true
+        return playerID == GameState.getSmallBlindPlayerID()
+    }
+
+    fun isBigBlind(): Boolean {
+        return playerID == GameState.getBigBlindPlayerID()
+    }
+
     companion object {
         const val MAX_NICKNAME_LEN = 20
 

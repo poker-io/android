@@ -21,11 +21,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,7 +51,10 @@ fun GameScreen() {
     val orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     val systemUiController = rememberSystemUiController()
     var raiseDialogOpen by remember { mutableStateOf(false) }
-    var debugNumberOfActions by remember { mutableStateOf(0) }
+    var actions by remember { mutableStateOf(0)}
+    var players by remember(key1 = actions) {
+        mutableStateOf(GameState.players.toList())
+    }
 
     DisposableEffect(orientation) {
         // Set orientation
@@ -62,9 +67,11 @@ fun GameScreen() {
         systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         // Setup callbacks
-        val callbackId = GameState.addOnNewActionCallback {
-            debugNumberOfActions++
-        }
+        val newActionCallbackId =
+            GameState.addOnNewActionCallback {
+                players = GameState.players.toList()
+                actions++
+            }
 
         GameState.onWon = { onWon(context, it) }
 
@@ -75,7 +82,7 @@ fun GameScreen() {
             systemUiController.setSystemUiVisible(true)
             systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
 
-            GameState.removeOnNewActionCallback(callbackId)
+            GameState.removeOnNewActionCallback(newActionCallbackId)
 
             GameState.onWon = {}
         }
@@ -89,7 +96,7 @@ fun GameScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            GameState.players.forEach {
+            players.forEach {
                 PlayerView(it)
             }
 //            Column {
