@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,6 +65,7 @@ fun PlayerView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
+            modifier = Modifier.testTag("player_"+player.nickname + "_card"),
             shape = PLAYER_VIEW_CARD_SHAPE,
             colors = CardDefaults.cardColors(
                 containerColor = cardColor
@@ -77,12 +79,12 @@ fun PlayerView(
                         .width(IntrinsicSize.Max)
                         .align(CenterHorizontally),
                     colors = CardDefaults.cardColors(
-                        containerColor = cardColor
+                        containerColor = Color.Transparent
                     )
                 ) {
                     Text(
                         text = player.nickname,
-                        modifier = TEXT_MODIFIER,
+                        modifier = TEXT_MODIFIER.testTag("nickname"),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -107,7 +109,7 @@ fun PlayerView(
                 ) {
                     Text(
                         text = "${player.funds}",
-                        modifier = Modifier.align(CenterHorizontally),
+                        modifier = Modifier.align(CenterHorizontally).testTag("funds"),
                         fontSize = AMOUNT_SIZE
                     )
                 }
@@ -131,7 +133,7 @@ fun PlayerView(
                 ) {
                     Text(
                         text = "${player.bet}",
-                        modifier = Modifier.align(CenterHorizontally),
+                        modifier = Modifier.align(CenterHorizontally).testTag("bet"),
                         fontSize = AMOUNT_SIZE
                     )
                 }

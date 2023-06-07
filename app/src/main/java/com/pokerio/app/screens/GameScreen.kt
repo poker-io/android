@@ -122,7 +122,7 @@ fun GameScreen() {
                     )
                     Text(
                         text = winningsPool.toString(),
-                        modifier = Modifier.padding(2.dp).align(CenterHorizontally)
+                        modifier = Modifier.padding(2.dp).align(CenterHorizontally).testTag("winnings_pool")
                     )
                 }
             }
