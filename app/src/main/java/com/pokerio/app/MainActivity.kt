@@ -5,7 +5,11 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -21,17 +25,25 @@ import com.pokerio.app.screens.InitialSetupScreen
 import com.pokerio.app.screens.LobbyScreen
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.Screens
 import com.pokerio.app.utils.ThemeUtils
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
+            val snackbarHostState = remember { SnackbarHostState() }
+            PokerioLogger.snackbarHostState = snackbarHostState
+
             AppTheme {
                 MainActivityComposable()
+                SnackbarHost(hostState = snackbarHostState) {
+                    Snackbar(snackbarData = it)
+                }
             }
         }
     }

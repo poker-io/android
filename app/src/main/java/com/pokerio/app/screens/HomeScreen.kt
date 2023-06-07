@@ -148,7 +148,7 @@ private fun StartGameCard(
 
 private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) {
     if (gameCode.isBlank()) {
-        PokerioLogger.displayMessage(context, context.getString(R.string.error_game_code_empty))
+        PokerioLogger.displayMessage(context.getString(R.string.error_game_code_empty))
         return
     }
 
@@ -157,7 +157,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.failed_join))
+        PokerioLogger.displayMessage(context.getString(R.string.failed_join))
     }
 
     GameState.launchTask {
@@ -167,7 +167,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.failed_create))
+        PokerioLogger.displayMessage(context.getString(R.string.failed_create))
     }
 
     GameState.launchTask {

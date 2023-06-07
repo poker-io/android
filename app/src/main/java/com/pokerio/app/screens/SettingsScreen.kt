@@ -117,7 +117,7 @@ fun SettingsScreen(
 
         // Unregister callback when we leave the view
         val onError = {
-            PokerioLogger.displayMessage(context, context.getString(R.string.failed_update))
+            PokerioLogger.displayMessage(context.getString(R.string.failed_update))
         }
 
         val onSuccess = {

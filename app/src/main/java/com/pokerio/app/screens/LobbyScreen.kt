@@ -216,7 +216,7 @@ private fun leaveGame(context: Context) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.failed_leave))
+        PokerioLogger.displayMessage(context.getString(R.string.failed_leave))
     }
 
     GameState.launchTask {
@@ -230,7 +230,7 @@ private fun startGame(context: Context) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.failed_start))
+        PokerioLogger.displayMessage(context.getString(R.string.failed_start))
     }
 
     GameState.launchTask {

@@ -204,7 +204,7 @@ private fun onCall(context: Context) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.call_failed))
+        PokerioLogger.displayMessage(context.getString(R.string.call_failed))
     }
 
     GameState.launchTask {
@@ -218,7 +218,7 @@ private fun onCheck(context: Context) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.check_failed))
+        PokerioLogger.displayMessage(context.getString(R.string.check_failed))
     }
 
     GameState.launchTask {
@@ -289,7 +289,7 @@ private fun onRaise(context: Context, newAmount: Int) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.raise_failed))
+        PokerioLogger.displayMessage(context.getString(R.string.raise_failed))
     }
 
     GameState.launchTask {
@@ -303,7 +303,7 @@ private fun onFold(context: Context) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.fold_failed))
+        PokerioLogger.displayMessage(context.getString(R.string.fold_failed))
     }
 
     GameState.launchTask {
@@ -312,7 +312,7 @@ private fun onFold(context: Context) {
 }
 
 private fun onWon(context: Context, player: Player) {
-    PokerioLogger.displayMessage(context, "${player.nickname} ${context.getString(R.string.won)}!")
+    PokerioLogger.displayMessage("${player.nickname} ${context.getString(R.string.won)}!")
 }
 
 private fun SystemUiController.setSystemUiVisible(value: Boolean) {

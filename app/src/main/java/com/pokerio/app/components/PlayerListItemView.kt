@@ -95,7 +95,7 @@ fun kickPlayer(context: Context, playerID: String) {
     }
 
     val onError = {
-        PokerioLogger.displayMessage(context, context.getString(R.string.failed_kick))
+        PokerioLogger.displayMessage(context.getString(R.string.failed_kick))
     }
 
     GameState.launchTask {
