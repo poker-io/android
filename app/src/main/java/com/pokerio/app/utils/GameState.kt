@@ -552,8 +552,7 @@ object GameState {
     }
 
     private fun getPlayer(id: String): Player {
-        val isThisPlayer = isThisPlayersId(id)
-        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == id }
+        val player = if (isThisPlayersId(id)) thisPlayer else players.find { it.playerID == id }
         requireNotNull(player)
 
         return player
