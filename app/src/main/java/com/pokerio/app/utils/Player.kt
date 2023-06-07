@@ -9,6 +9,18 @@ class Player(
     var folded: Boolean = false,
     var turn: Int = 0
 ) {
+    fun isSmallBlind(): Boolean {
+        return playerID == GameState.getSmallBlindPlayer().playerID
+    }
+
+    fun isBigBlind(): Boolean {
+        return playerID == GameState.getBigBlindPlayer().playerID
+    }
+
+    fun isNone(): Boolean {
+        return nickname == "" && playerID == ""
+    }
+
     companion object {
         const val MAX_NICKNAME_LEN = 20
 
@@ -26,6 +38,10 @@ class Player(
             returnNickname = returnNickname.replace(Regex("\\s+"), " ")
 
             return returnNickname
+        }
+
+        fun none(): Player {
+            return Player("", "")
         }
     }
 }

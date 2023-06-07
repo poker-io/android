@@ -61,7 +61,7 @@ class FirebaseMessagesTest {
         GameState.addPlayer(Player(playerNickname, playerId))
 
         val map = HashMap<String, String>()
-        map["playerHash"] = playerId
+        map["playerToken"] = playerId
 
         assert(GameState.players.size == 1)
         PokerioFirebaseMessagingService.playerKicked(map)
@@ -268,6 +268,9 @@ class FirebaseMessagesTest {
 
         val map = HashMap<String, String>()
         map["cards"] = "[\"$card1\", \"$card2\"]"
+        // Adding player so it can be considered a game
+        GameState.addPlayer(Player("test1", "test1"))
+        GameState.addPlayer(Player("test2", "test2"))
 
         PokerioFirebaseMessagingService.newCards(map)
 

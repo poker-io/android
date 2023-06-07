@@ -50,29 +50,19 @@ import com.pokerio.app.utils.UnitUnitProvider
 fun LobbyScreen(
     @PreviewParameter(UnitUnitProvider::class) navigateToSettings: () -> Unit
 ) {
-    var numberOfPlayers by remember { mutableStateOf(GameState.players.size) }
-    var funds by remember { mutableStateOf(GameState.startingFunds) }
-    var smallBlind by remember { mutableStateOf(GameState.smallBlind) }
+    var action by remember { mutableStateOf(0) }
+    val numberOfPlayers by remember(key1 = action) { mutableStateOf(GameState.players.size) }
+    val funds by remember(key1 = action) { mutableStateOf(GameState.startingFunds) }
+    val smallBlind by remember(key1 = action) { mutableStateOf(GameState.smallBlind) }
     val context = LocalContext.current
-    var isAdmin by remember { mutableStateOf(GameState.thisPlayer.isAdmin) }
+    val isAdmin by remember(key1 = action) { mutableStateOf(GameState.thisPlayer.isAdmin) }
 
     DisposableEffect(LocalLifecycleOwner.current) {
         // Sign-up for updates when a new player appears
-        val joinedCallbackId =
-            GameState.addOnPlayerJoinedCallback {
-                numberOfPlayers = GameState.players.size
-                isAdmin = GameState.thisPlayer.isAdmin
-            }
-        val removedCallbackId =
-            GameState.addOnPlayerRemovedCallback {
-                numberOfPlayers = GameState.players.size
-                isAdmin = GameState.thisPlayer.isAdmin
-            }
-        val callbackSettingsId =
-            GameState.addOnSettingsChangedCallback {
-                funds = GameState.startingFunds
-                smallBlind = GameState.smallBlind
-            }
+        val joinedCallbackId = GameState.addOnPlayerJoinedCallback { action++ }
+        val removedCallbackId = GameState.addOnPlayerRemovedCallback { action++ }
+        val callbackSettingsId = GameState.addOnSettingsChangedCallback { action++ }
+
         onDispose {
             // Unregister callback when we leave the view
             GameState.removeOnSettingsChangedCallback(callbackSettingsId)
@@ -141,6 +131,7 @@ fun PlayerList(
     numberOfPlayers: Int
 ) {
     val scrollState = rememberScrollState(0)
+    val checkedPlayerCount = minOf(numberOfPlayers, GameState.players.size)
 
     Column(
         modifier = Modifier
@@ -150,12 +141,12 @@ fun PlayerList(
     ) {
         for (i in 1..GameState.MAX_PLAYERS) {
             AnimatedVisibility(
-                visible = i <= numberOfPlayers,
+                visible = i <= checkedPlayerCount,
                 enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                 exit = scaleOut(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                 modifier = Modifier.padding(vertical = 6.dp)
             ) {
-                if (i <= numberOfPlayers) {
+                if (i <= checkedPlayerCount) {
                     PlayerListItemView(player = GameState.players[i - 1])
                 }
             }

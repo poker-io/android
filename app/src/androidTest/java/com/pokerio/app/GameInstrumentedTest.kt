@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -26,10 +28,12 @@ class GameInstrumentedTest {
         val playerHash1 = "testHash1"
         val playerNickname2 = "test2"
         val playerHash2 = "testHash2"
+        val winningsPool = 10000
 
         GameState.addPlayer(Player(playerNickname1, playerHash1))
         GameState.thisPlayer = Player(playerNickname2, playerHash2)
         GameState.addPlayer(GameState.thisPlayer)
+        GameState.winningsPool = winningsPool
 
         androidTestRule.activity.setContent {
             val activity = LocalContext.current as Activity
@@ -42,6 +46,9 @@ class GameInstrumentedTest {
         androidTestRule.onNodeWithTag("fold_button").performClick()
         androidTestRule.onNodeWithTag("check_button").performClick()
         androidTestRule.onNodeWithTag("raise_button").performClick()
+        val winningsPoolText = androidTestRule.onNodeWithTag("winnings_pool")
+        winningsPoolText.assertExists()
+        winningsPoolText.assert(hasText("$winningsPool$"))
         val raiseDialogCloseButton = androidTestRule.onNodeWithTag("raise_dialog_close")
         raiseDialogCloseButton.assertIsDisplayed()
         raiseDialogCloseButton.performClick()
