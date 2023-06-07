@@ -23,7 +23,7 @@ class Player(
             returnNickname = returnNickname.trimEnd(' ')
             returnNickname = returnNickname.trimStart(' ')
             // Do not allow double spaces
-            returnNickname = returnNickname.replace("  ", " ")
+            returnNickname = returnNickname.replace(Regex("\\s+"), " ")
 
             return returnNickname
         }
