@@ -284,11 +284,7 @@ object GameState {
     }
 
     fun handleActionCall(playerHash: String) {
-        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        requireNotNull(player)
-
+        val player = getPlayer(playerHash)
         val newBet = getMaxBet()
 
         player.funds -= (newBet - player.bet)
@@ -320,10 +316,7 @@ object GameState {
     }
 
     fun handleActionCheck(playerHash: String) {
-        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        requireNotNull(player)
+        val player = getPlayer(playerHash)
 
         newActionCallbacks.forEach { it.value(player) }
     }
@@ -352,10 +345,7 @@ object GameState {
     }
 
     fun handleActionRaise(playerHash: String, newAmount: Int) {
-        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        requireNotNull(player)
+        val player = getPlayer(playerHash)
 
         player.funds -= (newAmount - player.bet)
         player.bet = newAmount
@@ -386,10 +376,7 @@ object GameState {
     }
 
     fun handleActionFold(playerHash: String) {
-        val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        requireNotNull(player)
+        val player = getPlayer(playerHash)
 
         player.folded = true
         winningsPool += player.bet
@@ -399,16 +386,7 @@ object GameState {
 
     fun handleActionWon(winners: List<String>, amount: Int) {
         winners.forEach { playerHash ->
-            val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-            val player = if (isThisPlayer) {
-                thisPlayer
-            } else {
-                players.find {
-                    it.playerID == playerHash
-                }
-            }
-            requireNotNull(player)
+            val player = getPlayer(playerHash)
 
             player.funds += amount
             onWon(player)
@@ -493,23 +471,21 @@ object GameState {
             return
         }
 
-        val isThisPlayerRemoved = (playerHash == sha256(thisPlayer.playerID))
-        if (isThisPlayerRemoved) {
+        if (isThisPlayersId(playerHash)) {
             return resetGameState()
         }
 
-        val removedPlayer = players.find { it.playerID == playerHash }
-        requireNotNull(removedPlayer)
+        val removedPlayer = getPlayer(playerHash)
 
         if (removedPlayer.isAdmin) {
             requireNotNull(newAdmin)
-            val isThisPlayerNewAdmin = (newAdmin == sha256(thisPlayer.playerID))
+            val isThisPlayerNewAdmin = isThisPlayersId(newAdmin)
 
             if (isThisPlayerNewAdmin) {
                 thisPlayer.isAdmin = true
             } else {
-                val newAdminPlayer = players.find { it.playerID == newAdmin }
-                newAdminPlayer!!.isAdmin = true
+                val newAdminPlayer = getPlayer(newAdmin)
+                newAdminPlayer.isAdmin = true
             }
         }
 
@@ -526,13 +502,9 @@ object GameState {
         val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)
         playersJsonArray.forEach { playerWithTurnJson ->
             val playerWithTurn = Json.decodeFromString(PlayerWithTurnResponseSerializer, playerWithTurnJson.toString())
+            val player = getPlayer(playerWithTurn.playerHash)
 
-            if (sha256(thisPlayer.playerID) == playerWithTurn.playerHash) {
-                thisPlayer.turn = playerWithTurn.turn
-            } else {
-                val player = players.find { it.playerID == playerWithTurn.playerHash }!!
-                player.turn = playerWithTurn.turn
-            }
+            player.turn = playerWithTurn.turn
         }
 
         players.sortBy { it.turn }
@@ -577,6 +549,18 @@ object GameState {
     @Throws(NoSuchElementException::class)
     fun getMaxBet(): Int {
         return players.maxOf { it.bet }
+    }
+
+    private fun getPlayer(id: String): Player {
+        val isThisPlayer = isThisPlayersId(id)
+        val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == id }
+        requireNotNull(player)
+
+        return player
+    }
+
+    private fun isThisPlayersId(id: String): Boolean {
+        return id == sha256(thisPlayer.playerID)
     }
 }
 

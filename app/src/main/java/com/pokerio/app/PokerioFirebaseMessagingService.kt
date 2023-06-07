@@ -134,7 +134,6 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
         @OptIn(ExperimentalSerializationApi::class)
         fun endGame(data: Map<String, String>) {
             PokerioLogger.debug("Received gameEnd FCM message")
-            println(data["winners"])
             GameState.handleActionWon(
                 Json.decodeFromString(data["winners"]!!),
                 data["amount"]!!.toInt()
