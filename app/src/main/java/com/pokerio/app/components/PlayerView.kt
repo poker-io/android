@@ -33,14 +33,7 @@ val TEXT_MODIFIER = Modifier.padding(2.dp)
 val AMOUNT_SIZE = 11.sp
 val LABEL_SIZE = 10.sp
 
-// val NICK_BACKGROUND_COLOR = Color.
-val PLAYER_VIEW_CARD_SHAPE =
-    RoundedCornerShape(
-        topStart = 8.dp,
-        topEnd = 8.dp,
-        bottomStart = 8.dp,
-        bottomEnd = 8.dp
-    )
+val PLAYER_VIEW_CARD_SHAPE = RoundedCornerShape(8.dp)
 
 @Composable
 @Preview

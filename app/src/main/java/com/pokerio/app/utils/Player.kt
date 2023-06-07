@@ -10,11 +10,15 @@ class Player(
     var turn: Int = 0
 ) {
     fun isSmallBlind(): Boolean {
-        return playerID == GameState.getSmallBlindPlayer()?.playerID
+        return playerID == GameState.getSmallBlindPlayer().playerID
     }
 
     fun isBigBlind(): Boolean {
-        return playerID == GameState.getBigBlindPlayer()?.playerID
+        return playerID == GameState.getBigBlindPlayer().playerID
+    }
+
+    fun isNone(): Boolean {
+        return nickname == "" && playerID == ""
     }
 
     companion object {
@@ -34,6 +38,10 @@ class Player(
             returnNickname = returnNickname.replace(Regex("\\s+"), " ")
 
             return returnNickname
+        }
+
+        fun none(): Player {
+            return Player("", "")
         }
     }
 }

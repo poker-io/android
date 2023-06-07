@@ -152,6 +152,9 @@ class GameStateTest {
         GameState.gameCard1 = GameCard.none()
         GameState.gameCard2 = GameCard.none()
         GameState.cards[0] = GameCard.fromString("01K")
+        GameState.winningsPool = 1000
+        GameState.currentPlayer = Player("testPlayer", "hash")
+        GameState.previousRoundBet = 102
 
         GameState.resetGameState()
         assertTrue("gameID not reset", GameState.gameID.isEmpty())
@@ -163,6 +166,9 @@ class GameStateTest {
         assertTrue("card1 not reset", GameState.gameCard1.isNone())
         assertTrue("card2 not reset", GameState.gameCard2.isNone())
         assertTrue("cards array not reset", GameState.cards[0].isNone())
+        assertTrue("winnings pool array not reset", GameState.winningsPool == 0)
+        assertTrue("currentPlayer not reset", GameState.currentPlayer.isNone())
+        assertTrue("previous round bet not reset", GameState.previousRoundBet == 0)
     }
 
     @Test
@@ -400,6 +406,10 @@ class GameStateTest {
         cardsArray.add(card1)
         cardsArray.add(card2)
         cardsArray.add(card3)
+
+        // Adding player so it can be considered a game
+        GameState.addPlayer(Player("test1", "test1"))
+        GameState.addPlayer(Player("test2", "test2"))
 
         GameState.newCards(cardsArray)
 

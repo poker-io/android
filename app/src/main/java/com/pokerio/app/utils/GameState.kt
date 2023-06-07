@@ -34,8 +34,8 @@ object GameState {
 
     var startingFunds: Int = -1
     var smallBlind: Int = -1
-    var thisPlayer: Player = Player("", "")
-    var currentPlayer: Player = Player("", "")
+    var thisPlayer: Player = Player.none()
+    var currentPlayer: Player = Player.none()
     var gameCard1: GameCard = GameCard.none()
     var gameCard2: GameCard = GameCard.none()
     val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
@@ -422,11 +422,12 @@ object GameState {
         players.clear()
         startingFunds = -1
         smallBlind = -1
-        thisPlayer = Player("", "")
+        thisPlayer = Player.none()
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
         winningsPool = 0
         previousRoundBet = 0
+        currentPlayer = Player.none()
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -477,6 +478,9 @@ object GameState {
 
     fun addPlayer(player: Player) {
         players.add(player)
+        if (currentPlayer.isNone()) {
+            currentPlayer = player
+        }
         playerJoinedCallbacks.forEach { it.value(player) }
     }
 
@@ -581,41 +585,34 @@ object GameState {
         return players.maxOf { it.bet }
     }
 
-    fun getSmallBlindPlayer(): Player? {
-        if (players.size < 2) {
-            return null
-        }
+    fun getSmallBlindPlayer(): Player {
+        check(players.size >= 2)
         return players[players.size - 2]
     }
 
-    fun getBigBlindPlayer(): Player? {
-        if (players.size < 2) {
-            return null
-        }
+    fun getBigBlindPlayer(): Player {
+        check(players.size >= 2)
         return players[players.size - 1]
     }
 
     fun nextCurrentPlayer() {
-        var index = players.indexOfFirst { player: Player -> player == currentPlayer }
-        if (index != -1) {
-            index = (index + 1) % players.size
-            while (players[index] != currentPlayer) {
-                if (!players[index].folded) {
-                    currentPlayer = players[index]
-                    break
-                }
-                index = (index + 1) % players.size
+        var index = players.indexOf(currentPlayer)
+        check(index != -1)
+        index = (index + 1) % players.size
+        while (players[index] != currentPlayer) {
+            if (!players[index].folded) {
+                currentPlayer = players[index]
+                break
             }
+            index = (index + 1) % players.size
         }
     }
 
     fun nextRoundPlayer() {
         val smallBlind = getSmallBlindPlayer()
-        if (smallBlind != null) {
-            currentPlayer = smallBlind
-            if (smallBlind.folded) {
-                nextCurrentPlayer()
-            }
+        currentPlayer = smallBlind
+        if (smallBlind.folded) {
+            nextCurrentPlayer()
         }
     }
 }

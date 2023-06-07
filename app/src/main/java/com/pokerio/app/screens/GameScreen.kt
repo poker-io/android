@@ -61,7 +61,7 @@ fun GameScreen() {
     var players by remember(key1 = actions) {
         mutableStateOf(GameState.players.toList())
     }
-    var winningsPool by remember {
+    var winningsPool by remember(key1 = actions) {
         mutableStateOf(GameState.winningsPool)
     }
 
@@ -78,8 +78,6 @@ fun GameScreen() {
         // Setup callbacks
         val newActionCallbackId =
             GameState.addOnNewActionCallback {
-                players = GameState.players.toList()
-                winningsPool = GameState.winningsPool
                 actions++
             }
 
