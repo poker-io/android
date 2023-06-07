@@ -97,7 +97,7 @@ fun PlayerView(
                     )
                 ) {
                     Text(
-                        text = "Funds",
+                        text = stringResource(R.string.funds),
                         fontSize = LABEL_SIZE
                     )
                 }
@@ -109,7 +109,9 @@ fun PlayerView(
                 ) {
                     Text(
                         text = "${player.funds}",
-                        modifier = Modifier.align(CenterHorizontally).testTag("funds"),
+                        modifier = Modifier
+                            .align(CenterHorizontally)
+                            .testTag("funds"),
                         fontSize = AMOUNT_SIZE
                     )
                 }
@@ -121,7 +123,7 @@ fun PlayerView(
                     )
                 ) {
                     Text(
-                        text = "Bet",
+                        text = stringResource(R.string.bet),
                         fontSize = LABEL_SIZE
                     )
                 }
@@ -133,7 +135,9 @@ fun PlayerView(
                 ) {
                     Text(
                         text = "${player.bet}",
-                        modifier = Modifier.align(CenterHorizontally).testTag("bet"),
+                        modifier = Modifier
+                            .align(CenterHorizontally)
+                            .testTag("bet"),
                         fontSize = AMOUNT_SIZE
                     )
                 }

@@ -10,7 +10,6 @@ class Player(
     var turn: Int = 0
 ) {
     fun isSmallBlind(): Boolean {
-//        return true
         return playerID == GameState.getSmallBlindPlayer()?.playerID
     }
 
