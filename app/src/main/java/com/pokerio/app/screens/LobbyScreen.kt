@@ -1,7 +1,6 @@
 package com.pokerio.app.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.components.PlayerListItemView
 import com.pokerio.app.utils.GameState
@@ -218,9 +216,7 @@ private fun leaveGame(context: Context) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.failed_leave), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.failed_leave))
     }
 
     GameState.launchTask {
@@ -234,9 +230,7 @@ private fun startGame(context: Context) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.failed_start), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.failed_start))
     }
 
     GameState.launchTask {

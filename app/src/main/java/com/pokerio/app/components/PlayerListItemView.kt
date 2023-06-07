@@ -1,7 +1,6 @@
 package com.pokerio.app.components
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
@@ -97,9 +95,7 @@ fun kickPlayer(context: Context, playerID: String) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.failed_kick), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.failed_kick))
     }
 
     GameState.launchTask {

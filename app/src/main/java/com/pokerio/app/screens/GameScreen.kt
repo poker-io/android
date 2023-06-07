@@ -3,7 +3,6 @@ package com.pokerio.app.screens
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -228,9 +226,7 @@ private fun onCall(context: Context) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.call_failed), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.call_failed))
     }
 
     GameState.launchTask {
@@ -244,9 +240,7 @@ private fun onCheck(context: Context) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.check_failed), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.check_failed))
     }
 
     GameState.launchTask {
@@ -317,9 +311,7 @@ private fun onRaise(context: Context, newAmount: Int) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.raise_failed), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.raise_failed))
     }
 
     GameState.launchTask {
@@ -333,9 +325,7 @@ private fun onFold(context: Context) {
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast.makeText(context, context.getString(R.string.fold_failed), Toast.LENGTH_LONG).show()
-        }
+        PokerioLogger.displayMessage(context.getString(R.string.fold_failed))
     }
 
     GameState.launchTask {
@@ -344,9 +334,7 @@ private fun onFold(context: Context) {
 }
 
 private fun onWon(context: Context, player: Player) {
-    ContextCompat.getMainExecutor(context).execute {
-        Toast.makeText(context, "${player.nickname} " + context.getString(R.string.won) + "!", Toast.LENGTH_LONG).show()
-    }
+    PokerioLogger.displayMessage("${player.nickname} ${context.getString(R.string.won)}!")
 }
 
 private fun SystemUiController.setSystemUiVisible(value: Boolean) {
