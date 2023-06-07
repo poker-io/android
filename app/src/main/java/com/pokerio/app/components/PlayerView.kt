@@ -108,7 +108,7 @@ fun PlayerView(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "${player.funds}",
+                        text = "${player.funds}$",
                         modifier = Modifier
                             .align(CenterHorizontally)
                             .testTag("funds"),
@@ -134,7 +134,7 @@ fun PlayerView(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "${player.bet}",
+                        text = "${player.bet}$",
                         modifier = Modifier
                             .align(CenterHorizontally)
                             .testTag("bet"),

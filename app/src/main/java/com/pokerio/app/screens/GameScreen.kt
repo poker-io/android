@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,11 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -110,24 +112,40 @@ fun GameScreen() {
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier.width(IntrinsicSize.Max)
             ) {
-                OutlinedCard() {
-                    Text(
-                        text = stringResource(R.string.winnings_pool) + ":",
-                        modifier = Modifier.padding(2.dp)
-                    )
-                    Text(
-                        text = winningsPool.toString(),
-                        modifier = Modifier.padding(2.dp).align(CenterHorizontally).testTag("winnings_pool")
-                    )
+                Text(
+                    text = stringResource(R.string.winnings_pool),
+                    modifier = Modifier.padding(2.dp),
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "$winningsPool$",
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally).testTag("winnings_pool")
+                )
+            }
+            Row() {
+                GameState.cards.forEach { card ->
+                    CardView(card)
                 }
             }
-            GameState.cards.forEach { card ->
-                CardView(card)
+            Column(
+                modifier = Modifier.width(IntrinsicSize.Max)
+            ) {
+                Text(
+                    text = stringResource(R.string.winnings_pool) + ":",
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    color = Color.Transparent
+                )
+                Text(
+                    text = winningsPool.toString(),
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    color = Color.Transparent
+                )
             }
         }
         Row(
