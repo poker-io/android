@@ -36,14 +36,9 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val snackbarHostState = remember { SnackbarHostState() }
-            PokerioLogger.snackbarHostState = snackbarHostState
-
             AppTheme {
                 MainActivityComposable()
-                SnackbarHost(hostState = snackbarHostState) {
-                    Snackbar(snackbarData = it)
-                }
+                GlobalSnackbar()
             }
         }
     }
@@ -125,4 +120,14 @@ private fun AppTheme(
         colorScheme = ThemeUtils.lightColorScheme,
         content = content
     )
+}
+
+@Composable
+private fun GlobalSnackbar() {
+    val snackbarHostState = remember { SnackbarHostState() }
+    PokerioLogger.snackbarHostState = snackbarHostState
+
+    SnackbarHost(hostState = snackbarHostState) {
+        Snackbar(snackbarData = it)
+    }
 }
