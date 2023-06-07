@@ -298,6 +298,7 @@ object GameState {
         player.funds -= (newBet - player.bet)
         player.bet = newBet
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -329,6 +330,7 @@ object GameState {
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
         require(player != null)
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -364,6 +366,7 @@ object GameState {
         player.funds -= (newAmount - player.bet)
         player.bet = newAmount
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -396,8 +399,8 @@ object GameState {
         require(player != null)
 
         player.folded = true
-        winningsPool += player.bet
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -530,20 +533,6 @@ object GameState {
         players[bigBlindIndex].bet = smallBlind * 2
         players[bigBlindIndex].funds -= smallBlind * 2
 
-        addOnNewActionCallback {
-            var index = players.indexOfFirst { player: Player -> player == currentPlayer }
-            if (index != -1) {
-                index = (index + 1) % players.size
-                while (players[index] != currentPlayer) {
-                    if (!players[index].folded) {
-                        currentPlayer = players[index]
-                        break
-                    }
-                    index = (index + 1) % players.size
-                }
-            }
-        }
-
         onGameStart()
     }
 
@@ -555,6 +544,12 @@ object GameState {
             index++
         }
 
+        players.forEach() {
+            winningsPool += it.bet
+            it.bet = 0
+        }
+
+        nextRoundPlayer()
         newActionCallbacks.forEach { it.value(null) }
     }
 
@@ -580,20 +575,42 @@ object GameState {
         return players.maxOf { it.bet }
     }
 
-    fun getSmallBlindPlayerID(): String? {
+    fun getSmallBlindPlayer(): Player? {
         if (players.size < 2) {
             return null
         }
-        return players[players.size - 2].playerID
+        return players[players.size - 2]
     }
 
-    fun getBigBlindPlayerID(): String? {
+    fun getBigBlindPlayer(): Player? {
         if (players.size < 2) {
             return null
         }
-        PokerioLogger.debug("getSmallBlindPlayer called ")
-        PokerioLogger.debug(players[players.size - 1].playerID)
-        return players[players.size - 1].playerID
+        return players[players.size - 1]
+    }
+
+    fun nextCurrentPlayer() {
+        var index = players.indexOfFirst { player: Player -> player == currentPlayer }
+        if (index != -1) {
+            index = (index + 1) % players.size
+            while (players[index] != currentPlayer) {
+                if (!players[index].folded) {
+                    currentPlayer = players[index]
+                    break
+                }
+                index = (index + 1) % players.size
+            }
+        }
+    }
+
+    fun nextRoundPlayer() {
+        val smallBlind = getSmallBlindPlayer()
+        if (smallBlind != null){
+            currentPlayer = smallBlind
+            if (smallBlind.folded){
+                nextCurrentPlayer()
+            }
+        }
     }
 }
 

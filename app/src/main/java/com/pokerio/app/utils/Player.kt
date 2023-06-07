@@ -11,11 +11,11 @@ class Player(
 ) {
     fun isSmallBlind(): Boolean {
 //        return true
-        return playerID == GameState.getSmallBlindPlayerID()
+        return playerID == GameState.getSmallBlindPlayer()?.playerID
     }
 
     fun isBigBlind(): Boolean {
-        return playerID == GameState.getBigBlindPlayerID()
+        return playerID == GameState.getBigBlindPlayer()?.playerID
     }
 
     companion object {
