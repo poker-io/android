@@ -21,7 +21,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    const val BASE_URL = "http://158.101.160.143:42069"
+    const val BASE_URL = "http://172.20.239.191:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -32,7 +32,6 @@ object GameState {
     var gameID = ""
     val players = mutableStateListOf<Player>()
 
-//    val _players: List<Player> = players
     var startingFunds: Int = -1
     var smallBlind: Int = -1
     var thisPlayer: Player = Player("", "")
@@ -41,6 +40,7 @@ object GameState {
     var gameCard2: GameCard = GameCard.none()
     val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
     var winningsPool = 0
+    var previousRoundBet = 0
 
     // Callbacks
     var onGameReset = {}
@@ -344,8 +344,9 @@ object GameState {
         try {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
+            val requestAmount = previousRoundBet + newAmount
             // Prepare url
-            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$newAmount"
+            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$requestAmount"
             val url = URL(baseUrl + urlString)
 
             url.readText()
@@ -363,8 +364,10 @@ object GameState {
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
         require(player != null)
 
-        player.funds -= (newAmount - player.bet)
-        player.bet = newAmount
+        val roundAmount = newAmount - previousRoundBet
+
+        player.funds -= (roundAmount - player.bet)
+        player.bet = roundAmount
 
         nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
@@ -422,6 +425,8 @@ object GameState {
         thisPlayer = Player("", "")
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
+        winningsPool = 0
+        previousRoundBet = 0
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
@@ -545,6 +550,7 @@ object GameState {
         }
 
         players.forEach() {
+            previousRoundBet = maxOf(previousRoundBet, it.bet)
             winningsPool += it.bet
             it.bet = 0
         }
