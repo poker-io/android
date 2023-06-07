@@ -65,7 +65,7 @@ fun PlayerView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier.testTag("player_"+player.nickname + "_card"),
+            modifier = Modifier.testTag("player_" + player.nickname + "_card"),
             shape = PLAYER_VIEW_CARD_SHAPE,
             colors = CardDefaults.cardColors(
                 containerColor = cardColor
