@@ -202,4 +202,64 @@ class SettingsInstrumentedTest {
             .assertRangeInfoEquals(ProgressBarRangeInfo(current = 1.0f, range = 0.0f..1.0f, steps = 0))
         androidTestRule.onNodeWithTag("slider_text").assert(hasText("20"))
     }
+
+    @Test
+    fun newlineNicknameTest() {
+        val testNickname = "test\n"
+        val correctNickname = "test"
+
+        val context = androidTestRule.activity
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val textField = androidTestRule.onNodeWithTag("settings_nickname")
+        textField.assertExists()
+        textField.assertIsDisplayed()
+        textField.performTextReplacement(testNickname)
+
+        val backButton = androidTestRule.onNodeWithTag("settings_back")
+        backButton.performClick()
+
+        val newNickname = sharedPreferences.getString(
+            context.getString(R.string.sharedPreferences_nickname),
+            ""
+        )
+        assert(newNickname == correctNickname)
+    }
+
+    @Test
+    fun newlineNickname2Test() {
+        val testNickname = "test\n\ntest"
+        val correctNickname = "test test"
+
+        val context = androidTestRule.activity
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences_file),
+            Context.MODE_PRIVATE
+        )
+
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val textField = androidTestRule.onNodeWithTag("settings_nickname")
+        textField.assertExists()
+        textField.assertIsDisplayed()
+        textField.performTextReplacement(testNickname)
+
+        val backButton = androidTestRule.onNodeWithTag("settings_back")
+        backButton.performClick()
+
+        val newNickname = sharedPreferences.getString(
+            context.getString(R.string.sharedPreferences_nickname),
+            ""
+        )
+        assert(newNickname == correctNickname)
+    }
 }

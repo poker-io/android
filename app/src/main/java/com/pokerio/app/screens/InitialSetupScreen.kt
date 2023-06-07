@@ -49,6 +49,8 @@ fun InitialSetupScreen(
     }
 
     val onContinue = {
+        nickname = Player.fixNickname(nickname)
+
         with(sharedPreferences.edit()) {
             putString(nicknameSharedKey, nickname)
             apply()
@@ -75,7 +77,8 @@ fun InitialSetupScreen(
                 if (!nicknameCorrect) {
                     Text(stringResource(id = R.string.nickname_error))
                 }
-            }
+            },
+            singleLine = true
         )
         IconButton(
             onClick = { onContinue() },
