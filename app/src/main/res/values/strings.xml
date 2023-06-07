@@ -20,7 +20,7 @@
     <string name="nickname_error">Nickname should be between 1 and 20 characters long</string>
     <string name="failed_update">Failed to update settings</string>
     <string name="camara_credit">Thanks to Arthur Camara, who\'s work our card suit graphics are based on!</string>
-    <string name="camara_link"></string>
+    <string name="camara_link">https://arthurcamara.co/</string>
 
     <!-- Lobby screen -->
     <string name="players">Players</string>

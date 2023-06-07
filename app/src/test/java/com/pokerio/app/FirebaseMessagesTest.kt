@@ -1,5 +1,6 @@
 package com.pokerio.app
 
+import com.pokerio.app.PokerioFirebaseMessagingService.Companion.MessageType
 import com.pokerio.app.utils.GameCard
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
@@ -237,28 +238,34 @@ class FirebaseMessagesTest {
 
     @Test
     fun handleActionWonTest() {
+        val baseFunds = 100
+        val winningsAmount = 100
+
         val playerNickname = "test1"
         val playerID = GameState.sha256("testHash1")
         val thisPlayerNickname = "test2"
         val thisPlayerID = "testHash2"
 
-        GameState.addPlayer(Player(playerNickname, playerID, true))
+        val player = Player(playerNickname, playerID, true)
+        player.funds = baseFunds
+        GameState.addPlayer(player)
         GameState.thisPlayer = Player(thisPlayerNickname, thisPlayerID)
         GameState.addPlayer(GameState.thisPlayer)
 
         val map = HashMap<String, String>()
-        map["player"] = playerID
+        map["winners"] = "[\"playerID\"]"
+        map["amount"] = "$winningsAmount"
 
         var onWonCalled = 0
-        val onWon = { player: Player ->
-            onWonCalled++
-            assert(player.nickname == playerNickname)
+        val onWon = { _: Player ->
+            onWonCalled += 1
         }
         GameState.onWon = onWon
 
-        PokerioFirebaseMessagingService.actionWon(map)
+        PokerioFirebaseMessagingService.endGame(map)
 
         assert(onWonCalled == 1)
+        assert(player.funds == baseFunds + winningsAmount)
     }
 
     @Test
@@ -276,6 +283,22 @@ class FirebaseMessagesTest {
         assert(GameState.cards[2].isNone())
         assert(GameState.cards[3].isNone())
         assert(GameState.cards[4].isNone())
+    }
+
+    @Test
+    fun messageTypeEnumTest() {
+        assert(MessageType.parse("playerJoined") == MessageType.PlayerJoined)
+        assert(MessageType.parse("settingsUpdated") == MessageType.SettingsUpdated)
+        assert(MessageType.parse("playerKicked") == MessageType.PlayerKicked)
+        assert(MessageType.parse("playerLeft") == MessageType.PlayerLeft)
+        assert(MessageType.parse("startGame") == MessageType.StartGame)
+        assert(MessageType.parse("fold") == MessageType.ActionFold)
+        assert(MessageType.parse("raise") == MessageType.ActionRaise)
+        assert(MessageType.parse("check") == MessageType.ActionCheck)
+        assert(MessageType.parse("call") == MessageType.ActionCall)
+        assert(MessageType.parse("newCards") == MessageType.NewCards)
+        assert(MessageType.parse("gameEnd") == MessageType.EndGame)
+        assert(MessageType.parse("someMessage") == MessageType.UnknownMessage)
     }
 
     @After

@@ -15,21 +15,22 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val type = message.data["type"]
+        val type = MessageType.parse(message.data["type"]!!)
         try {
             when (type) {
-                PLAYER_JOINED -> playerJoined(message.data)
-                SETTINGS_UPDATED -> settingsUpdated(message.data)
-                PLAYER_KICKED -> playerKicked(message.data)
-                PLAYER_LEFT -> playerLeft(message.data)
-                START_GAME -> startGame(message.data)
-                ACTION_FOLD -> actionFold(message.data)
-                ACTION_RAISE -> actionRaise(message.data)
-                ACTION_CHECK -> actionCheck(message.data)
-                ACTION_CALL -> actionCall(message.data)
-                ACTION_WON -> actionWon(message.data)
-                NEW_CARDS -> newCards(message.data)
-                else -> PokerioLogger.error("Received unknown message type: ${message.data["type"]}")
+                MessageType.PlayerJoined -> playerJoined(message.data)
+                MessageType.SettingsUpdated -> settingsUpdated(message.data)
+                MessageType.PlayerKicked -> playerKicked(message.data)
+                MessageType.PlayerLeft -> playerLeft(message.data)
+                MessageType.StartGame -> startGame(message.data)
+                MessageType.ActionFold -> actionFold(message.data)
+                MessageType.ActionRaise -> actionRaise(message.data)
+                MessageType.ActionCheck -> actionCheck(message.data)
+                MessageType.ActionCall -> actionCall(message.data)
+                MessageType.NewCards -> newCards(message.data)
+                MessageType.EndGame -> endGame(message.data)
+                MessageType.UnknownMessage ->
+                    PokerioLogger.error("Received unknown message type: ${message.data["type"]!!}")
             }
         } catch (e: Exception) {
             PokerioLogger.error("Exception occurred while processing '$type' firebase message")
@@ -43,17 +44,27 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
-        const val PLAYER_JOINED = "playerJoined"
-        const val SETTINGS_UPDATED = "settingsUpdated"
-        const val PLAYER_KICKED = "playerKicked"
-        const val PLAYER_LEFT = "playerLeft"
-        const val START_GAME = "startGame"
-        const val ACTION_FOLD = "fold"
-        const val ACTION_RAISE = "raise"
-        const val ACTION_CHECK = "check"
-        const val ACTION_CALL = "call"
-        const val ACTION_WON = "won"
-        const val NEW_CARDS = "newCards"
+        enum class MessageType(val typeName: String) {
+            PlayerJoined("playerJoined"),
+            SettingsUpdated("settingsUpdated"),
+            PlayerKicked("playerKicked"),
+            PlayerLeft("playerLeft"),
+            StartGame("startGame"),
+            ActionFold("fold"),
+            ActionRaise("raise"),
+            ActionCheck("check"),
+            ActionCall("call"),
+            NewCards("newCards"),
+            EndGame("gameEnd"),
+
+            UnknownMessage("");
+
+            companion object {
+                fun parse(type: String): MessageType {
+                    return MessageType.values().find { it.typeName == type } ?: UnknownMessage
+                }
+            }
+        }
 
         fun playerJoined(data: Map<String, String>) {
             PokerioLogger.debug("Received playerJoined FCM message")
@@ -114,15 +125,20 @@ class PokerioFirebaseMessagingService : FirebaseMessagingService() {
             GameState.handleActionCall(data["player"]!!)
         }
 
-        fun actionWon(data: Map<String, String>) {
-            PokerioLogger.debug("Received won FCM message")
-            GameState.handleActionWon(data["player"]!!)
-        }
-
         @OptIn(ExperimentalSerializationApi::class)
         fun newCards(data: Map<String, String>) {
             PokerioLogger.debug("Received newCards FCM message")
             GameState.newCards(Json.decodeFromString(data["cards"]!!))
+        }
+
+        @OptIn(ExperimentalSerializationApi::class)
+        fun endGame(data: Map<String, String>) {
+            PokerioLogger.debug("Received gameEnd FCM message")
+            println(data["winners"])
+            GameState.handleActionWon(
+                Json.decodeFromString(data["winners"]!!),
+                data["amount"]!!.toInt()
+            )
         }
     }
 }
