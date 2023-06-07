@@ -432,7 +432,6 @@ object GameState {
         thisPlayer = Player("", "")
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
-        winningsPool = 0
         cards.fill(GameCard.none())
         onWon = {}
 
