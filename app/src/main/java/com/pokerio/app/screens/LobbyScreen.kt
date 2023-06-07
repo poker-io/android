@@ -131,7 +131,7 @@ fun PlayerList(
     numberOfPlayers: Int
 ) {
     val scrollState = rememberScrollState(0)
-    val test = minOf(numberOfPlayers, GameState.players.size)
+    val checkedPlayerCount = minOf(numberOfPlayers, GameState.players.size)
 
     Column(
         modifier = Modifier
@@ -141,12 +141,12 @@ fun PlayerList(
     ) {
         for (i in 1..GameState.MAX_PLAYERS) {
             AnimatedVisibility(
-                visible = i <= test,
+                visible = i <= checkedPlayerCount,
                 enter = scaleIn(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                 exit = scaleOut(animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                 modifier = Modifier.padding(vertical = 6.dp)
             ) {
-                if (i <= test) {
+                if (i <= checkedPlayerCount) {
                     PlayerListItemView(player = GameState.players[i - 1])
                 }
             }
