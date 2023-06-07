@@ -21,7 +21,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    const val BASE_URL = "http://172.20.239.191:42069"
+    const val BASE_URL = "http://192.168.86.30:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
