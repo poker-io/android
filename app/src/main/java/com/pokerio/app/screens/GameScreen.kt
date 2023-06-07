@@ -6,9 +6,12 @@ import android.content.pm.ActivityInfo
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,12 +27,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -49,7 +57,13 @@ fun GameScreen() {
     val orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     val systemUiController = rememberSystemUiController()
     var raiseDialogOpen by remember { mutableStateOf(false) }
-    var debugNumberOfActions by remember { mutableStateOf(0) }
+    var actions by remember { mutableStateOf(0) }
+    var players by remember(key1 = actions) {
+        mutableStateOf(GameState.players.toList())
+    }
+    var winningsPool by remember(key1 = actions) {
+        mutableStateOf(GameState.winningsPool)
+    }
 
     DisposableEffect(orientation) {
         // Set orientation
@@ -62,9 +76,10 @@ fun GameScreen() {
         systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         // Setup callbacks
-        val callbackId = GameState.addOnNewActionCallback {
-            debugNumberOfActions++
-        }
+        val newActionCallbackId =
+            GameState.addOnNewActionCallback {
+                actions++
+            }
 
         GameState.onWon = { onWon(context, it) }
 
@@ -75,7 +90,7 @@ fun GameScreen() {
             systemUiController.setSystemUiVisible(true)
             systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
 
-            GameState.removeOnNewActionCallback(callbackId)
+            GameState.removeOnNewActionCallback(newActionCallbackId)
 
             GameState.onWon = {}
         }
@@ -89,20 +104,46 @@ fun GameScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            GameState.players.forEach {
+            players.forEach {
                 PlayerView(it)
-            }
-            Column {
-                Text(stringResource(R.string.winnings_pool) + ": ${GameState.winningsPool}")
-                Text("DEBUG: $debugNumberOfActions")
             }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            GameState.cards.forEach { card ->
-                CardView(card)
+            Column(
+                modifier = Modifier.width(IntrinsicSize.Max)
+            ) {
+                Text(
+                    text = stringResource(R.string.winnings_pool),
+                    modifier = Modifier.padding(2.dp),
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "$winningsPool$",
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally).testTag("winnings_pool")
+                )
+            }
+            Row() {
+                GameState.cards.forEach { card ->
+                    CardView(card)
+                }
+            }
+            Column(
+                modifier = Modifier.width(IntrinsicSize.Max)
+            ) {
+                Text(
+                    text = stringResource(R.string.winnings_pool) + ":",
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    color = Color.Transparent
+                )
+                Text(
+                    text = winningsPool.toString(),
+                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    color = Color.Transparent
+                )
             }
         }
         Row(

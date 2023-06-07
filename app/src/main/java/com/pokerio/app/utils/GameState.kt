@@ -1,6 +1,7 @@
 package com.pokerio.app.utils
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import com.google.firebase.messaging.FirebaseMessaging
 import com.pokerio.app.R
 import kotlinx.coroutines.CoroutineScope
@@ -29,14 +30,17 @@ object GameState {
 
     // Class fields
     var gameID = ""
-    val players = mutableListOf<Player>()
+    val players = mutableStateListOf<Player>()
+
     var startingFunds: Int = -1
     var smallBlind: Int = -1
-    var thisPlayer: Player = Player("", "")
+    var thisPlayer: Player = Player.none()
+    var currentPlayer: Player = Player.none()
     var gameCard1: GameCard = GameCard.none()
     var gameCard2: GameCard = GameCard.none()
     val cards = Array(CARDS_ON_TABLE) { GameCard.none() }
     var winningsPool = 0
+    var previousRoundBet = 0
 
     // Callbacks
     var onGameReset = {}
@@ -290,6 +294,7 @@ object GameState {
         player.funds -= (newBet - player.bet)
         player.bet = newBet
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -318,6 +323,7 @@ object GameState {
     fun handleActionCheck(playerHash: String) {
         val player = getPlayer(playerHash)
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -331,8 +337,9 @@ object GameState {
         try {
             val myID = firebaseId ?: FirebaseMessaging.getInstance().token.await()
 
+            val requestAmount = previousRoundBet + newAmount
             // Prepare url
-            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$newAmount"
+            val urlString = "/actionRaise?playerToken=$myID&gameId=$gameID&amount=$requestAmount"
             val url = URL(baseUrl + urlString)
 
             url.readText()
@@ -347,9 +354,12 @@ object GameState {
     fun handleActionRaise(playerHash: String, newAmount: Int) {
         val player = getPlayer(playerHash)
 
-        player.funds -= (newAmount - player.bet)
-        player.bet = newAmount
+        val roundAmount = newAmount - previousRoundBet
 
+        player.funds -= (roundAmount - player.bet)
+        player.bet = roundAmount
+
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -379,8 +389,8 @@ object GameState {
         val player = getPlayer(playerHash)
 
         player.folded = true
-        winningsPool += player.bet
 
+        nextCurrentPlayer()
         newActionCallbacks.forEach { it.value(player) }
     }
 
@@ -407,11 +417,14 @@ object GameState {
         players.clear()
         startingFunds = -1
         smallBlind = -1
-        thisPlayer = Player("", "")
+        thisPlayer = Player.none()
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
         cards.fill(GameCard.none())
         onWon = {}
+        winningsPool = 0
+        previousRoundBet = 0
+        currentPlayer = Player.none()
 
         // Callbacks
         playerJoinedCallbacks.clear()
@@ -462,6 +475,9 @@ object GameState {
 
     fun addPlayer(player: Player) {
         players.add(player)
+        if (currentPlayer.isNone()) {
+            currentPlayer = player
+        }
         playerJoinedCallbacks.forEach { it.value(player) }
     }
 
@@ -508,6 +524,7 @@ object GameState {
         }
 
         players.sortBy { it.turn }
+        currentPlayer = players[0]
         val smallBlindIndex: Int = players.lastIndex - 1
         val bigBlindIndex: Int = players.lastIndex
         players[smallBlindIndex].bet = smallBlind
@@ -526,6 +543,13 @@ object GameState {
             index++
         }
 
+        players.forEach() {
+            previousRoundBet = maxOf(previousRoundBet, it.bet)
+            winningsPool += it.bet
+            it.bet = 0
+        }
+
+        nextRoundPlayer()
         newActionCallbacks.forEach { it.value(null) }
     }
 
@@ -560,6 +584,37 @@ object GameState {
 
     private fun isThisPlayersId(id: String): Boolean {
         return id == sha256(thisPlayer.playerID)
+    }
+
+    fun getSmallBlindPlayer(): Player {
+        check(players.size >= 2)
+        return players[players.size - 2]
+    }
+
+    fun getBigBlindPlayer(): Player {
+        check(players.size >= 2)
+        return players[players.size - 1]
+    }
+
+    fun nextCurrentPlayer() {
+        var index = players.indexOf(currentPlayer)
+        check(index != -1)
+        index = (index + 1) % players.size
+        while (players[index] != currentPlayer) {
+            if (!players[index].folded) {
+                currentPlayer = players[index]
+                break
+            }
+            index = (index + 1) % players.size
+        }
+    }
+
+    fun nextRoundPlayer() {
+        val smallBlind = getSmallBlindPlayer()
+        currentPlayer = smallBlind
+        if (smallBlind.folded) {
+            nextCurrentPlayer()
+        }
     }
 }
 

@@ -2,58 +2,151 @@ package com.pokerio.app.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pokerio.app.R
+import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.Player
 import com.pokerio.app.utils.PlayerProvider
+
+val TEXT_MODIFIER = Modifier.padding(2.dp)
+val AMOUNT_SIZE = 11.sp
+val LABEL_SIZE = 10.sp
+
+val PLAYER_VIEW_CARD_SHAPE = RoundedCornerShape(8.dp)
 
 @Composable
 @Preview
 fun PlayerView(
     @PreviewParameter(PlayerProvider::class) player: Player
 ) {
+    val smallBlindColor = MaterialTheme.colorScheme.tertiary
+    val bigBlindColor = MaterialTheme.colorScheme.onTertiaryContainer
+    val cardColor =
+        if (player == GameState.currentPlayer) {
+            MaterialTheme.colorScheme.primary
+        } else if (player.folded) {
+            Color.LightGray
+        } else {
+            MaterialTheme.colorScheme.secondaryContainer
+        }
+
     Column(
-        modifier = Modifier.width(IntrinsicSize.Min),
+        modifier = Modifier
+            .width(100.dp)
+            .padding(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .width(IntrinsicSize.Max),
-            shape = RoundedCornerShape(
-                topStart = 0.dp,
-                topEnd = 0.dp,
-                bottomStart = 8.dp,
-                bottomEnd = 8.dp
+            modifier = Modifier.testTag("player_" + player.nickname + "_card"),
+            shape = PLAYER_VIEW_CARD_SHAPE,
+            colors = CardDefaults.cardColors(
+                containerColor = cardColor
             )
         ) {
-            Text(player.nickname)
-            Text("Funds: ${player.funds}")
+            Column(
+                modifier = Modifier.padding(1.dp)
+            ) {
+                Card(
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                        .align(CenterHorizontally),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    )
+                ) {
+                    Text(
+                        text = player.nickname,
+                        modifier = TEXT_MODIFIER.testTag("nickname"),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Card(
+                    modifier = Modifier.width(IntrinsicSize.Max),
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = cardColor
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.funds),
+                        fontSize = LABEL_SIZE
+                    )
+                }
+                OutlinedCard(
+                    shape = PLAYER_VIEW_CARD_SHAPE,
+                    modifier = Modifier
+                        .align(CenterHorizontally)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "${player.funds}$",
+                        modifier = Modifier
+                            .align(CenterHorizontally)
+                            .testTag("funds"),
+                        fontSize = AMOUNT_SIZE
+                    )
+                }
+                Card(
+                    modifier = Modifier.width(IntrinsicSize.Max),
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = cardColor
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.bet),
+                        fontSize = LABEL_SIZE
+                    )
+                }
+                OutlinedCard(
+                    shape = PLAYER_VIEW_CARD_SHAPE,
+                    modifier = Modifier
+                        .align(CenterHorizontally)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "${player.bet}$",
+                        modifier = Modifier
+                            .align(CenterHorizontally)
+                            .testTag("bet"),
+                        fontSize = AMOUNT_SIZE
+                    )
+                }
+            }
         }
-        OutlinedCard(
-            modifier = Modifier
-                .padding(4.dp)
-                .width(IntrinsicSize.Max)
-        ) {
-            Text("Bet: ${player.bet}")
-        }
-        if (player.folded) {
+        if (player.isSmallBlind()) {
             Text(
-                stringResource(R.string.fold),
-                color = Color.Gray
+                modifier = Modifier.align(CenterHorizontally),
+                text = stringResource(R.string.small_blind),
+                color = smallBlindColor
+            )
+        } else if (player.isBigBlind()) {
+            Text(
+                modifier = Modifier.align(CenterHorizontally),
+                text = stringResource(R.string.big_blind),
+                color = bigBlindColor
             )
         }
     }
