@@ -253,12 +253,13 @@ class FirebaseMessagesTest {
         GameState.addPlayer(GameState.thisPlayer)
 
         val map = HashMap<String, String>()
-        map["winners"] = "[\"playerID\"]"
+        map["winners"] = "[\"$playerID\"]"
         map["amount"] = "$winningsAmount"
 
         var onWonCalled = 0
-        val onWon = { _: Player ->
+        val onWon = { winner: Player ->
             onWonCalled += 1
+            assert(winner == player)
         }
         GameState.onWon = onWon
 

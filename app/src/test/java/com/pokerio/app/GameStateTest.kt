@@ -435,6 +435,111 @@ class GameStateTest {
     }
 
     @Test
+    fun singleWinnerTest() {
+        val baseFunds = 100
+        val winAmount = 100
+
+        val player1 = Player("player1", "id1", true)
+        val player2 = Player("player2", GameState.sha256("id2"), false)
+        val player3 = Player("player3", GameState.sha256("id3"), false)
+
+        player1.funds = baseFunds
+        player2.funds = baseFunds
+        player3.funds = baseFunds
+
+        player1.bet = 123
+        player2.bet = 123
+        player3.bet = 123
+
+        player2.folded = true
+
+        GameState.thisPlayer = player1
+        GameState.addPlayer(player1)
+        GameState.addPlayer(player2)
+        GameState.addPlayer(player3)
+
+        val winners = listOf(player1.playerID)
+
+        GameState.handleActionWon(winners, winAmount)
+
+        assert(player1.funds == baseFunds + winAmount)
+        assert(player1.bet == 0)
+        assert(player2.funds == baseFunds)
+        assert(player2.bet == 0)
+        assertFalse(player2.folded)
+        assert(player3.funds == baseFunds)
+        assert(player3.bet == 0)
+    }
+
+    @Test
+    fun multipleWinnersTest() {
+        val baseFunds = 100
+        val winAmount = 100
+
+        val player1 = Player("player1", "id1", true)
+        val player2 = Player("player2", GameState.sha256("id2"), false)
+        val player3 = Player("player3", GameState.sha256("id3"), false)
+
+        player1.funds = baseFunds
+        player2.funds = baseFunds
+        player3.funds = baseFunds
+
+        player1.bet = 123
+        player2.bet = 123
+        player3.bet = 123
+
+        GameState.thisPlayer = player1
+        GameState.addPlayer(player1)
+        GameState.addPlayer(player2)
+        GameState.addPlayer(player3)
+
+        val winners = listOf(player2.playerID, player3.playerID)
+
+        GameState.handleActionWon(winners, winAmount)
+
+        assert(player1.funds == baseFunds)
+        assert(player1.bet == 0)
+        assert(player2.funds == baseFunds + winAmount)
+        assert(player2.bet == 0)
+        assert(player3.funds == baseFunds + winAmount)
+        assert(player3.bet == 0)
+    }
+
+    @Test
+    fun allWinnersTest() {
+        val baseFunds = 100
+        val winAmount = 100
+
+        val player1 = Player("player1", "id1", true)
+        val player2 = Player("player2", GameState.sha256("id2"), false)
+        val player3 = Player("player3", GameState.sha256("id3"), false)
+
+        player1.funds = baseFunds
+        player2.funds = baseFunds
+        player3.funds = baseFunds
+
+        player1.bet = 123
+        player2.bet = 123
+        player3.bet = 123
+
+        GameState.thisPlayer = player1
+        GameState.addPlayer(player1)
+        GameState.addPlayer(player2)
+        GameState.addPlayer(player3)
+
+        val winners = listOf(player1.playerID, player2.playerID, player3.playerID)
+
+        GameState.handleActionWon(winners, winAmount)
+
+        assert(player1.funds == baseFunds + winAmount)
+        assert(player1.bet == 0)
+        assert(player2.funds == baseFunds + winAmount)
+        assert(player2.bet == 0)
+        assert(player3.funds == baseFunds + winAmount)
+        assert(player3.bet == 0)
+    }
+
+    @Test
     fun checkIfServerAddressCorrect() {
         // We change this all the time for testing locally. Let's just make sure it is correct, when
         // we want to merge into main

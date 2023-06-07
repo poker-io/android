@@ -20,7 +20,7 @@ import kotlin.jvm.Throws
 // will always be one and only one instance of this object
 object GameState {
     // Constants
-    const val BASE_URL = "http://192.168.86.30:42069"
+    const val BASE_URL = "http://158.101.160.143:42069"
     const val STARTING_FUNDS_DEFAULT = 1000
     const val SMALL_BLIND_DEFAULT = 100
     const val MAX_PLAYERS = 8
@@ -405,6 +405,7 @@ object GameState {
         }
 
         winners.forEach { playerHash ->
+            println(playerHash)
             val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
 
             val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
@@ -426,6 +427,8 @@ object GameState {
         thisPlayer = Player("", "")
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
+        winningsPool = 0
+
         // Callbacks
         playerJoinedCallbacks.clear()
         playerRemovedCallbacks.clear()
