@@ -23,5 +23,17 @@ class Player(
         fun validateNickname(nickname: String): Boolean {
             return nickname.isNotBlank() && nickname.length <= MAX_NICKNAME_LEN
         }
+
+        fun fixNickname(nickname: String): String {
+            // Do not allow newlines
+            var returnNickname = nickname.replace('\n', ' ')
+            // Do not allow trailing and leading spaces
+            returnNickname = returnNickname.trimEnd(' ')
+            returnNickname = returnNickname.trimStart(' ')
+            // Do not allow double spaces
+            returnNickname = returnNickname.replace(Regex("\\s+"), " ")
+
+            return returnNickname
+        }
     }
 }

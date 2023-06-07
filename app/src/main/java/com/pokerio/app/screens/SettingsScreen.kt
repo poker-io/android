@@ -106,6 +106,8 @@ fun SettingsScreen(
 
     val onNavigateBack = {
         // Update shared preferences values on exit
+        nickname = Player.fixNickname(nickname)
+
         with(sharedPreferences.edit()) {
             if (nicknameCorrect) {
                 putString(nicknameSharedKey, nickname)
@@ -182,7 +184,8 @@ fun SettingsScreen(
                         if (!nicknameCorrect) {
                             Text(stringResource(id = R.string.nickname_error))
                         }
-                    }
+                    },
+                    singleLine = true
                 )
             }
             Spacer(modifier = spacerModifier)
