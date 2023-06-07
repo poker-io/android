@@ -150,18 +150,5 @@ fun PlayerView(
                 color = bigBlindColor
             )
         }
-//        if (player.folded) {
-//            PokerioLogger.debug("FOLDED TESTING TESTING")
-//            Text(
-//                stringResource(R.string.fold),
-//                color = Color.Gray
-//            )
-//        }
-//        if (player == GameState.currentPlayer){
-//            Text(
-//                "current",
-//                color = Color.Red
-//            )
-//        }
     }
 }
