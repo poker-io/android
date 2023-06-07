@@ -49,7 +49,7 @@ fun InitialSetupScreen(
     }
 
     val onContinue = {
-        nickname = nickname.filterNot { it == '\n' }
+        nickname = Player.fixNickname(nickname)
 
         with(sharedPreferences.edit()) {
             putString(nicknameSharedKey, nickname)

@@ -205,7 +205,8 @@ class SettingsInstrumentedTest {
 
     @Test
     fun newlineNicknameTest() {
-        val testNickname = "test"
+        val testNickname = "test\n"
+        val correctNickname = "test"
 
         val context = androidTestRule.activity
         val sharedPreferences = context.getSharedPreferences(
@@ -220,7 +221,7 @@ class SettingsInstrumentedTest {
         val textField = androidTestRule.onNodeWithTag("settings_nickname")
         textField.assertExists()
         textField.assertIsDisplayed()
-        textField.performTextReplacement("$testNickname\n")
+        textField.performTextReplacement(testNickname)
 
         val backButton = androidTestRule.onNodeWithTag("settings_back")
         backButton.performClick()
@@ -229,13 +230,13 @@ class SettingsInstrumentedTest {
             context.getString(R.string.sharedPreferences_nickname),
             ""
         )
-        assert(newNickname == testNickname)
+        assert(newNickname == correctNickname)
     }
 
     @Test
     fun newlineNickname2Test() {
         val testNickname = "test\n\ntest"
-        val correctNickname = "testtest"
+        val correctNickname = "test test"
 
         val context = androidTestRule.activity
         val sharedPreferences = context.getSharedPreferences(
