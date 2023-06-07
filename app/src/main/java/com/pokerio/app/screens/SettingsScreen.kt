@@ -1,7 +1,6 @@
 package com.pokerio.app.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
@@ -119,14 +117,9 @@ fun SettingsScreen(
 
         // Unregister callback when we leave the view
         val onError = {
-            ContextCompat.getMainExecutor(context).execute {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.failed_update),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            PokerioLogger.displayMessage(context, context.getString(R.string.failed_update))
         }
+
         val onSuccess = {
             PokerioLogger.debug("Successfully updated settings")
         }

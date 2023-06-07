@@ -1,7 +1,6 @@
 package com.pokerio.app.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.pokerio.app.R
 import com.pokerio.app.utils.GameState
+import com.pokerio.app.utils.PokerioLogger
 import com.pokerio.app.utils.UnitUnitProvider
 
 @Composable
@@ -148,9 +148,7 @@ private fun StartGameCard(
 
 private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) {
     if (gameCode.isBlank()) {
-        Toast
-            .makeText(context, context.getString(R.string.error_game_code_empty), Toast.LENGTH_LONG)
-            .show()
+        PokerioLogger.displayMessage(context, context.getString(R.string.error_game_code_empty))
         return
     }
 
@@ -159,11 +157,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
     }
 
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast
-                .makeText(context, context.getString(R.string.failed_join), Toast.LENGTH_LONG)
-                .show()
-        }
+        PokerioLogger.displayMessage(context, context.getString(R.string.failed_join))
     }
 
     GameState.launchTask {
@@ -173,11 +167,7 @@ private fun joinGame(context: Context, gameCode: String, onSuccess: () -> Unit) 
 
 private fun createGame(context: Context, onSuccess: () -> Unit) {
     val onError = {
-        ContextCompat.getMainExecutor(context).execute {
-            Toast
-                .makeText(context, context.getString(R.string.failed_create), Toast.LENGTH_LONG)
-                .show()
-        }
+        PokerioLogger.displayMessage(context, context.getString(R.string.failed_create))
     }
 
     GameState.launchTask {
