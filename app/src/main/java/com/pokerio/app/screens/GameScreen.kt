@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -115,22 +114,21 @@ fun GameScreen() {
         ) {
             Column(
                 modifier = Modifier.width(IntrinsicSize.Max)
-            ){
-                OutlinedCard(
-                ) {
-                Text(
-                    text = stringResource(R.string.winnings_pool) + ":",
-                    modifier = Modifier.padding(2.dp)
-                )
-                Text(
-                    text = winningsPool.toString(),
-                    modifier = Modifier.padding(2.dp).align(CenterHorizontally)
-                )
+            ) {
+                OutlinedCard() {
+                    Text(
+                        text = stringResource(R.string.winnings_pool) + ":",
+                        modifier = Modifier.padding(2.dp)
+                    )
+                    Text(
+                        text = winningsPool.toString(),
+                        modifier = Modifier.padding(2.dp).align(CenterHorizontally)
+                    )
                 }
             }
-                GameState.cards.forEach { card ->
-                    CardView(card)
-                }
+            GameState.cards.forEach { card ->
+                CardView(card)
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

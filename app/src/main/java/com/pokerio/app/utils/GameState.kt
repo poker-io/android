@@ -605,9 +605,9 @@ object GameState {
 
     fun nextRoundPlayer() {
         val smallBlind = getSmallBlindPlayer()
-        if (smallBlind != null){
+        if (smallBlind != null) {
             currentPlayer = smallBlind
-            if (smallBlind.folded){
+            if (smallBlind.folded) {
                 nextCurrentPlayer()
             }
         }
