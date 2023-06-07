@@ -48,7 +48,7 @@ class GameInstrumentedTest {
         androidTestRule.onNodeWithTag("raise_button").performClick()
         val winningsPoolText = androidTestRule.onNodeWithTag("winnings_pool")
         winningsPoolText.assertExists()
-        winningsPoolText.assert(hasText(winningsPool.toString()))
+        winningsPoolText.assert(hasText("$winningsPool$"))
         val raiseDialogCloseButton = androidTestRule.onNodeWithTag("raise_dialog_close")
         raiseDialogCloseButton.assertIsDisplayed()
         raiseDialogCloseButton.performClick()

@@ -33,11 +33,11 @@ class PlayerViewInstrumentedTest {
 
         val fundsText = composeTestRule.onNodeWithTag("funds")
         fundsText.assertExists()
-        fundsText.assert(hasText(funds.toString()))
+        fundsText.assert(hasText("$funds$"))
 
         val betText = composeTestRule.onNodeWithTag("bet")
         betText.assertExists()
-        betText.assert(hasText(bet.toString()))
+        betText.assert(hasText("$bet$"))
 
         val playerCard = composeTestRule.onNodeWithTag("player_" + nickname + "_card")
         playerCard.assertExists()
