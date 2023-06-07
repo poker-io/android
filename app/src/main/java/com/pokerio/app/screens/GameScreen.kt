@@ -64,6 +64,9 @@ fun GameScreen() {
     var winningsPool by remember(key1 = actions) {
         mutableStateOf(GameState.winningsPool)
     }
+    var maxBet by remember(key1 = actions) {
+        mutableStateOf(GameState.getMaxBet())
+    }
 
     DisposableEffect(orientation) {
         // Set orientation
@@ -123,7 +126,10 @@ fun GameScreen() {
                 )
                 Text(
                     text = "$winningsPool$",
-                    modifier = Modifier.padding(2.dp).align(CenterHorizontally).testTag("winnings_pool")
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .align(CenterHorizontally)
+                        .testTag("winnings_pool")
                 )
             }
             Row() {
@@ -136,12 +142,16 @@ fun GameScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.winnings_pool) + ":",
-                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .align(CenterHorizontally),
                     color = Color.Transparent
                 )
                 Text(
                     text = winningsPool.toString(),
-                    modifier = Modifier.padding(2.dp).align(CenterHorizontally),
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .align(CenterHorizontally),
                     color = Color.Transparent
                 )
             }
@@ -155,39 +165,51 @@ fun GameScreen() {
                 CardView(GameState.gameCard1)
                 CardView(GameState.gameCard2)
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2)
-            ) {
-                item {
-                    Button(
-                        onClick = { onCall(context) },
-                        modifier = Modifier.testTag("call_button")
+            if (GameState.currentPlayer == GameState.thisPlayer) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2)
+                ) {
+                    if (GameState.thisPlayer.bet + GameState.thisPlayer.funds >= maxBet &&
+                        GameState.thisPlayer.bet < maxBet
                     ) {
-                        Text(stringResource(R.string.call) + " (${GameState.getMaxBet()})")
+                        item {
+                            Button(
+                                onClick = { onCall(context) },
+                                modifier = Modifier.testTag("call_button")
+                            ) {
+                                Text(stringResource(R.string.call) + " ($maxBet)")
+                            }
+                        }
                     }
-                }
-                item {
-                    Button(
-                        onClick = { raiseDialogOpen = true },
-                        modifier = Modifier.testTag("raise_button")
+                    if (GameState.thisPlayer.bet + GameState.thisPlayer.funds >= maxBet &&
+                        GameState.thisPlayer.funds > 0
                     ) {
-                        Text(stringResource(R.string.raise))
+                        item {
+                            Button(
+                                onClick = { raiseDialogOpen = true },
+                                modifier = Modifier.testTag("raise_button")
+                            ) {
+                                Text(stringResource(R.string.raise))
+                            }
+                        }
                     }
-                }
-                item {
-                    Button(
-                        onClick = { onCheck(context) },
-                        modifier = Modifier.testTag("check_button")
-                    ) {
-                        Text(stringResource(R.string.check))
+                    if (GameState.thisPlayer.bet == maxBet) {
+                        item {
+                            Button(
+                                onClick = { onCheck(context) },
+                                modifier = Modifier.testTag("check_button")
+                            ) {
+                                Text(stringResource(R.string.check))
+                            }
+                        }
                     }
-                }
-                item {
-                    Button(
-                        onClick = { onFold(context) },
-                        modifier = Modifier.testTag("fold_button")
-                    ) {
-                        Text(stringResource(R.string.fold))
+                    item {
+                        Button(
+                            onClick = { onFold(context) },
+                            modifier = Modifier.testTag("fold_button")
+                        ) {
+                            Text(stringResource(R.string.fold))
+                        }
                     }
                 }
             }
