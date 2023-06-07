@@ -365,6 +365,7 @@ object GameState {
         require(player != null)
 
         val roundAmount = newAmount - previousRoundBet
+        PokerioLogger.debug("received $newAmount, changed to $roundAmount, bo $previousRoundBet")
 
         player.funds -= (roundAmount - player.bet)
         player.bet = roundAmount
