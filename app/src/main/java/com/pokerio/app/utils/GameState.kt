@@ -287,7 +287,7 @@ object GameState {
         val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
 
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        require(player != null)
+        requireNotNull(player)
 
         val newBet = getMaxBet()
 
@@ -323,7 +323,7 @@ object GameState {
         val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
 
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        require(player != null)
+        requireNotNull(player)
 
         newActionCallbacks.forEach { it.value(player) }
     }
@@ -355,7 +355,7 @@ object GameState {
         val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
 
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        require(player != null)
+        requireNotNull(player)
 
         player.funds -= (newAmount - player.bet)
         player.bet = newAmount
@@ -389,7 +389,7 @@ object GameState {
         val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
 
         val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-        require(player != null)
+        requireNotNull(player)
 
         player.folded = true
         winningsPool += player.bet
@@ -398,21 +398,26 @@ object GameState {
     }
 
     fun handleActionWon(winners: List<String>, amount: Int) {
+        winners.forEach { playerHash ->
+            val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
+
+            val player = if (isThisPlayer) {
+                thisPlayer
+            } else {
+                players.find {
+                    it.playerID == playerHash
+                }
+            }
+            requireNotNull(player)
+
+            player.funds += amount
+            onWon(player)
+        }
+
         winningsPool = 0
         players.forEach {
             it.bet = 0
             it.folded = false
-        }
-
-        winners.forEach { playerHash ->
-            println(playerHash)
-            val isThisPlayer = sha256(thisPlayer.playerID) == playerHash
-
-            val player = if (isThisPlayer) thisPlayer else players.find { it.playerID == playerHash }
-            require(player != null)
-
-            player.funds += amount
-            onWon(player)
         }
 
         newActionCallbacks.forEach { it.value(null) }
@@ -428,6 +433,8 @@ object GameState {
         gameCard1 = GameCard.none()
         gameCard2 = GameCard.none()
         winningsPool = 0
+        cards.fill(GameCard.none())
+        onWon = {}
 
         // Callbacks
         playerJoinedCallbacks.clear()
@@ -436,7 +443,6 @@ object GameState {
         newActionCallbacks.clear()
         // Not resetting nextId, because someone might be holding on to an old one and we don't
         // want then to remove new callbacks by mistake
-        cards.fill(GameCard.none())
 
         onGameReset()
     }
@@ -494,10 +500,10 @@ object GameState {
         }
 
         val removedPlayer = players.find { it.playerID == playerHash }
-        require(removedPlayer != null)
+        requireNotNull(removedPlayer)
 
         if (removedPlayer.isAdmin) {
-            require(newAdmin != null)
+            requireNotNull(newAdmin)
             val isThisPlayerNewAdmin = (newAdmin == sha256(thisPlayer.playerID))
 
             if (isThisPlayerNewAdmin) {
@@ -520,7 +526,6 @@ object GameState {
 
         val playersJsonArray = Json.decodeFromString<JsonArray>(playersString)
         playersJsonArray.forEach { playerWithTurnJson ->
-            println(playerWithTurnJson.toString())
             val playerWithTurn = Json.decodeFromString(PlayerWithTurnResponseSerializer, playerWithTurnJson.toString())
 
             if (sha256(thisPlayer.playerID) == playerWithTurn.playerHash) {

@@ -458,7 +458,7 @@ class GameStateTest {
         GameState.addPlayer(player2)
         GameState.addPlayer(player3)
 
-        val winners = listOf(player1.playerID)
+        val winners = listOf(GameState.sha256(player1.playerID))
 
         GameState.handleActionWon(winners, winAmount)
 
@@ -527,7 +527,7 @@ class GameStateTest {
         GameState.addPlayer(player2)
         GameState.addPlayer(player3)
 
-        val winners = listOf(player1.playerID, player2.playerID, player3.playerID)
+        val winners = listOf(GameState.sha256(player1.playerID), player2.playerID, player3.playerID)
 
         GameState.handleActionWon(winners, winAmount)
 
