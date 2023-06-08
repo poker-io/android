@@ -3,18 +3,25 @@ package com.pokerio.app.screens
 import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,11 +38,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -51,6 +60,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.pokerio.app.BuildConfig
 import com.pokerio.app.R
 import com.pokerio.app.components.ViewOnlySlider
 import com.pokerio.app.utils.GameState
@@ -66,6 +76,10 @@ const val DIFF_MAX = 1000
 const val DIFF_MID = 100
 const val DIFF_MIN = 10
 
+const val APP_ICON_SCALE = 1.5F
+val APP_ICON_SIZE = 100.dp
+
+val CONTENT_PADDING = 10.dp
 val SECTION_TITLE_FONT_SIZE = 24.sp
 val SECTION_TITLE_FONT_WEIGHT = FontWeight.Bold
 val SECTION_TITLE_MODIFIER = Modifier.padding(10.dp)
@@ -127,7 +141,9 @@ fun SettingsScreen(
 
     Column {
         TopBar(onNavigateBack)
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(CONTENT_PADDING)) {
+            AppLogo()
+            Spacer(modifier = SPACER_MODIFIER)
             NicknameEditor()
             Spacer(modifier = SPACER_MODIFIER)
             StartingFundsSelector(startingFunds, onStartingFundsUpdate)
@@ -162,6 +178,47 @@ private fun TopBar(
             }
         }
     )
+}
+
+@Composable
+private fun AppLogo() {
+    if (GameState.isInGame()) {
+        return
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(top = CONTENT_PADDING)
+            .fillMaxWidth()
+            .testTag("app_logo_section"),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ElevatedCard(
+            shape = CircleShape,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color.White
+            ),
+            modifier = Modifier.size(APP_ICON_SIZE)
+        ) {
+            Box(modifier = Modifier.scale(APP_ICON_SCALE)) {
+                Image(
+                    painterResource(R.drawable.ic_launcher_foreground),
+                    stringResource(R.string.contentDescription_appLogo),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+        Text(
+            text = stringResource(id = R.string.app_name),
+            fontSize = SECTION_TITLE_FONT_SIZE,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = BuildConfig.VERSION_NAME,
+            color = Color.Gray,
+            fontWeight = FontWeight.Light
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -316,7 +373,6 @@ private fun Credits() {
     }
 }
 
-@Preview
 @Composable
 fun Selector(
     minValue: Float = 0f,

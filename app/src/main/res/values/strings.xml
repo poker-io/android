@@ -57,6 +57,7 @@
     <string name="contentDescription_navigate_back">Navigate back</string>
     <string name="contentDescription_admin">Player is an admin</string>
     <string name="contentDescription_kickUser">Kick user from the game</string>
+    <string name="contentDescription_appLogo">App logo</string>
 
     <!-- Internal -->
     <string name="shared_preferences_file">com.pokerio.app.SHARED_PREFERENCES</string>
