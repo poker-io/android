@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CardDefaults
@@ -141,7 +143,11 @@ fun SettingsScreen(
 
     Column {
         TopBar(onNavigateBack)
-        Column(modifier = Modifier.padding(CONTENT_PADDING)) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(CONTENT_PADDING)
+        ) {
             AppLogo()
             Spacer(modifier = SPACER_MODIFIER)
             NicknameEditor()
