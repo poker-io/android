@@ -21,7 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -53,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.pokerio.app.R
+import com.pokerio.app.components.ViewOnlySlider
 import com.pokerio.app.utils.GameState
 import com.pokerio.app.utils.IntUnitProvider
 import com.pokerio.app.utils.Player
@@ -389,7 +389,7 @@ fun Selector(
                 }
             }
         }
-        Slider(
+        ViewOnlySlider(
             value = (currentValue - minValue) / (maxValue - minValue),
             onValueChange = { updateValue(minValue + it * (maxValue - minValue)) },
             modifier = Modifier.testTag("selector_slider")
