@@ -338,62 +338,61 @@ fun Selector(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(
-                    onClick = { updateValue(currentValue - DIFF_MAX) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "-$DIFF_MAX")
-                }
-                OutlinedButton(
-                    onClick = { updateValue(currentValue - DIFF_MID) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "-$DIFF_MID")
-                }
-                OutlinedButton(
-                    onClick = { updateValue(currentValue - DIFF_MIN) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("slider-10")
-                ) {
-                    Text(text = "-$DIFF_MIN")
-                }
-            }
+            SliderButtonColumn(
+                currentValue = currentValue,
+                updateValue = { updateValue(it) },
+                sign = '-',
+                operand = Float::minus
+            )
             Text(
                 text = currentValue.toInt().toString(),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.testTag("slider_text")
             )
-            Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                OutlinedButton(
-                    onClick = { updateValue(currentValue + DIFF_MAX) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "+$DIFF_MAX")
-                }
-                OutlinedButton(
-                    onClick = { updateValue(currentValue + DIFF_MID) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "+$DIFF_MID")
-                }
-                OutlinedButton(
-                    onClick = { updateValue(currentValue + DIFF_MIN) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("slider+10")
-                ) {
-                    Text(text = "+$DIFF_MIN")
-                }
-            }
+            SliderButtonColumn(
+                currentValue = currentValue,
+                updateValue = { updateValue(it) },
+                sign = '+',
+                operand = Float::plus
+            )
         }
         ViewOnlySlider(
             value = (currentValue - minValue) / (maxValue - minValue),
             onValueChange = { updateValue(minValue + it * (maxValue - minValue)) },
             modifier = Modifier.testTag("selector_slider")
         )
+    }
+}
+
+@Composable
+private fun SliderButtonColumn(
+    currentValue: Float,
+    updateValue: (Float) -> Unit,
+    sign: Char,
+    operand: (Float, Int) -> Float
+) {
+    Column(modifier = Modifier.width(IntrinsicSize.Min)) {
+        OutlinedButton(
+            onClick = { updateValue(operand(currentValue, DIFF_MAX)) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "$sign$DIFF_MAX")
+        }
+        OutlinedButton(
+            onClick = { updateValue(operand(currentValue, DIFF_MID)) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "$sign$DIFF_MID")
+        }
+        OutlinedButton(
+            onClick = { updateValue(operand(currentValue, DIFF_MIN)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("slider${sign}10")
+        ) {
+            Text(text = "$sign$DIFF_MIN")
+        }
     }
 }
 
