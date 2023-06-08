@@ -11,6 +11,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
+import androidx.lifecycle.Lifecycle
 import com.pokerio.app.screens.Selector
 import com.pokerio.app.screens.SettingsScreen
 import com.pokerio.app.utils.GameState
@@ -50,8 +51,8 @@ class SettingsInstrumentedTest {
         textField.performTextReplacement(replaceNickname)
         textField.assert(hasText(replaceNickname))
 
-        val backButton = androidTestRule.onNodeWithTag("settings_back")
-        backButton.performClick()
+        // This simulates exiting the activity
+        androidTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
 
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
@@ -87,8 +88,8 @@ class SettingsInstrumentedTest {
         textField.performTextReplacement(replaceNickname)
         textField.assert(hasText(replaceNickname))
 
-        val backButton = androidTestRule.onNodeWithTag("settings_back")
-        backButton.performClick()
+        // This simulates exiting the activity
+        androidTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
 
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
@@ -124,8 +125,8 @@ class SettingsInstrumentedTest {
         textField.performTextReplacement(replaceNickname)
         textField.assert(hasText(replaceNickname))
 
-        val backButton = androidTestRule.onNodeWithTag("settings_back")
-        backButton.performClick()
+        // This simulates exiting the activity
+        androidTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
 
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
@@ -223,8 +224,8 @@ class SettingsInstrumentedTest {
         textField.assertIsDisplayed()
         textField.performTextReplacement(testNickname)
 
-        val backButton = androidTestRule.onNodeWithTag("settings_back")
-        backButton.performClick()
+        // This simulates exiting the activity
+        androidTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
 
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
@@ -253,8 +254,8 @@ class SettingsInstrumentedTest {
         textField.assertIsDisplayed()
         textField.performTextReplacement(testNickname)
 
-        val backButton = androidTestRule.onNodeWithTag("settings_back")
-        backButton.performClick()
+        // This simulates exiting the activity
+        androidTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
 
         val newNickname = sharedPreferences.getString(
             context.getString(R.string.sharedPreferences_nickname),
