@@ -25,6 +25,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -64,38 +66,23 @@ const val DIFF_MAX = 1000
 const val DIFF_MID = 100
 const val DIFF_MIN = 10
 
-@OptIn(ExperimentalMaterial3Api::class)
+val SECTION_TITLE_FONT_SIZE = 24.sp
+val SECTION_TITLE_FONT_WEIGHT = FontWeight.Bold
+val SECTION_TITLE_MODIFIER = Modifier.padding(10.dp)
+val SPACER_MODIFIER = Modifier.padding(10.dp)
+
 @Preview
 @Composable
 fun SettingsScreen(
     @PreviewParameter(UnitUnitProvider::class) navigateBack: () -> Unit
 ) {
-    val sectionTitleFontSize = 24.sp
-    val sectionTitleFontWeight = FontWeight.Bold
-    val sectionTitleModifier = Modifier.padding(10.dp)
-    val spacerModifier = Modifier.padding(10.dp)
-
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences(
-        stringResource(id = R.string.shared_preferences_file),
-        Context.MODE_PRIVATE
-    )
 
-    val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
-    var nickname by remember { mutableStateOf(getInitialNickname(context)) }
-    var nicknameCorrect by remember { mutableStateOf(true) }
-    val onNicknameUpdate = { newValue: String ->
-        nickname = newValue
-        nicknameCorrect = Player.validateNickname(nickname)
-    }
-
-    val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
     var smallBlind by remember { mutableStateOf(getInitialSmallBlind(context)) }
     val onSmallBlindUpdate = { newValue: Int ->
         smallBlind = newValue
     }
 
-    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
     var startingFunds by remember { mutableStateOf(getInitialStartingFunds(context)) }
     val onStartingFundsUpdate = { newValue: Int ->
         startingFunds = newValue
@@ -105,18 +92,6 @@ fun SettingsScreen(
     }
 
     val onNavigateBack = {
-        // Update shared preferences values on exit
-        nickname = Player.fixNickname(nickname)
-
-        with(sharedPreferences.edit()) {
-            if (nicknameCorrect) {
-                putString(nicknameSharedKey, nickname)
-            }
-            putInt(startingFundsSharedKey, startingFunds)
-            putInt(smallBlindSharedKey, smallBlind)
-            apply()
-        }
-
         // Unregister callback when we leave the view
         val onError = {
             ContextCompat.getMainExecutor(context).execute {
@@ -151,76 +126,167 @@ fun SettingsScreen(
     }
 
     Column {
-        CenterAlignedTopAppBar(
-            title = { Text(stringResource(id = R.string.settings)) },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            navigationIcon = {
-                IconButton(
-                    onClick = { onNavigateBack() },
-                    modifier = Modifier.testTag("settings_back")
-                ) {
-                    Icon(
-                        Icons.Rounded.ArrowBack,
-                        contentDescription = stringResource(
-                            id = R.string.contentDescription_navigate_back
-                        )
-                    )
-                }
-            }
-        )
+        TopBar(onNavigateBack)
         Column(modifier = Modifier.padding(10.dp)) {
-            if (!GameState.isInGame()) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("settings_nickname"),
-                    value = nickname,
-                    onValueChange = { onNicknameUpdate(it) },
-                    label = { Text(stringResource(id = R.string.nickname)) },
-                    isError = !nicknameCorrect,
-                    supportingText = {
-                        if (!nicknameCorrect) {
-                            Text(stringResource(id = R.string.nickname_error))
-                        }
-                    },
-                    singleLine = true
-                )
-            }
-            Spacer(modifier = spacerModifier)
-            Text(
-                text = stringResource(id = R.string.starting_funds),
-                fontSize = sectionTitleFontSize,
-                fontWeight = sectionTitleFontWeight,
-                modifier = sectionTitleModifier
-            )
-            Selector(
-                onValueSelected = { onStartingFundsUpdate(it) },
-                minValue = 100f,
-                maxValue = 10000f,
-                initialValue = startingFunds.toFloat()
-            )
-            Spacer(modifier = spacerModifier)
-            Text(
-                text = stringResource(id = R.string.small_blind),
-                fontSize = sectionTitleFontSize,
-                fontWeight = sectionTitleFontWeight,
-                modifier = sectionTitleModifier
-            )
-            Selector(
-                onValueSelected = { onSmallBlindUpdate(it) },
-                minValue = 10f,
-                maxValue = startingFunds * MAX_SMALL_BLIND_MODIFIER,
-                initialValue = smallBlind.toFloat()
-            )
+            NicknameEditor()
+            Spacer(modifier = SPACER_MODIFIER)
+            StartingFundsSelector(startingFunds, onStartingFundsUpdate)
+            Spacer(modifier = SPACER_MODIFIER)
+            SmallBlindSelector(smallBlind, startingFunds, onSmallBlindUpdate)
+            Credits()
         }
-        Credits()
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Credits() {
+private fun TopBar(
+    onNavigateBack: () -> Unit
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(stringResource(id = R.string.settings)) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        navigationIcon = {
+            IconButton(
+                onClick = { onNavigateBack() },
+                modifier = Modifier.testTag("settings_back")
+            ) {
+                Icon(
+                    Icons.Rounded.ArrowBack,
+                    contentDescription = stringResource(
+                        id = R.string.contentDescription_navigate_back
+                    )
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NicknameEditor() {
+    if (GameState.isInGame()) {
+        return
+    }
+
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences(
+        stringResource(id = R.string.shared_preferences_file),
+        Context.MODE_PRIVATE
+    )
+
+    val nicknameSharedKey = stringResource(id = R.string.sharedPreferences_nickname)
+    var nickname by remember { mutableStateOf(getInitialNickname(context)) }
+    var nicknameCorrect by remember { mutableStateOf(true) }
+    val onNicknameUpdate = { newValue: String ->
+        nickname = newValue
+        nicknameCorrect = Player.validateNickname(nickname)
+    }
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        onDispose {
+            nickname = Player.fixNickname(nickname)
+
+            with(sharedPreferences.edit()) {
+                if (nicknameCorrect) {
+                    putString(nicknameSharedKey, nickname)
+                }
+                apply()
+            }
+        }
+    }
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("settings_nickname"),
+        value = nickname,
+        onValueChange = { onNicknameUpdate(it) },
+        label = { Text(stringResource(id = R.string.nickname)) },
+        isError = !nicknameCorrect,
+        supportingText = {
+            if (!nicknameCorrect) {
+                Text(stringResource(id = R.string.nickname_error))
+            }
+        },
+        singleLine = true
+    )
+}
+
+@Composable
+private fun StartingFundsSelector(
+    startingFunds: Int,
+    onStartingFundsUpdate: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences(
+        stringResource(id = R.string.shared_preferences_file),
+        Context.MODE_PRIVATE
+    )
+
+    val startingFundsSharedKey = stringResource(id = R.string.sharedPreferences_starting_funds)
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        onDispose {
+            with(sharedPreferences.edit()) {
+                putInt(startingFundsSharedKey, startingFunds)
+                apply()
+            }
+        }
+    }
+    Text(
+        text = stringResource(id = R.string.starting_funds),
+        fontSize = SECTION_TITLE_FONT_SIZE,
+        fontWeight = SECTION_TITLE_FONT_WEIGHT,
+        modifier = SECTION_TITLE_MODIFIER
+    )
+    Selector(
+        onValueSelected = { onStartingFundsUpdate(it) },
+        minValue = 100f,
+        maxValue = 10000f,
+        initialValue = startingFunds.toFloat()
+    )
+}
+
+@Composable
+private fun SmallBlindSelector(
+    smallBlind: Int,
+    startingFunds: Int,
+    onSmallBlindUpdate: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences(
+        stringResource(id = R.string.shared_preferences_file),
+        Context.MODE_PRIVATE
+    )
+
+    val smallBlindSharedKey = stringResource(id = R.string.sharedPreferences_small_blind)
+
+    DisposableEffect(LocalLifecycleOwner.current) {
+        onDispose {
+            with(sharedPreferences.edit()) {
+                putInt(smallBlindSharedKey, smallBlind)
+                apply()
+            }
+        }
+    }
+    Text(
+        text = stringResource(id = R.string.small_blind),
+        fontSize = SECTION_TITLE_FONT_SIZE,
+        fontWeight = SECTION_TITLE_FONT_WEIGHT,
+        modifier = SECTION_TITLE_MODIFIER
+    )
+    Selector(
+        onValueSelected = { onSmallBlindUpdate(it) },
+        minValue = 10f,
+        maxValue = startingFunds * MAX_SMALL_BLIND_MODIFIER,
+        initialValue = smallBlind.toFloat()
+    )
+}
+
+@Composable
+private fun Credits() {
     if (GameState.isInGame()) {
         return
     }
@@ -248,20 +314,6 @@ fun Credits() {
             }
         )
     }
-}
-
-fun buildLink(
-    link: String,
-    color: Color,
-    sp: TextUnit = 10.sp
-): AnnotatedString = buildAnnotatedString {
-    pushStringAnnotation(tag = link, annotation = link)
-    withStyle(
-        style = SpanStyle(color = color, textDecoration = TextDecoration.Underline, fontSize = sp)
-    ) {
-        append(link)
-    }
-    pop()
 }
 
 @Preview
@@ -343,6 +395,20 @@ fun Selector(
             modifier = Modifier.testTag("selector_slider")
         )
     }
+}
+
+private fun buildLink(
+    link: String,
+    color: Color,
+    sp: TextUnit = 10.sp
+): AnnotatedString = buildAnnotatedString {
+    pushStringAnnotation(tag = link, annotation = link)
+    withStyle(
+        style = SpanStyle(color = color, textDecoration = TextDecoration.Underline, fontSize = sp)
+    ) {
+        append(link)
+    }
+    pop()
 }
 
 private fun getInitialNickname(context: Context): String {
