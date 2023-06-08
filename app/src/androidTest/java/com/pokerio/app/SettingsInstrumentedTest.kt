@@ -263,4 +263,32 @@ class SettingsInstrumentedTest {
         )
         assert(newNickname == correctNickname)
     }
+
+    @Test
+    fun testAppLogoAndVersion() {
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val buildVersionName = BuildConfig.VERSION_NAME
+
+        val versionNameView = androidTestRule.onNodeWithTag("app_version_name")
+        versionNameView.assertExists()
+        versionNameView.assertIsDisplayed()
+        versionNameView.assert(hasText(buildVersionName))
+    }
+
+    @Test
+    fun testAppLogoInGame() {
+        GameState.gameID = "123897"
+
+        androidTestRule.activity.setContent {
+            SettingsScreen(navigateBack = {})
+        }
+
+        val versionNameView = androidTestRule.onNodeWithTag("app_version_name")
+        versionNameView.assertDoesNotExist()
+
+        GameState.resetGameState()
+    }
 }

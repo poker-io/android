@@ -216,7 +216,8 @@ private fun AppLogo() {
         Text(
             text = BuildConfig.VERSION_NAME,
             color = Color.Gray,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
+            modifier = Modifier.testTag("app_version_name")
         )
     }
 }
