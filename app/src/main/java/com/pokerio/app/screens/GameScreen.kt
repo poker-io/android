@@ -76,7 +76,8 @@ fun GameScreen() {
 
         // Hide system UI
         systemUiController.setSystemUiVisible(false)
-        systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        systemUiController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         // Setup callbacks
         val newActionCallbackId =
@@ -91,7 +92,6 @@ fun GameScreen() {
             activity.requestedOrientation = originalOrientation
 
             systemUiController.setSystemUiVisible(true)
-            systemUiController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
 
             GameState.removeOnNewActionCallback(newActionCallbackId)
 
@@ -350,7 +350,5 @@ private fun onWon(context: Context, player: Player) {
 }
 
 private fun SystemUiController.setSystemUiVisible(value: Boolean) {
-    isNavigationBarVisible = value
     isSystemBarsVisible = value
-    isStatusBarVisible = value
 }

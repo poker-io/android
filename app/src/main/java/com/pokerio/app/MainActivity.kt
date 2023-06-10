@@ -6,15 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.pokerio.app.components.setDefaultBarsBehaviour
 import com.pokerio.app.screens.GameScreen
 import com.pokerio.app.screens.HomeScreen
 import com.pokerio.app.screens.InitialSetupScreen
@@ -27,7 +26,6 @@ import com.pokerio.app.utils.ThemeUtils
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             AppTheme {
@@ -39,14 +37,10 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun MainActivityComposable() {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(
-        color = Color.Transparent,
-        darkIcons = true
-    )
-
     val navController = rememberNavController()
     val context = LocalContext.current
+
+    setDefaultBarsBehaviour(LocalView.current)
 
     val navigateToSettings = {
         ContextCompat.getMainExecutor(context).execute {
