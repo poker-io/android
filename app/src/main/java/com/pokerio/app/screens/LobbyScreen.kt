@@ -130,12 +130,11 @@ fun TopGameSettings(
 fun PlayerList(
     numberOfPlayers: Int
 ) {
-    val scrollState = rememberScrollState(0)
     val checkedPlayerCount = minOf(numberOfPlayers, GameState.players.size)
 
     Column(
         modifier = Modifier
-            .verticalScroll(scrollState, true)
+            .verticalScroll(rememberScrollState())
             .padding(vertical = 12.dp)
             .testTag("player_list")
     ) {
